@@ -1,0 +1,100 @@
+﻿using System;
+using Microsoft.CSharp;
+using System.CodeDom.Compiler;
+using System.CodeDom;
+using System.Reflection;
+
+namespace CodeDome
+{
+	class MainClass
+	{
+		static CodeTypeDeclaration CreateFolder (CodeNamespace contentNs, string folderName)
+		{
+			var textures = new CodeTypeDeclaration (folderName);
+			contentNs.Types.Add (textures);
+			return textures;
+		}
+
+		static void SetVersionNumber (CodeCompileUnit contentUnit, string value)
+		{
+			var attributeType = new CodeTypeReference (typeof(AssemblyVersionAttribute));
+			var versionNumber = new CodeAttributeDeclaration (attributeType, new CodeAttributeArgument (new CodePrimitiveExpression (value)));
+			contentUnit.AssemblyCustomAttributes.Add (versionNumber);
+		}
+
+		static void AddFile (CodeTypeDeclaration folder, string alias)
+		{
+			var localVariable = "m" + alias;
+			var field1 = new CodeMemberField (typeof(string), localVariable);
+			folder.Members.Add (field1);
+
+			CodeMemberProperty property1 = new CodeMemberProperty ();
+			property1.Name = alias;
+			property1.Type = new CodeTypeReference ("System.String");
+			property1.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+			property1.HasGet = true;
+			property1.HasSet = true;
+			property1.GetStatements.Add (new CodeMethodReturnStatement (new CodeFieldReferenceExpression (new CodeThisReferenceExpression (), localVariable)));
+			property1.SetStatements.Add (new CodeAssignStatement (new CodeFieldReferenceExpression (new CodeThisReferenceExpression (), localVariable), new CodePropertySetValueReferenceExpression ()));
+			folder.Members.Add (property1);
+		}
+
+		public static void Main (string[] args)
+		{
+			CSharpCodeProvider provider = new CSharpCodeProvider();
+
+			// Build the parameters for source compilation.
+			CompilerParameters cp = new CompilerParameters();
+
+			// Add an assembly reference.
+			cp.ReferencedAssemblies.Add( "System.dll" );
+
+			// Generate an executable instead of
+			// a class library.
+			cp.GenerateExecutable = false;
+
+			// Set the assembly file name to generate.
+			cp.OutputAssembly = "BirdNest.Content.dll";
+
+			// Save the assembly as a physical file.
+			cp.GenerateInMemory = false;
+
+			var contentUnit = new CodeCompileUnit ();
+
+			SetVersionNumber (contentUnit, "2.0.0.3");
+
+			var contentNs  = new CodeNamespace("BirdNest.Content");
+			contentUnit.Namespaces.Add (contentNs);
+
+			var materials = CreateFolder (contentNs, "Materials");
+
+			AddFile (materials, "Default");
+			AddFile (materials, "Shiny");
+
+			var textures = CreateFolder (contentNs, "Textures");
+			AddFile (textures, "Checkerboard");
+			AddFile (textures, "Purple");
+
+			CreateFolder (contentNs, "Models");
+			CreateFolder (contentNs, "Fonts");
+
+			// Invoke compilation.
+			CompilerResults cr = provider.CompileAssemblyFromDom(cp, contentUnit);
+
+			if (cr.Errors.Count > 0)
+			{
+				Console.WriteLine("Source built into {0} unsuccessfully.", cr.PathToAssembly);				
+				// Display compilation errors.
+				foreach (CompilerError ce in cr.Errors)
+				{
+					Console.WriteLine("  {0}", ce.ToString());
+					Console.WriteLine();
+				}
+			}
+			else
+			{
+				Console.WriteLine("Source built into {0} successfully.", cr.PathToAssembly);
+			}
+		}
+	}
+}

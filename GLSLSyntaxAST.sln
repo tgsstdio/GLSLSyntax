@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irony", "Irony\Irony.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextEditor", "TextEditor\TextEditor.csproj", "{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLSLSyntaxAST.UnitTests", "GLSLSyntaxAST.UnitTests\GLSLSyntaxAST.UnitTests.csproj", "{6C4D0A55-F5F0-4F0D-8664-00A89D4A2457}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLSLSyntaxAST.CommandLine", "GLSLSyntaxAST.CommandLine\GLSLSyntaxAST.CommandLine.csproj", "{8936293E-A966-4521-A4BE-4015601F2F2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLSLSyntaxAST.CodeDom", "GLSLSyntaxAST.CodeDom\GLSLSyntaxAST.CodeDom.csproj", "{D5B25375-C28B-4544-A331-8BE9E6971719}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -17,16 +23,25 @@ Global
 		{0A832F99-F59C-4D75-B5CC-9CD3317060A6}.Debug|x86.Build.0 = Debug|x86
 		{0A832F99-F59C-4D75-B5CC-9CD3317060A6}.Release|x86.ActiveCfg = Release|x86
 		{0A832F99-F59C-4D75-B5CC-9CD3317060A6}.Release|x86.Build.0 = Release|x86
+		{6C4D0A55-F5F0-4F0D-8664-00A89D4A2457}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6C4D0A55-F5F0-4F0D-8664-00A89D4A2457}.Debug|x86.Build.0 = Debug|Any CPU
+		{6C4D0A55-F5F0-4F0D-8664-00A89D4A2457}.Release|x86.ActiveCfg = Release|Any CPU
+		{6C4D0A55-F5F0-4F0D-8664-00A89D4A2457}.Release|x86.Build.0 = Release|Any CPU
+		{8936293E-A966-4521-A4BE-4015601F2F2F}.Debug|x86.ActiveCfg = Debug|x86
+		{8936293E-A966-4521-A4BE-4015601F2F2F}.Debug|x86.Build.0 = Debug|x86
+		{8936293E-A966-4521-A4BE-4015601F2F2F}.Release|x86.ActiveCfg = Release|x86
+		{8936293E-A966-4521-A4BE-4015601F2F2F}.Release|x86.Build.0 = Release|x86
 		{B23CADAF-63EE-4EEB-9BD8-FC452BFC5D5C}.Debug|x86.ActiveCfg = Debug|x86
 		{B23CADAF-63EE-4EEB-9BD8-FC452BFC5D5C}.Debug|x86.Build.0 = Debug|x86
 		{B23CADAF-63EE-4EEB-9BD8-FC452BFC5D5C}.Release|x86.ActiveCfg = Release|x86
 		{B23CADAF-63EE-4EEB-9BD8-FC452BFC5D5C}.Release|x86.Build.0 = Release|x86
+		{D5B25375-C28B-4544-A331-8BE9E6971719}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5B25375-C28B-4544-A331-8BE9E6971719}.Debug|x86.Build.0 = Debug|Any CPU
+		{D5B25375-C28B-4544-A331-8BE9E6971719}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5B25375-C28B-4544-A331-8BE9E6971719}.Release|x86.Build.0 = Release|Any CPU
 		{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}.Debug|x86.ActiveCfg = Debug|x86
 		{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}.Debug|x86.Build.0 = Debug|x86
 		{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}.Release|x86.ActiveCfg = Release|x86
 		{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}.Release|x86.Build.0 = Release|x86
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = TextEditor\TextEditor.csproj
 	EndGlobalSection
 EndGlobal

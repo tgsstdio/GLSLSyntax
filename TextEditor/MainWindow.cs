@@ -18,10 +18,10 @@ public partial class MainWindow: Gtk.Window
 		mTextField.PasteClipboard += DoPaste;
 		mTextField.CutClipboard += DoCut;
 
-		GLSLGrammar lang = new GLSLGrammar ();
-		var compiler = new Irony.Parsing.Parser(lang);
-		var tree = compiler.Parse ("void main(void) { float v = vec3(1,1,1); }");
-		CheckNodes (tree.Root, 0);
+		//GLSLGrammar lang = new GLSLGrammar ();
+		//var compiler = new Irony.Parsing.Parser(lang);
+		//var tree = compiler.Parse ("void main(void) { float v = vec3(1,1,1); }");
+		//CheckNodes (tree.Root, 0);
 	}
 
 	public void CheckNodes(ParseTreeNode node, int level)

@@ -1,0 +1,24 @@
+﻿translation_unit
+  external_declaration
+    declaration
+      block_structure
+        type_qualifier
+          layout_qualifier
+            layout (Keyword)
+            layout_qualifier_id_list
+              std140 (IDENTIFIER)
+          uniform (Keyword)
+        UBOData (IDENTIFIER)
+        struct_declaration_list
+          struct_declaration
+            vec3 (Keyword)
+            struct_declarator
+              firstValue (IDENTIFIER)
+          struct_declaration
+            float (Keyword)
+            struct_declarator
+              thirdValue (IDENTIFIER)
+          struct_declaration
+            vec4 (Keyword)
+            struct_declarator
+              secondValue (IDENTIFIER)

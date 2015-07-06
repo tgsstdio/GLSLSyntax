@@ -15,7 +15,7 @@ namespace GLSLSyntaxAST
 			string LEFT_BRACE = "{";
 			string RIGHT_BRACE = "}";
 			string SEMICOLON = ";";
-			string COMMA = ",";
+			var COMMA = ToTerm(",", "COMMA");
 			var QUESTION = ToTerm ("?", "QUESTION");
 			var COLON = ToTerm (":", "COLON");
 			var OR_OP = ToTerm ("||", "OR_OP");
@@ -441,10 +441,14 @@ namespace GLSLSyntaxAST
 			var invariant_qualifier = new NonTerminal ("invariant_qualifier"); // CHECKED
 			var precise_qualifier = new NonTerminal ("precise_qualifier"); // CHECKED
 
+			var array_empty_bracket = new NonTerminal ("array_empty_bracket");
+			var constant_inside_bracket = new NonTerminal ("constant_inside_bracket");
+
 			// Place Rules Here
 			this.Root = translation_unit;
 
-			translation_unit.Rule = external_declaration | translation_unit + external_declaration;
+			//translation_unit.Rule = external_declaration | translation_unit + external_declaration;
+			translation_unit.Rule = MakePlusRule(translation_unit, external_declaration);
 
 			external_declaration.Rule =  function_definition | declaration;
 
@@ -460,6 +464,8 @@ namespace GLSLSyntaxAST
 
 			identifier_list.Rule = COMMA + IDENTIFIER
 				| identifier_list + COMMA + IDENTIFIER;
+
+//			identifier_list.Rule = MakePlusRule (identifier_list, COMMA, IDENTIFIER);
 
 			precision_qualifier.Rule = HIGH_PRECISION 
 							| MEDIUM_PRECISION 
@@ -491,6 +497,8 @@ namespace GLSLSyntaxAST
 			function_header_with_parameters.Rule = function_header + parameter_declaration
 				| function_header_with_parameters + COMMA + parameter_declaration;
 
+//			function_header_with_parameters.Rule = MakePlusRule (function_header_with_parameters, COMMA, parameter_declaration);
+
 			parameter_declaration.Rule = type_qualifier + parameter_declarator 	
 				| parameter_declarator
 				| type_qualifier + parameter_type_specifier
@@ -504,6 +512,7 @@ namespace GLSLSyntaxAST
 			compound_statement_no_new_scope.Rule = LEFT_BRACE + RIGHT_BRACE | LEFT_BRACE + statement_list + RIGHT_BRACE;
 
 			statement_list.Rule = statement | statement_list + statement;
+//			statement_list.Rule = MakePlusRule(statement_list, statement);
 
 			statement.Rule = compound_statement | simple_statement;
 
@@ -521,7 +530,8 @@ namespace GLSLSyntaxAST
 
 			expression_statement.Rule = SEMICOLON | expression + SEMICOLON;
 
-			expression.Rule = assignment_expression | expression  + COMMA + assignment_expression;				
+			expression.Rule = assignment_expression | expression  + COMMA + assignment_expression;
+			//expression.Rule = MakePlusRule(expression, COMMA, assignment_expression);
 
 			assignment_expression.Rule = conditional_expression	| unary_expression  + assignment_operator + assignment_expression;
 
@@ -538,6 +548,7 @@ namespace GLSLSyntaxAST
 			exclusive_or_expression.Rule = and_expression | exclusive_or_expression + CARET + and_expression;
 
 			and_expression.Rule = equality_expression | and_expression + AMPERSAND +  equality_expression;
+			//and_expression = MakePlusRule(and_expression, AMPERSAND, equality_expression);
 
 			equality_expression.Rule = relational_expression
 						| equality_expression + EQ_OP + relational_expression
@@ -550,8 +561,12 @@ namespace GLSLSyntaxAST
 				| relational_expression + GE_OP + shift_expression;
 
 			shift_expression.Rule =  additive_expression 
-						| shift_expression + LEFT_OP + additive_expression 
+					| shift_expression + LEFT_OP + additive_expression 
 						| shift_expression + RIGHT_OP + additive_expression;
+
+		//	shift_expression.Rule = additive_expression
+		//		| MakePlusRule (shift_expression, LEFT_OP, additive_expression)
+	//			| MakePlusRule (shift_expression, RIGHT_OP, additive_expression);
 
 			additive_expression.Rule = multiplicative_expression 
 						| additive_expression + PLUS + multiplicative_expression 
@@ -583,8 +598,10 @@ namespace GLSLSyntaxAST
 			function_call_generic.Rule = function_call_header_with_parameters + RIGHT_PAREN
 				| function_call_header_no_parameters + RIGHT_PAREN;
 
+//			function_call_header_with_parameters.Rule = function_call_header + assignment_expression
+//				| function_call_header_with_parameters + COMMA + assignment_expression;
 			function_call_header_with_parameters.Rule = function_call_header + assignment_expression
-				| function_call_header_with_parameters + COMMA + assignment_expression;
+				| MakePlusRule(function_call_header_with_parameters, COMMA, assignment_expression);
 
 			function_call_header.Rule = function_identifier + LEFT_PAREN;
 
@@ -669,15 +686,25 @@ namespace GLSLSyntaxAST
 			type_specifier.Rule = type_specifier_nonarray
 				| type_specifier_nonarray + array_specifier;
 
-			array_specifier.Rule = LEFT_BRACKET + RIGHT_BRACKET
-				| LEFT_BRACKET + constant_expression + RIGHT_BRACKET
-				| array_specifier + LEFT_BRACKET + RIGHT_BRACKET
-				| array_specifier + LEFT_BRACKET + constant_expression + RIGHT_BRACKET;
+//			array_specifier.Rule = LEFT_BRACKET + RIGHT_BRACKET
+//				| LEFT_BRACKET + constant_expression + RIGHT_BRACKET
+//				| array_specifier + LEFT_BRACKET + RIGHT_BRACKET
+//				| array_specifier + LEFT_BRACKET + constant_expression + RIGHT_BRACKET;
+
+			array_specifier.Rule = 
+				  MakePlusRule (array_specifier, array_empty_bracket)
+				| MakePlusRule (array_specifier, constant_inside_bracket);
+
+			// two additional rules
+			array_empty_bracket.Rule = LEFT_BRACKET + RIGHT_BRACKET;
+			constant_inside_bracket.Rule = LEFT_BRACKET + constant_expression + RIGHT_BRACKET;
 
 			constant_expression.Rule = conditional_expression;
 
-			type_qualifier.Rule = single_type_qualifier
-				| type_qualifier + single_type_qualifier;
+//			type_qualifier.Rule = single_type_qualifier
+//				| type_qualifier + single_type_qualifier;
+
+			type_qualifier.Rule = MakePlusRule(type_qualifier, single_type_qualifier);
 
 			single_type_qualifier.Rule = storage_qualifier
 					| layout_qualifier
@@ -688,8 +715,10 @@ namespace GLSLSyntaxAST
 
 			layout_qualifier.Rule = LAYOUT + LEFT_PAREN + layout_qualifier_id_list + RIGHT_PAREN;
 
-			layout_qualifier_id_list.Rule = layout_qualifier_id
-				| layout_qualifier_id_list + COMMA + layout_qualifier_id;
+//			layout_qualifier_id_list.Rule =  layout_qualifier_id
+//				| layout_qualifier_id_list + COMMA + layout_qualifier_id;
+
+			layout_qualifier_id_list.Rule = MakePlusRule (layout_qualifier_id_list, COMMA, layout_qualifier_id);
 
 			layout_qualifier_id.Rule = IDENTIFIER 
 					| IDENTIFIER + EQUAL  + constant_expression
@@ -727,9 +756,9 @@ namespace GLSLSyntaxAST
 					| type_name_list + COMMA + TYPE_NAME;
 
 			type_specifier_nonarray.Rule = VOID_STM 
-				| FLOAT_TKN 
-				| DOUBLE_TKN 
-				| INT_TKN 
+				| ImplyPrecedenceHere(2) + FLOAT_TKN 
+				| ImplyPrecedenceHere(3) + DOUBLE_TKN 
+				| ImplyPrecedenceHere(1) + INT_TKN 
 				| UINT_TKN 
 				| BOOL_TKN 
 				| VEC2 
@@ -852,14 +881,18 @@ namespace GLSLSyntaxAST
 			struct_specifier.Rule = STRUCT_STM + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE
 				| STRUCT_STM + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
 
-			struct_declaration_list.Rule = struct_declaration
-				| struct_declaration_list + struct_declaration;
+//			struct_declaration_list.Rule = struct_declaration
+//				| struct_declaration_list + struct_declaration;
+
+			struct_declaration_list.Rule = MakePlusRule (struct_declaration_list, struct_declaration);
 
 			struct_declaration.Rule = type_specifier + struct_declarator_list + SEMICOLON 
 				| type_qualifier + type_specifier + struct_declarator_list  + SEMICOLON;
 
-			struct_declarator_list.Rule = struct_declarator
-				| struct_declarator_list + COMMA + struct_declarator;
+//			struct_declarator_list.Rule = struct_declarator
+//				| struct_declarator_list + COMMA + struct_declarator;
+
+			struct_declarator_list.Rule = MakePlusRule (struct_declarator_list, COMMA, struct_declarator);
 
 			struct_declarator.Rule = IDENTIFIER 
 				| IDENTIFIER + array_specifier;
@@ -870,24 +903,24 @@ namespace GLSLSyntaxAST
 				| RETURN_STM + expression + SEMICOLON
 				| DISCARD + SEMICOLON;
 
-			this.MarkPunctuation (LEFT_BRACKET, RIGHT_BRACKET, LEFT_BRACE, RIGHT_BRACE, LEFT_PAREN, RIGHT_PAREN, SEMICOLON, COMMA);
-			/**
+			this.MarkPunctuation (LEFT_BRACKET, RIGHT_BRACKET, LEFT_BRACE, RIGHT_BRACE, LEFT_PAREN, RIGHT_PAREN, SEMICOLON);
+
 			this.MarkTransient(
-				translation_unit,
-				external_declaration,
-				//function_definition,
-				//declaration,
-				//function_prototype,
-				compound_statement_no_new_scope,
-				function_declarator,
-				statement_list,
-				statement,
-				compound_statement,
-				simple_statement,
-				//declaration_statement,
-				expression_statement,
-				expression,
-				assignment_expression,
+//				translation_unit,
+//				external_declaration,
+//				//function_definition,
+//				//declaration,
+//				//function_prototype,
+//				compound_statement_no_new_scope,
+//				function_declarator,
+//				statement_list,
+//				statement,
+//				compound_statement,
+//				simple_statement,
+//				//declaration_statement,
+//				expression_statement,
+//				expression,
+//				assignment_expression,
 				conditional_expression,
 				logical_or_expression,
 				logical_xor_expression,
@@ -903,60 +936,62 @@ namespace GLSLSyntaxAST
 				unary_expression,
 				postfix_expression,
 				unary_operator,
-				assignment_operator,
-				selection_statement,
-				selection_rest_statement,
-				statement_scoped,
-				switch_statement,
-				switch_statement_list,
-				case_label,
-				iteration_statement,
-				//condition,
-				statement_no_new_scope,
-				for_init_statement,
-				for_rest_statement,
-				conditionopt,
-				fully_specified_type,
-				initializer,
-				initializer_list,
+//				assignment_operator,
+//				selection_statement,
+//				selection_rest_statement,
+//				statement_scoped,
+//				switch_statement,
+//				switch_statement_list,
+//				case_label,
+//				iteration_statement,
+//				//condition,
+//				statement_no_new_scope,
+//				for_init_statement,
+//				for_rest_statement,
+//				conditionopt,
+//				fully_specified_type,
+//				initializer,
+//				initializer_list,
 				type_specifier,
 				single_type_qualifier,
 				type_specifier_nonarray,
-				//type_qualifier,
-				//array_specifier,
-				constant_expression,
-				struct_specifier,
-				struct_declaration_list, 
-				//struct_declaration, 
+//				//type_qualifier,
+//				//array_specifier,
+//				constant_expression,
+//				struct_specifier,
+//				struct_declaration_list, 
+//				//struct_declaration, 
 				struct_declarator_list,
-				struct_declarator, 
-				jump_statement, 
-				init_declarator_list, 
-				precision_qualifier, 
-				block_structure, 
-				single_declaration, 
-				identifier_list,
-				//function_header,
-				//function_header_with_parameters,
-				parameter_declaration,
-				parameter_declarator,
-				parameter_type_specifier,
+//				struct_declarator, 
+//				jump_statement, 
+//				init_declarator_list, 
+//				precision_qualifier, 
+//				block_structure, 
+//				single_declaration, 
+//				identifier_list,
+//				//function_header,
+//				function_header_with_parameters,
+//				parameter_declaration,
+//				parameter_declarator,
+//				parameter_type_specifier,
 				primary_expression,
-				integer_expression,
-//				function_call,
-//				function_call_generic,
+//				integer_expression,
+////				function_call,
+////				function_call_generic,
 //				function_call_header_with_parameters,
-//				function_call_header_no_parameters,
-//				function_call_header,
-//				function_identifier,
-				//variable_identifier,
-				boolconstant,
-				type_name_list,
+//				function_call_header_no_parameters
+////				function_call_header,
+////				function_identifier,
+//				//variable_identifier,
+//				boolconstant,
+//				type_name_list,
 				storage_qualifier,
 				layout_qualifier_id,
-				invariant_qualifier
+//				invariant_qualifier
+//				array_empty_bracket
+				constant_inside_bracket
 			);
-			**/
+
 		}
 	}
 }
