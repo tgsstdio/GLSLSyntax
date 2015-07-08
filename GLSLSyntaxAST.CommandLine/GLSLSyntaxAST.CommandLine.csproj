@@ -31,6 +31,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="OpenTK">
+      <HintPath>..\packages\OpenTK.1.1.1589.5942\lib\NET40\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="GLSLOutput">
+      <HintPath>bin\Debug\GLSLOutput.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -46,5 +52,12 @@
       <Project>{B23CADAF-63EE-4EEB-9BD8-FC452BFC5D5C}</Project>
       <Name>GLSLSyntaxAST</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GLSLSyntaxAST.CodeDom\GLSLSyntaxAST.CodeDom.csproj">
+      <Project>{D5B25375-C28B-4544-A331-8BE9E6971719}</Project>
+      <Name>GLSLSyntaxAST.CodeDom</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

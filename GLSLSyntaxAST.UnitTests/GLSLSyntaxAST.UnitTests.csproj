@@ -32,6 +32,9 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="GLSLOutput">
+      <HintPath>..\GLSLSyntaxAST.CommandLine\bin\Debug\GLSLOutput.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Test.cs" />

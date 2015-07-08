@@ -1,22 +1,30 @@
 ﻿<Properties StartupItem="GLSLSyntaxAST.CommandLine\GLSLSyntaxAST.CommandLine.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Program.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="TextEditor\MainWindow.cs" Line="24" Column="29" />
+      <File FileName="GLSLSyntaxAST.CodeDom\ExampleProgram.cs.txt" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLStructGenerator.cs" Line="1" Column="1" />
+      <File FileName="GLSLGrammar.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CommandLine\Program.cs" Line="56" Column="10" />
+      <File FileName="GLSLSyntaxAST.UnitTests\Test.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.UnitTests\CodeDomTest.cs" Line="31" Column="8" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StructMember.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\packages.config" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLTypeLookup.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLAssembly.cs" Line="1" Column="1" />
       <File FileName="TextEditor\Program.cs" Line="1" Column="1" />
-      <File FileName="GLSLGrammar.cs" Line="862" Column="57" />
-      <File FileName="Program.cs" Line="1" Column="1" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\Irony\Parsing\Parser\Parser.cs" Line="1" Column="1" />
-      <File FileName="JsonGrammar.cs" Line="1" Column="1" />
-      <File FileName="glslang.y" Line="218" Column="20" />
-      <File FileName="GLSL ops.txt" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\EmptyStruct.cs" Line="1" Column="1" />
+      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\Program.cs" line="17" column="41" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\TextEditor\MainWindow.cs" line="80" column="37" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\TextEditor\MainWindow.cs" line="23" column="25" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="48" column="36" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="44" column="20" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" line="306" column="5" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="52" column="4" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

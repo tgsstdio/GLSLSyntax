@@ -2,177 +2,39 @@
 using System.Diagnostics;
 using Irony.Parsing;
 using System.Collections.Generic;
-using OpenTK;
+using System.IO;
+using Microsoft.CSharp;
+using System.CodeDom.Compiler;
+using System.CodeDom;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace GLSLSyntaxAST.CodeDom
 {
 	public class GLSLStructBuilder : IGLSLStructGenerator
 	{
-		public GLSLStructBuilder ()
+		public GLSLStructBuilder (IGLSLTypeLookup lookup)
 		{
+			mTypeLookup = lookup;
 		}
 
 		#region IStructGenerator implementation
 
-		public int NoOfBlocks {
-			get {
-				return Blocks.Count;
-			}
+		public string SaveAsText ()
+		{
+			throw new NotImplementedException ();
 		}
 
-		private Dictionary<string, Type> mClosestTypes;
+		public List<StructMember> Uniforms {
+			get;
+			private set;
+		}
+
+		private IGLSLTypeLookup mTypeLookup;
 		public void Initialize ()
 		{
+			Uniforms = new List<StructMember> ();
 			Blocks = new List<StructInfo> ();
-			mClosestTypes = new Dictionary<string, Type> ();
-			InitialiseClosestTypes ();
-		}
-
-
-
-
-
-		private void InitialiseClosestTypes()
-		{
-			mClosestTypes.Add ("uint", typeof(uint));			
-			mClosestTypes.Add ("int", typeof(int));
-			mClosestTypes.Add ("float", typeof(float));
-			mClosestTypes.Add ("double", typeof(double));
-			mClosestTypes.Add ("bool", typeof(bool));
-			mClosestTypes.Add ("vec2", typeof(Vector2));
-			mClosestTypes.Add ("vec3", typeof(Vector3));
-			mClosestTypes.Add ("vec4", typeof(Vector4));
-			mClosestTypes.Add ("dvec2", typeof(Vector2d));
-			mClosestTypes.Add ("dvec3", typeof(Vector3d));
-			mClosestTypes.Add ("dvec4", typeof(Vector4d));
-			// TODO: double check
-//			mClosestTypes.Add ("bvec2", typeof(byte));
-//			mClosestTypes.Add ("bvec3", typeof(byte));
-//			mClosestTypes.Add ("bvec4", typeof(byte));
-//			mClosestTypes.Add ("ivec2", typeof(int));
-//			mClosestTypes.Add ("ivec3", typeof(int));
-//			mClosestTypes.Add ("ivec4", typeof(int));
-//			mClosestTypes.Add ("uvec2", typeof(uint));
-//			mClosestTypes.Add ("uvec3", typeof(uint));
-//			mClosestTypes.Add ("uvec4", typeof(uint));
-
-			mClosestTypes.Add ("mat2", typeof(Matrix2));
-			mClosestTypes.Add ("mat3", typeof(Matrix3));
-			mClosestTypes.Add ("mat4", typeof(Matrix4));
-
-			//mClosestTypes.Add ("mat2x2", typeof(Matrix2));
-			mClosestTypes.Add ("mat2x3", typeof(Matrix2x3));
-			mClosestTypes.Add ("mat2x4", typeof(Matrix2x4));
-
-			mClosestTypes.Add ("mat3x2", typeof(Matrix3x2));
-			mClosestTypes.Add ("mat3x3", typeof(Matrix3));
-			mClosestTypes.Add ("mat3x4", typeof(Matrix3x4));
-
-			mClosestTypes.Add ("mat4x2", typeof(Matrix4x2));
-			mClosestTypes.Add ("mat4x3", typeof(Matrix4x3));
-			mClosestTypes.Add ("mat4x4", typeof(Matrix4));
-
-			mClosestTypes.Add ("dmat2", typeof(Matrix2d));
-			mClosestTypes.Add ("dmat3", typeof(Matrix3d));
-			mClosestTypes.Add ("dmat4", typeof(Matrix4d));
-
-			//mClosestTypes.Add ("dmat2x2", typeof(Matrix2));
-			mClosestTypes.Add ("dmat2x3", typeof(Matrix2x3d));
-			mClosestTypes.Add ("dmat2x4", typeof(Matrix2x4d));
-
-			mClosestTypes.Add ("dmat3x2", typeof(Matrix3x2d));
-			mClosestTypes.Add ("dmat3x3", typeof(Matrix3d));
-			mClosestTypes.Add ("dmat3x4", typeof(Matrix3x4d));
-
-			mClosestTypes.Add ("dmat4x2", typeof(Matrix4x2d));
-			mClosestTypes.Add ("dmat4x3", typeof(Matrix4x3d));
-			mClosestTypes.Add ("dmat4x4", typeof(Matrix4d));
-
-			// TODO : more types
-//				| atomic_uint
-//				| sampler1d
-//				| sampler2d
-//				| sampler3d
-//				| samplercube
-//				| sampler1dshadow
-//				| sampler2dshadow
-//				| samplercubeshadow
-//				| sampler1darray
-//				| sampler2darray
-//				| sampler1darrayshadow
-//				| sampler2darrayshadow
-//				| samplercubearray
-//				| samplercubearrayshadow
-//				| isampler1d
-//				| isampler2d
-//				| isampler3d
-//				| isamplercube
-//				| isampler1darray
-//				| isampler2darray
-//				| isamplercubearray
-//				| usampler1d
-//				| usampler2d
-//				| usampler3d
-//				| usamplercube
-//				| usampler1darray
-//				| usampler2darray
-//				| usamplercubearray
-//				| sampler2drect
-//				| sampler2drectshadow
-//				| isampler2drect
-//				| usampler2drect
-//				| samplerbuffer
-//				| isamplerbuffer
-//				| usamplerbuffer
-//				| sampler2dms
-//				| isampler2dms
-//				| usampler2dms
-//				| sampler2dmsarray
-//				| isampler2dmsarray
-//				| usampler2dmsarray
-//				| image1d
-//				| iimage1d
-//				| uimage1d
-//				| image2d
-//				| iimage2d
-//				| uimage2d
-//				| image3d
-//				| iimage3d
-//				| uimage3d
-//				| image2drect
-//				| iimage2drect
-//				| uimage2drect
-//				| imagecube
-//				| iimagecube
-//				| uimagecube
-//				| imagebuffer
-//				| iimagebuffer
-//				| uimagebuffer
-//				| image1darray
-//				| iimage1darray
-//				| uimage1darray
-//				| image2darray
-//				| iimage2darray
-//				| uimage2darray
-//				| imagecubearray
-//				| iimagecubearray
-//				| uimagecubearray
-//				| image2dms
-//				| iimage2dms
-//				| uimage2dms
-//				| image2dmsarray
-//				| iimage2dmsarray
-//				| uimage2dmsarray
-//				| samplerexternaloes
-//				| struct_specifier
-//				| type_name;
-		}
-
-		public Type FindClosestType (string typeName)
-		{
-			Type result = null;
-			mClosestTypes.TryGetValue (typeName.ToLowerInvariant (), out result);
-			return result;
 		}
 
 		private bool CheckForUniformTag (StructInfo info, ParseTreeNode child)
@@ -227,7 +89,7 @@ namespace GLSLSyntaxAST.CodeDom
 				{
 					var temp = new StructMember ();
 					temp.TypeString = member.ChildNodes [0].Token.ValueString;
-					temp.ClosestType = FindClosestType (temp.TypeString);
+					temp.ClosestType = mTypeLookup.FindClosestType (temp.TypeString);
 
 					var declarator = member.ChildNodes [1];
 					if (declarator.Term.Name == "struct_declarator")
@@ -303,12 +165,146 @@ namespace GLSLSyntaxAST.CodeDom
 
 		public int Extract (System.IO.Stream stream)
 		{
-			throw new NotImplementedException ();
+			using (var reader = new StreamReader (stream))
+			{
+				return Extract (reader.ReadToEnd ());
+			}
 		}
 
-		public void SaveAsAssembly (string path)
+		private static CodeTypeDeclaration CreateClass(CodeNamespace contentNs, string folderName)
 		{
-			throw new NotImplementedException ();
+			var textures = new CodeTypeDeclaration (folderName);
+			textures.IsClass = true;
+			textures.TypeAttributes = TypeAttributes.Public;
+			//textures.Members.
+
+			contentNs.Types.Add (textures);
+
+			return textures;
+		}
+
+		private static void SetVersionNumber (CodeCompileUnit contentUnit, string value)
+		{
+			var attributeType = new CodeTypeReference (typeof(AssemblyVersionAttribute));
+			var versionNumber = new CodeAttributeDeclaration (attributeType, new CodeAttributeArgument (new CodePrimitiveExpression (value)));
+			contentUnit.AssemblyCustomAttributes.Add (versionNumber);
+		}
+
+		private static void AddStruct (CodeNamespace dest, CodeTypeDeclaration folder, StructInfo info)
+		{
+			var structType = new CodeTypeDeclaration (info.Name);
+			//structType.IsClass = false;
+			structType.IsStruct = true;
+			structType.TypeAttributes = TypeAttributes.Public | TypeAttributes.SequentialLayout | TypeAttributes.Sealed;
+
+//			structType.CustomAttributes.Add(
+//				new CodeAttributeDeclaration(typeof(StructLayoutAttribute),
+//				new CodeAttributeArgument(
+//					new CodeFieldReferenceExpression(
+//							new CodeTypeReferenceExpression(typeof(LayoutKind)), "Sequential")				
+//					)
+//				)
+//			);
+
+			dest.Types.Add (structType);
+
+			foreach (var member in info.Members)
+			{
+				if (member.ClosestType != null)
+				{
+					var field1 = new CodeMemberField (member.ClosestType, member.Name);
+					field1.Attributes = MemberAttributes.Public;
+					structType.Members.Add (field1);
+				}
+			}
+
+//			var localVariable = "m" + alias;
+//			var field1 = new CodeMemberField (typeof(string), localVariable);
+//			folder.Members.Add (field1);
+//
+//			CodeMemberProperty property1 = new CodeMemberProperty ();
+//			property1.Name = alias;
+//			property1.Type = new CodeTypeReference ("System.String");
+//			property1.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+//			property1.HasGet = true;
+//			property1.HasSet = true;
+//			property1.GetStatements.Add (new CodeMethodReturnStatement (new CodeFieldReferenceExpression (new CodeThisReferenceExpression (), localVariable)));
+//			property1.SetStatements.Add (new CodeAssignStatement (new CodeFieldReferenceExpression (new CodeThisReferenceExpression (), localVariable), new CodePropertySetValueReferenceExpression ()));
+//			folder.Members.Add (property1);
+		}
+
+		public void SaveAsAssembly (GLSLAssembly assembly)
+		{
+			using (CSharpCodeProvider provider = new CSharpCodeProvider ())
+			{
+				// Build the parameters for source compilation.
+				CompilerParameters cp = new CompilerParameters();
+
+				// Add an assembly reference.
+				cp.ReferencedAssemblies.Add( "System.dll" );
+				cp.ReferencedAssemblies.Add ("System.Runtime.InteropServices.dll");
+
+				if (assembly.ReferencedAssemblies != null)
+				{
+					foreach (var assemblyName in assembly.ReferencedAssemblies)
+					{
+						cp.ReferencedAssemblies.Add( assemblyName );
+					}
+				}
+
+				// Generate an executable instead of
+				// a class library.
+				cp.GenerateExecutable = false;
+
+				// Set the assembly file name to generate.
+				cp.OutputAssembly = System.IO.Path.Combine(assembly.Path,assembly.OutputAssembly);
+
+				// Save the assembly as a physical file.
+				cp.GenerateInMemory = assembly.InMemory;
+
+				var contentUnit = new CodeCompileUnit ();
+
+				SetVersionNumber (contentUnit, assembly.Version);
+
+				string nameSpace = assembly.Namespace;
+				if (string.IsNullOrWhiteSpace (nameSpace))
+				{
+					nameSpace = System.IO.Path.GetFileNameWithoutExtension (assembly.OutputAssembly);
+				}
+
+				var contentNs  = new CodeNamespace(nameSpace);
+				contentUnit.Namespaces.Add (contentNs);
+
+				var uniforms = CreateClass (contentNs, "Uniforms");
+				CodeTypeConstructor defaultConstructor = new CodeTypeConstructor ();	
+				defaultConstructor.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+				uniforms.Members.Add (defaultConstructor);
+			
+				defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (typeof(int), "testInt", new CodePrimitiveExpression (0)));
+
+				foreach (var block in Blocks)
+				{
+					AddStruct (contentNs, uniforms, block);
+				}
+
+				// Invoke compilation.
+				CompilerResults cr = provider.CompileAssemblyFromDom(cp, contentUnit);
+	
+				if (cr.Errors.Count > 0)
+				{
+					Debug.WriteLine(string.Format("Source built into {0} unsuccessfully.", cr.PathToAssembly));				
+					// Display compilation errors.
+					foreach (CompilerError ce in cr.Errors)
+					{
+						Debug.WriteLine("  {0}", ce.ToString());		
+					}
+				}
+				else
+				{
+					Debug.WriteLine(string.Format("Source built into {0} successfully.", cr.PathToAssembly));
+				}				
+			}
+
 		}
 
 		#endregion

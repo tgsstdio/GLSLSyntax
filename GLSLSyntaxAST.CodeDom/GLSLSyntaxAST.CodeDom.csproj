@@ -39,6 +39,10 @@
     <Compile Include="IGLSLStructGenerator.cs" />
     <Compile Include="StructMember.cs" />
     <Compile Include="StructInfo.cs" />
+    <Compile Include="OpenTKTypeLookup.cs" />
+    <Compile Include="IGLSLTypeLookup.cs" />
+    <Compile Include="GLSLAssembly.cs" />
+    <Compile Include="EmptyStruct.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
