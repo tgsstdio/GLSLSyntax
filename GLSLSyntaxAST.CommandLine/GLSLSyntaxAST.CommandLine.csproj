@@ -59,5 +59,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Shaders\fullscreen_blend.frag.glsl" />
+    <None Include="Shaders\fullscreen_blend.vert.glsl" />
+    <None Include="Shaders\PassThru.frag" />
+    <None Include="Shaders\PassThru.vert" />
+    <None Include="Shaders\phong_linked_list.frag.glsl" />
+    <None Include="Shaders\phong_linked_list.vert.glsl" />
+    <None Include="Shaders\ToScreen.frag" />
+    <None Include="Shaders\ToScreen.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Shaders\" />
   </ItemGroup>
 </Project>

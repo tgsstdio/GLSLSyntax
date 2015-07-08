@@ -14,7 +14,7 @@ namespace GLSLSyntaxAST.UnitTests
 			int expected = 1;
 			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();
-			IGLSLStructGenerator test = new GLSLStructBuilder (lookup);
+			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
 			int actual = test.Extract ("layout(std140) uniform UBOData {\n\tvec3 firstValue;\n\tfloat thirdValue;\n\tvec4 secondValue;\n};");
 			Assert.AreEqual (expected, actual);
@@ -25,7 +25,7 @@ namespace GLSLSyntaxAST.UnitTests
 		public void Initialize01 ()
 		{
 			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();			
-			IGLSLStructGenerator test = new GLSLStructBuilder (lookup);
+			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();		
 		}
 	}

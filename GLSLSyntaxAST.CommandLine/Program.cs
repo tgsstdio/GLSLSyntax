@@ -3,52 +3,63 @@ using Irony.Parsing;
 using System.Diagnostics;
 using GLSLSyntaxAST.CodeDom;
 using System.Reflection;
+using System.IO;
 
 namespace GLSLSyntaxAST.CommandLine
 {
 	class MainClass
 	{
-		static void OldCode ()
+		public static int Main (string[] args)
 		{
-			Console.WriteLine ("Hello World!");
-			GLSLGrammar lang = new GLSLGrammar ();
-			var compiler = new Irony.Parsing.Parser (lang);
-			//var tree = compiler.Parse ("struct Camera { float x; int num; vec3 output; vec2 data[10]; vec4 grid[3][4]; bool samples[]; };");
-			var tree = compiler.Parse ("layout(std140) uniform UBOData {\n\tvec3 firstValue;\n\tfloat thirdValue;\n\tvec4 secondValue;\n};");
-			//var tree = compiler.Parse ("uniform vec3 light;");
-			CheckNodes (tree.Root, 0);
-		}
+			try
+			{
+				if (args.Length < 2)
+				{
+					Console.WriteLine("Invalid arguments");
+					Console.WriteLine("{0} {1} {n}... ");
+					Console.WriteLine("{0} = output file");
+					Console.WriteLine("{1} = glsl shader file 1");
+					Console.WriteLine("{n} = glsl shader file n");
+					return 1;
+				}
 
-		static void GenerateAssembly ()
-		{
-			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
-			lookup.Initialize ();
-			IGLSLStructGenerator test = new GLSLStructBuilder (lookup);
-			test.Initialize ();
-			int actual = test.Extract ("layout(std140) uniform UBOData {\n\tvec3 firstValue;\n\tfloat thirdValue;\n\tvec4 secondValue;\n};");
-			GLSLAssembly output = new GLSLAssembly ();
-			output.OutputAssembly = "GLSLOutput.dll";
-			output.Version = "1.0.0.2";
-			output.Namespace = "GLSLOutput";
-			output.Path = "";
-			output.InMemory = false;
-			output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
-			test.SaveAsAssembly (output);
-		}
+				foreach(var arg in args)
+				{
+					Console.WriteLine(arg);
+				}
 
-		public static void Main (string[] args)
-		{
-			//OldCode ();
-//			try
-//			{
-//				GenerateAssembly ();
-//			}
-//			catch (Exception ex)
-//			{
-//				Debug.WriteLine (ex.Message);
-//			}
+				IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
+				lookup.Initialize ();
+				IGLSLUniformExtractor extractor = new GLSLUniformExtractor (lookup);
+				extractor.Initialize ();
+
+				for (int i = 1; i < args.Length; ++i)
+				{
+					using (var fs = File.Open(args[i], FileMode.Open))
+					{
+						int actual = extractor.Extract (fs);
+						Console.WriteLine("{0} - no of blocks extracted : {1}", args[i], actual);
+					}
+				}
+
+				GLSLAssembly output = new GLSLAssembly ();
+				output.OutputAssembly = System.IO.Path.GetFileName(args[0]);
+				output.Version = "1.0.0.1";
+				output.Namespace = "";
+				output.Path = System.IO.Path.GetPathRoot(args[0]);
+				output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
+
+				IGLSLStructGenerator generator = new GLSLStructGenerator(extractor);
+				generator.SaveAsAssembly (output);
+
+				return 0;
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine (ex.Message);
+				return 1;
+			}
 		//	Test();
-			Compare();
 		}
 
 		public static void Compare()

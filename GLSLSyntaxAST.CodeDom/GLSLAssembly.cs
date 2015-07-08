@@ -8,7 +8,6 @@ namespace GLSLSyntaxAST.CodeDom
 		public string OutputAssembly { get; set; }
 		public string Version { get; set; }
 		public string Namespace { get; set; }
-		public bool InMemory {get;set;}
 		public string[] ReferencedAssemblies { get; set; }
 	}
 }

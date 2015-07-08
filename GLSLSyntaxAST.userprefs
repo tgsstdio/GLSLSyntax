@@ -1,31 +1,44 @@
 ﻿<Properties StartupItem="GLSLSyntaxAST.CommandLine\GLSLSyntaxAST.CommandLine.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CommandLine\Program.cs">
     <Files>
-      <File FileName="GLSLSyntaxAST.CodeDom\ExampleProgram.cs.txt" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLStructGenerator.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLStructGenerator.cs" Line="9" Column="18" />
       <File FileName="GLSLGrammar.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Program.cs" Line="56" Column="10" />
+      <File FileName="GLSLSyntaxAST.CommandLine\Program.cs" Line="53" Column="14" />
       <File FileName="GLSLSyntaxAST.UnitTests\Test.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\CodeDomTest.cs" Line="31" Column="8" />
+      <File FileName="GLSLSyntaxAST.UnitTests\CodeDomTest.cs" Line="34" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\StructMember.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\packages.config" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\IGLSLTypeLookup.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLAssembly.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLAssembly.cs" Line="11" Column="1" />
       <File FileName="TextEditor\Program.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\EmptyStruct.cs" Line="1" Column="1" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" Line="1" Column="1" />
+      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="29" Column="25" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="163" Column="13" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLUniformExtractor.cs" Line="13" Column="32" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="48" column="36" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="44" column="20" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" line="306" column="5" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="52" column="4" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="59" column="36" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" line="166" column="5" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="63" column="4" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.GLSLSyntaxAST.CommandLine>
+    <MonoDevelop.Ide.CustomExecutionModes>
+      <Data Name="2 shaders (Custom)" Id="c0d9b50c-5b5c-404d-90c3-3203c5f39328" ModeId="Default">
+        <CommandData>
+          <Item Key="MonoDevelop.Ide.Execution.CustomArgsCustomizer">
+            <Value Arguments="ShaderData.dll &quot;Shaders/phong_linked_list.frag.glsl&quot; &quot;Shaders/phong_linked_list.vert.glsl&quot;" ctype="CustomArgsExecutionModeData">
+              <EnvironmentVariables />
+            </Value>
+          </Item>
+        </CommandData>
+      </Data>
+    </MonoDevelop.Ide.CustomExecutionModes>
+  </MonoDevelop.Ide.ItemProperties.GLSLSyntaxAST.CommandLine>
 </Properties>
