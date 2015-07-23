@@ -45,6 +45,24 @@
     <Compile Include="GLSLUniformExtractor.cs" />
     <Compile Include="IGLSLUniformExtractor.cs" />
     <Compile Include="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" />
+    <Compile Include="IPreprocessorContext.cs" />
+    <Compile Include="PreprocessorContext.cs" />
+    <Compile Include="TPpToken.cs" />
+    <Compile Include="TSourceLoc.cs" />
+    <Compile Include="TParseContext.cs" />
+    <Compile Include="TInputScanner.cs" />
+    <Compile Include="IScannableType.cs" />
+    <Compile Include="tStringInput.cs" />
+    <Compile Include="tInput.cs" />
+    <Compile Include="CppEnums.cs" />
+    <Compile Include="tMacroInput.cs" />
+    <Compile Include="TokenStream.cs" />
+    <Compile Include="MacroSymbol.cs" />
+    <Compile Include="ExtensionBehavior.cs" />
+    <Compile Include="Profile.cs" />
+    <Compile Include="TPragma.cs" />
+    <Compile Include="EvalPrecedence.cs" />
+    <Compile Include="tTokenInput.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

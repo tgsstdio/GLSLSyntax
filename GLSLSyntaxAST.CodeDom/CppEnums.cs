@@ -1,0 +1,43 @@
+﻿using System;
+
+namespace GLSLSyntaxAST.CodeDom
+{
+	public enum CppEnums : int
+	{
+		 AND_OP = 257
+		, SUB_ASSIGN = 259
+		, MOD_ASSIGN = 260
+		, ADD_ASSIGN = 261
+		, DIV_ASSIGN = 262
+		, MUL_ASSIGN = 263
+		, EQ_OP = 264
+		, XOR_OP = 265 
+		, ERROR_SY = 266
+		, FLOATCONSTANT = 267
+		, GE_OP = 268
+		, RIGHT_OP = 269
+		, IDENTIFIER = 270
+		, INTCONSTANT = 271
+		, LE_OP = 272
+		, LEFT_OP = 273
+		, DEC_OP = 274
+		, NE_OP = 275
+		, OR_OP = 276
+		, INC_OP = 277
+		, STRCONSTANT = 278
+		, RIGHT_ASSIGN = 280
+		, LEFT_ASSIGN = 281
+		, AND_ASSIGN = 282
+		, OR_ASSIGN = 283
+		, XOR_ASSIGN = 284
+		, LEFT_BRACKET = 285
+		, RIGHT_BRACKET = 286
+		, LEFT_BRACE = 287
+		, RIGHT_BRACE = 288
+		, UINTCONSTANT = 289
+		, DOUBLECONSTANT = 290
+		, TOKEN_PASTE = 291
+		, FIRST_USER_TOKEN_SY = 292
+	}
+}
+
