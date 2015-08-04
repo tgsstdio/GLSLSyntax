@@ -1,50 +1,12 @@
 ﻿<Properties StartupItem="GLSLSyntaxAST.CommandLine\GLSLSyntaxAST.CommandLine.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CodeDom\PreprocessorContext.cs">
-    <Files>
-      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLStructGenerator.cs" Line="1" Column="1" />
-      <File FileName="GLSLGrammar.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Program.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\Test.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\CodeDomTest.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StructMember.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\packages.config" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLTypeLookup.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLAssembly.cs" Line="1" Column="1" />
-      <File FileName="TextEditor\Program.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\EmptyStruct.cs" Line="1" Column="1" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLUniformExtractor.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IPreprocessorContext.cs" Line="11" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" Line="1351" Column="4" />
-      <File FileName="GLSLSyntaxAST.UnitTests\ProprocessorTests.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TPpToken.cs" Line="25" Column="35" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TSourceLoc.cs" Line="12" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TParseContext.cs" Line="107" Column="32" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TInputScanner.cs" Line="42" Column="35" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IScannableType.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\tStringInput.cs" Line="85" Column="6" />
-      <File FileName="GLSLSyntaxAST.CodeDom\tInput.cs" Line="13" Column="32" />
-      <File FileName="GLSLSyntaxAST.CodeDom\CppEnums.cs" Line="5" Column="28" />
-      <File FileName="GLSLSyntaxAST.CodeDom\tMacroInput.cs" Line="27" Column="29" />
-      <File FileName="GLSLSyntaxAST.CodeDom\MacroSymbol.cs" Line="14" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TokenStream.cs" Line="9" Column="10" />
-      <File FileName="GLSLSyntaxAST.CodeDom\EvalPrecedence.cs" Line="5" Column="28" />
-      <File FileName="GLSLSyntaxAST.CodeDom\ExtensionBehavior.cs" Line="9" Column="31" />
-      <File FileName="GLSLSyntaxAST.CodeDom\Profile.cs" Line="13" Column="3" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TPragma.cs" Line="15" Column="10" />
-      <File FileName="GLSLSyntaxAST.CodeDom\tTokenInput.cs" Line="12" Column="19" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="59" column="36" />
       <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" line="166" column="5" />
       <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="63" column="4" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" line="1247" column="1" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TSymbolTable.cs" line="18" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

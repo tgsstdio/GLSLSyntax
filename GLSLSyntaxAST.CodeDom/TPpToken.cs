@@ -18,7 +18,7 @@ namespace GLSLSyntaxAST.CodeDom
 		public bool Matches(TPpToken right)
 		{
 			return token == right.token && atom == right.atom &&
-				ival == right.ival && dval == right.dval &&
+				ival == right.ival && Math.Abs (dval - right.dval) < Double.Epsilon &&
 				name == right.name;
 		}
 

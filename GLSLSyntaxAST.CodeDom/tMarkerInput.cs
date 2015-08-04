@@ -1,20 +1,24 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class tTokenInput : tInput {
-		public tTokenInput(PreprocessorContext pp, TokenStream t) : base(pp)
+	public class tMarkerInput : tInput
+	{
+		public tMarkerInput(PreprocessorContext pp) :base(pp)
 		{
-			tokens = t;
+				
 		}
 
 		public override int scan(ref TPpToken ppToken)
 		{
-			return pp.ReadToken(tokens, ppToken);
+			if (done)
+				return tInput.END_OF_INPUT;
+			done = true;
+
+			return marker;
 		}
 
-		public override int getch() 
+		public override int getch()
 		{
 			throw new NotSupportedException ();
 		}
@@ -24,7 +28,7 @@ namespace GLSLSyntaxAST.CodeDom
 			throw new NotSupportedException ();
 		}
 
-		protected TokenStream tokens;
+		public static int marker = -3;
 	}
 }
 

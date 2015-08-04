@@ -18,7 +18,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		#region IScannableType implementation
 
-		public abstract int scan (TPpToken p);
+		public abstract int scan (ref TPpToken ppToken);
 
 		public abstract int getch ();
 

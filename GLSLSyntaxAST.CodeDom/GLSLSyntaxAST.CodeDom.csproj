@@ -63,6 +63,21 @@
     <Compile Include="TPragma.cs" />
     <Compile Include="EvalPrecedence.cs" />
     <Compile Include="tTokenInput.cs" />
+    <Compile Include="tZeroInput.cs" />
+    <Compile Include="tUngotTokenInput.cs" />
+    <Compile Include="tMarkerInput.cs" />
+    <Compile Include="TIntermediate.cs" />
+    <Compile Include="TInfoSink.cs" />
+    <Compile Include="TInfoSinkBase.cs" />
+    <Compile Include="TLimits.cs" />
+    <Compile Include="TBuiltInResource.cs" />
+    <Compile Include="TShader.cs" />
+    <Compile Include="TDeferredCompiler.cs" />
+    <Compile Include="EShMessages.cs" />
+    <Compile Include="EShLanguage.cs" />
+    <Compile Include="DoPreprocessing.cs" />
+    <Compile Include="EShOptimizationLevel.cs" />
+    <Compile Include="TScanContext.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

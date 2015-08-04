@@ -35,6 +35,7 @@
     <Reference Include="GLSLOutput">
       <HintPath>..\GLSLSyntaxAST.CommandLine\bin\Debug\GLSLOutput.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Test.cs" />
