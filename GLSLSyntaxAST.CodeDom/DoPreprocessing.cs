@@ -123,7 +123,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 
 			outputStream.AppendLine();
-			//outputString = outputStream.str();
+			Output = outputStream.ToString();
 
 			return true;
 		}

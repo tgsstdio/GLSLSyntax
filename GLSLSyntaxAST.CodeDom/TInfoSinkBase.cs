@@ -52,6 +52,11 @@ namespace GLSLSyntaxAST.CodeDom
 			EString = 0x04,
 		};
 
+		public override string ToString()
+		{
+			return sink.ToString ();
+		}
+
 		public void prefix(TPrefixType message)
 		{
 			switch(message) {

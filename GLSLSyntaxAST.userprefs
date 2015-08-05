@@ -1,12 +1,45 @@
-﻿<Properties StartupItem="GLSLSyntaxAST.CommandLine\GLSLSyntaxAST.CommandLine.csproj">
+﻿<Properties StartupItem="GLSLSyntax.Preprocessor\GLSLSyntax.Preprocessor.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntax.Preprocessor\Program.cs">
+    <Files>
+      <File FileName="GLSLSyntaxAST.CodeDom\tStringInput.cs" Line="28" Column="1" />
+      <File FileName="GLSLSyntax.Preprocessor\Program.cs" Line="14" Column="29" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TShader.cs" Line="68" Column="1" />
+      <File FileName="GLSLSyntax.Preprocessor\notex.vert" Line="22" Column="40" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TInputScanner.cs" Line="43" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" Line="122" Column="20" />
+      <File FileName="GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" Line="376" Column="46" />
+      <File FileName="GLSLSyntaxAST.CodeDom\tInput.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TParseContext.cs" Line="207" Column="1" />
+      <File FileName="GLSLSyntax.Preprocessor\Sample.vert" Line="1" Column="31" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TSourceLoc.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TScanContext.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\Profile.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\Standalone.cs" Line="236" Column="7" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="59" column="36" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" line="166" column="5" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="63" column="4" />
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TSymbolTable.cs" line="18" column="1" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="59" column="36" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructBuilder.cs" line="166" column="5" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="63" column="4" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TSymbolTable.cs" line="18" column="1" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\ProprocessorTests.cs" line="17" column="42" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="153" column="27" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\ProprocessorTests.cs" line="18" column="30" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="238" column="37" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntax.Preprocessor\Program.cs" line="12" column="23" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="235" column="48" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="67" column="25" />
+      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="71" column="31" />
+      <Breakpoint enabled="false" file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" line="88" column="24" />
+      <Breakpoint enabled="false" file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" line="121" column="19" />
+      <Breakpoint enabled="false" file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" line="91" column="23" />
+      <Breakpoint enabled="false" file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" line="120" column="19" />
+      <Breakpoint enabled="false" file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" line="89" column="23" />
+      <Breakpoint enabled="false" file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" line="350" column="58" />
+      <Breakpoint enabled="false" file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" line="446" column="15" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" line="383" column="34" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

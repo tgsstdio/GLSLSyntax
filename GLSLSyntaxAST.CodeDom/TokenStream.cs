@@ -7,6 +7,11 @@ namespace GLSLSyntaxAST.CodeDom
 	{
 		public List<UInt16> data;
 		public int current;
+
+		public TokenStream ()
+		{
+			data = new List<ushort> ();
+		}
 	};
 }
 

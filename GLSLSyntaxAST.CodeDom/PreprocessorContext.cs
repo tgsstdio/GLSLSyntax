@@ -7,9 +7,17 @@ namespace GLSLSyntaxAST.CodeDom
 {
 	public class PreprocessorContext : IPreprocessorContext
 	{
-		public void setInput (TInputScanner scanner, bool versionWillBeError)
+		public void setInput (TInputScanner input, bool versionWillBeError)
 		{
-			throw new NotImplementedException ();
+			if (inputStack.Count != 0)
+			{
+				throw new Exception ("Stack is use");
+			}
+
+			pushInput(new tStringInput(this, input));
+
+			errorOnVersion = versionWillBeError;
+			versionSeen = false;
 		}
 
 		const int maxMacroArgs = 64;
@@ -31,6 +39,8 @@ namespace GLSLSyntaxAST.CodeDom
 		public TParseContext parseContext;
 		public bool inComment;
 
+		public NameBuffer buffer;
+
 		public PreprocessorContext (TParseContext pc)
 		{
 			parseContext = pc;
@@ -44,6 +54,11 @@ namespace GLSLSyntaxAST.CodeDom
 			for (elsetracker = 0; elsetracker < MAXIFNESTING; elsetracker++)
 				elseSeen[elsetracker] = false;
 			elsetracker = 0;
+
+			inputStack = new Stack<tInput> ();
+			symbols = new Dictionary<int, Symbol> ();
+
+			buffer = new NameBuffer{ name = new char[NameBuffer.MAX_TOKEN_LENGTH], tokenText = new char[NameBuffer.MAX_TOKEN_LENGTH]};
 		}
 
 		private class BinaryEvalOperation
@@ -65,7 +80,6 @@ namespace GLSLSyntaxAST.CodeDom
 			// Add single character tokens to the atom table:
 			string[] s = {"~","!","%","^","&","*","(",")","-","+","=","|",",",".","<",">","/","?",";",":","[","]","{","}","#"};
 
-			const int OFFSET = 10000;
 			int key = 0;
 			foreach (var letter in s)
 			{
@@ -1159,6 +1173,7 @@ namespace GLSLSyntaxAST.CodeDom
 		Symbol NewSymbol(int atom)
 		{
 			Symbol lSymb = new Symbol ();
+			lSymb.atom = atom;
 			// MEMORY POOL
 			//			Symbol* lSymb;
 			//			char* pch;
@@ -1363,7 +1378,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 			TSourceLoc loc = ppToken.loc;  // in case we go to the next line before discovering the error
 			inp.mac = sym.mac;
-			if (sym.mac.args.Length > 0) {
+			if (sym.mac.args != null && sym.mac.args.Length > 0) {
 				token = scanToken(ref ppToken);
 				if (newLineOkay) {
 					while (token == '\n')                

@@ -4,36 +4,104 @@ namespace GLSLSyntaxAST.CodeDom
 {
 	public class TInputScanner
 	{
-		public TInputScanner(int n, string[] s, int[] l, int b = 0, int f = 0)
+		public TInputScanner(string[] s, int b, int f)
 		{
-			numSources = n;
 			sources = s;
-			lengths = l;
 			currentSource = 0;
 			currentChar = 0;
 			stringBias = b;
 			finale = f;
 
 			// loc[0]
-			loc = new TSourceLoc[numSources];
+			loc = new TSourceLoc[sources.Length];
 			loc[currentSource].stringBias = -stringBias;
 			loc[currentSource].line = 1;
 			loc[currentSource].column = 0;
 		}
 
+		// return of -1 means end of strings,
+		// anything else is the next character
+
+		// retrieve the next character and advance one character
 		public int get()
 		{
-			return 0;
+			if (currentSource >= sources.Length)
+				return -1;
+
+			if (sources [currentSource].Length == 0)
+				return -1;
+
+			int ret = sources[currentSource][currentChar];
+			++loc[currentSource].column;
+			if (ret == '\n') {
+				++loc[currentSource].line;
+				loc[currentSource].column = 0;
+			}
+			advance();
+
+			return ret;
+		}
+
+		// advance one character
+		void advance()
+		{
+			++currentChar;
+			var length = sources [currentSource].Length;
+			if (currentChar >= length) {
+				++currentSource;
+				if (currentSource < sources.Length) {
+					loc[currentSource].stringBias = loc[currentSource - 1].stringBias + 1;
+					loc[currentSource].line = 1;
+					loc[currentSource].column = 0;
+				}
+				while (currentSource < sources.Length && length == 0) {
+					++currentSource;
+					if (currentSource < sources.Length) {
+						loc[currentSource].stringBias = loc[currentSource - 1].stringBias + 1;
+						loc[currentSource].line = 1;
+						loc[currentSource].column = 0;
+					}
+				}
+				currentChar = 0;
+			}
 		}
 
 		public void unget()
 		{
-			
+			if (currentChar > 0) {
+				--currentChar;
+				--loc[currentSource].column;
+				if (loc[currentSource].column < 0) {
+					// We've moved back past a new line. Find the
+					// previous newline (or start of the file) to compute
+					// the column count on the now current line.
+					int ch = currentChar;
+					while(ch > 0) {
+						if (sources[currentSource][ch] == '\n') {
+							break;
+						}
+						--ch;
+					}
+					loc[currentSource].column = currentChar - ch;
+				}
+			} else {
+				var strLength = sources [currentSource].Length;
+				do {
+					--currentSource;
+				} while (currentSource > 0 && strLength == 0);
+				if (strLength == 0) {
+					// set to 0 if we've backed up to the start of an empty string
+					currentChar = 0;
+				} else
+					currentChar = strLength - 1;
+			}
+			if (peek() == '\n')
+				--loc[currentSource].line;
 		}
 
 		public int peek()
 		{
-			if (currentSource >= numSources)
+			if (currentSource >= sources.Length)
 				return -1;
 
 			return sources[currentSource][currentChar];
@@ -49,9 +117,7 @@ namespace GLSLSyntaxAST.CodeDom
 			loc[currentSource].stringBias = newString; 
 		}
 
-		int numSources;             // number of strings in source
 		string [] sources; // array of strings
-		int[] lengths;      // length of each string
 		int currentSource;
 		int currentChar;
 
@@ -64,7 +130,7 @@ namespace GLSLSyntaxAST.CodeDom
 		int finale;       // number of internal strings after user's last string
 
 		public TSourceLoc getSourceLoc() { 
-			return loc[Math.Max(0, Math.Min(currentSource, numSources - finale - 1))]; 
+			return loc[Math.Max(0, Math.Min(currentSource, sources.Length - finale - 1))]; 
 		}
 
 		// Returns true if there was non-white space (e.g., a comment, newline) before the #version

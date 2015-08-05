@@ -19,7 +19,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		public string[] strings;
 		public int numStrings;
-		void setStrings(string s, int n)
+		public void setStrings(string s, int n)
 		{
 			strings = new string[]{s};
 			numStrings = n;
@@ -140,14 +140,9 @@ namespace GLSLSyntaxAST.CodeDom
 			//   string numStrings+2:     "int;"
 			int numPre = 2;
 			int numPost = requireNonempty? 1 : 0;
-			var lengths = new int[numStrings + numPre + numPost];
 			var strings = new string[numStrings + numPre + numPost];
 			for (int s = 0; s < numStrings; ++s) {
 				strings[s + numPre] = shaderStrings[s];
-				if (inputLengths == null || inputLengths[s] < 0)
-					lengths[s + numPre] = shaderStrings[s].Length;
-				else
-					lengths[s + numPre] = inputLengths[s];
 			}
 
 			// First, without using the preprocessor or parser, find the #version, so we know what
@@ -155,7 +150,7 @@ namespace GLSLSyntaxAST.CodeDom
 			// outlined above, just the user shader.
 			int version;
 			Profile profile;
-			var userInput = new TInputScanner(numStrings, shaderStrings, inputLengths);  // no preamble
+			var userInput = new TInputScanner(shaderStrings, 0 , 0);  // no preamble
 			bool versionNotFirstToken;
 			bool versionNotFirst = userInput.scanVersion(out version, out profile, out versionNotFirstToken);
 			bool versionNotFound = version == 0;
@@ -227,19 +222,18 @@ namespace GLSLSyntaxAST.CodeDom
 
 
 			// Fill in the strings as outlined above.
-			strings[0] = parseContext.getPreamble();
-			lengths[0] = strings[0].Length;
+			strings[0] = ""; //parseContext.getPreamble();
 			strings[1] = customPreamble;
-			lengths[1] = strings[1].Length;
-			if (2 == numPre)
+			if (2 != numPre)
 			{
-				throw new Exception ();
+				throw new Exception ("Preamble check");
 			}
+
 			if (requireNonempty) {
 				strings[numStrings + numPre] = "\n int;";
-				lengths[numStrings + numPre] = strings[numStrings + numPre].Length;
 			}
-			var fullInput = new TInputScanner(numStrings + numPre + numPost, strings, lengths, numPre, numPost);
+			//var fullInput = new TInputScanner(strings, numPre, numPost);
+			var fullInput = new TInputScanner(shaderStrings, 0 , 0);
 
 			bool success = processingContext(parseContext, ppContext, fullInput, versionWillBeError);
 

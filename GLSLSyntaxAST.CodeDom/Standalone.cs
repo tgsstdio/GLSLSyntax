@@ -1,7 +1,8 @@
 ﻿using System;
-using GLSLSyntaxAST.CodeDom;
+using System.IO;
+using System.Diagnostics;
 
-namespace GLSLSyntaxAST.UnitTests
+namespace GLSLSyntaxAST.CodeDom
 {
 	public class Standalone
 	{
@@ -107,15 +108,15 @@ namespace GLSLSyntaxAST.UnitTests
 			Resources.maxCullDistances = 8;
 			Resources.maxCombinedClipAndCullDistances = 8;
 			Resources.maxSamples = 4;
-			Resources.limits.nonInductiveForLoops = (1 != 0);
-			Resources.limits.whileLoops = (1 != 0);
-			Resources.limits.doWhileLoops = (1 != 0);
-			Resources.limits.generalUniformIndexing = (1 != 0);
-			Resources.limits.generalAttributeMatrixVectorIndexing = (1 != 0);
-			Resources.limits.generalVaryingIndexing = (1 != 0);
-			Resources.limits.generalSamplerIndexing = (1 != 0);
-			Resources.limits.generalVariableIndexing = (1 != 0);
-			Resources.limits.generalConstantMatrixVectorIndexing = (1 != 0);
+			Resources.limits.nonInductiveForLoops = true;
+			Resources.limits.whileLoops = true;
+			Resources.limits.doWhileLoops = true;
+			Resources.limits.generalUniformIndexing = true;
+			Resources.limits.generalAttributeMatrixVectorIndexing = true;
+			Resources.limits.generalVaryingIndexing = true;
+			Resources.limits.generalSamplerIndexing = true;
+			Resources.limits.generalVariableIndexing = true;
+			Resources.limits.generalConstantMatrixVectorIndexing = true;
 		}
 
 		//
@@ -137,17 +138,17 @@ namespace GLSLSyntaxAST.UnitTests
 			}
 
 			string suffix = System.IO.Path.GetExtension(fileName);
-			if (suffix == "vert")
+			if (suffix == ".vert")
 				return EShLanguage.EShLangVertex;
-			else if (suffix == "tesc")
+			else if (suffix == ".tesc")
 				return EShLanguage.EShLangTessControl;
-			else if (suffix == "tese")
+			else if (suffix == ".tese")
 				return EShLanguage.EShLangTessEvaluation;
-			else if (suffix == "geom")
+			else if (suffix == ".geom")
 				return EShLanguage.EShLangGeometry;
-			else if (suffix == "frag")
+			else if (suffix == ".frag")
 				return EShLanguage.EShLangFragment;
-			else if (suffix == "comp")
+			else if (suffix == ".comp")
 				return EShLanguage.EShLangCompute;
 
 			return EShLanguage.EShLangVertex;
@@ -175,9 +176,6 @@ namespace GLSLSyntaxAST.UnitTests
 			EOptionOutputPreprocessed = 0x8000,
 		};
 
-
-
-
 		int Options = 0;
 		//
 		// Translate the meaningful subset of command-line options to parser-behavior options.
@@ -198,12 +196,10 @@ namespace GLSLSyntaxAST.UnitTests
 				messages = (EShMessages)(messages | EShMessages.EShMsgOnlyPreprocessor);
 		}
 
-
-
-		public void Run(string fileName)
+		public bool Run(string fileName, out string result)
 		{
 			ProcessConfigFile();
-
+			var success = false;
 			// keep track of what to free
 			//std::list<glslang::TShader*> shaders;
 
@@ -215,48 +211,61 @@ namespace GLSLSyntaxAST.UnitTests
 			//
 
 			EShLanguage stage = FindLanguage(fileName);
-			var infoSink = new TInfoSink ();
+			var infoSink = new TInfoSink {debug = new TInfoSinkBase(), info = new TInfoSinkBase()};
 			var compiler = new TDeferredCompiler(stage, infoSink);
-			var intermediate = new TIntermediate(stage);
+			var intermediate = new TIntermediate();
 
 			var shader = new TShader(stage, infoSink, compiler, intermediate);
 
 			string shaderStrings = null;
-			using(var fs = OpenRead(fileName))
+			using(var fs = File.OpenRead(fileName))
+			using(var sr = new StreamReader(fs))
 			{
 			//	shaderStrings = fs
+				shaderStrings = sr.ReadToEnd();
 			}
 
-			const int defaultVersion = Options & EOptionDefaultDesktop? 110: 100;
+			int defaultVersion = (Options & (int) TOptions.EOptionDefaultDesktop) > 0 ? 110: 100;
 
 			shader.setStrings(shaderStrings, 1);
-			if (Options & EOptionOutputPreprocessed) {
-				string str;
-				if (shader.preprocess(&Resources, defaultVersion, ENoProfile,
-					false, false, messages, &str)) {
-					PutsIfNonEmpty(str.c_str());
-				} else {
-					CompileFailed = true;
-				}
-				StderrIfNonEmpty(shader->getInfoLog());
-				StderrIfNonEmpty(shader->getInfoDebugLog());
-				FreeFileData(shaderStrings);
-				continue;
-			}
-			if (! shader->parse(&Resources, defaultVersion, false, messages))
-				CompileFailed = true;
+			success = shader.preprocess (Resources, defaultVersion, Profile.NoProfile,
+				false, false, messages, out result);
 
+			if (success)
+			{
+				//PutsIfNonEmpty(result);
+			} 
+			//StderrIfNonEmpty("INFO : " + infoSink.info.ToString());
+			//StderrIfNonEmpty("DEBUG : " +infoSink.debug.ToString());
 
-			if (! (Options & EOptionSuppressInfolog)) {
-				PutsIfNonEmpty(workItem->name.c_str());
-				PutsIfNonEmpty(shader->getInfoLog());
-				PutsIfNonEmpty(shader->getInfoDebugLog());
+			if ((Options & (int) TOptions.EOptionSuppressInfolog) == 0) {
+				//PutsIfNonEmpty(fileName);
+				//PutsIfNonEmpty(infoSink.info.ToString());
+				//PutsIfNonEmpty(infoSink.debug.ToString());
 			}
 
-			FreeFileData(shaderStrings);
-
-
+			return success;
 		}
+
+		// Outputs the given string, but only if it is non-null and non-empty.
+		// This prevents erroneous newlines from appearing.
+		static void PutsIfNonEmpty(string str)
+		{
+			if (!string.IsNullOrWhiteSpace(str)) {
+				Console.WriteLine(str);
+			}
+		}
+
+		// Outputs the given string to stderr, but only if it is non-null and non-empty.
+		// This prevents erroneous newlines from appearing.
+		static void StderrIfNonEmpty(string str)
+		{
+			if (!string.IsNullOrWhiteSpace(str)) 
+			{
+				Debug.WriteLine(str);
+			}
+		}
+
 	}
 }
 

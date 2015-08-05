@@ -11,7 +11,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		public const int EOF = -12345;
-		public const int END_OF_INPUT = -2;
+		public const int END_OF_INPUT = -1;
 
 		protected bool done;
 		protected PreprocessorContext pp;

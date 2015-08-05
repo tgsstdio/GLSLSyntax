@@ -12,18 +12,11 @@ namespace GLSLSyntaxAST.CodeDom
 			input = i;
 		}
 
-		private class NameBuffer
-		{
-			public char[] name;
-		}
-
 		public override int scan(ref TPpToken ppToken)
 		{
 		//
 		// Scanner used to tokenize source stream.
 		//
-			const int MAX_TOKEN_LENGTH = 1024;
-			char[] tokenText= new char[1025];
 			bool AlreadyComplained = false;
 			int len = 0;
 			int ch = 0;
@@ -33,9 +26,6 @@ namespace GLSLSyntaxAST.CodeDom
 			ppToken.ival = 0;
 			ppToken.space = false;
 			ch = pp.getChar();
-
-			var buffer = new NameBuffer ();
-			buffer.name = new char[MAX_TOKEN_LENGTH];
 
 			for (;;) {
 				while (ch == ' ' || ch == '\t') {
@@ -47,7 +37,6 @@ namespace GLSLSyntaxAST.CodeDom
 				len = 0;
 				switch (ch) {
 				default:
-					ppToken.name = new string(buffer.name, 0, len);						
 					return ch; // Single character token, including '#' and '\' (escaped newlines are handled at a lower level, so this is just a '\' token)
 
 				// TODO : EOF for stream
@@ -109,9 +98,9 @@ namespace GLSLSyntaxAST.CodeDom
 				case 'z':
 					do
 					{
-						if (len < MAX_TOKEN_LENGTH)
+						if (len < NameBuffer.MAX_TOKEN_LENGTH)
 						{
-							tokenText [len++] = (char)ch;
+							pp.buffer.tokenText [len++] = (char)ch;
 							ch = pp.getChar ();					
 						} else
 						{
@@ -131,20 +120,18 @@ namespace GLSLSyntaxAST.CodeDom
 					if (len == 0)
 						continue;
 
-					tokenText [len] = '\0';
+					pp.buffer.tokenText [len] = '\0';
 					pp.ungetChar ();
-					ppToken.atom = pp.LookUpAddString (new string (tokenText));
-
-					ppToken.name = new string(buffer.name, 0, len);	
+					ppToken.atom = pp.LookUpAddString (new string (pp.buffer.tokenText, 0, len));
 					return (int) CppEnums.IDENTIFIER;
 				case '0':
-					buffer.name[len++] = (char)ch;
+					pp.buffer.name[len++] = (char)ch;
 					ch = pp.getChar();
 					if (ch == 'x' || ch == 'X') {
 						// must be hexidecimal
 
 						bool isUnsigned = false;
-						buffer.name[len++] = (char)ch;
+						pp.buffer.name[len++] = (char)ch;
 						ch = pp.getChar();
 						if ((ch >= '0' && ch <= '9') ||
 							(ch >= 'A' && ch <= 'F') ||
@@ -153,7 +140,7 @@ namespace GLSLSyntaxAST.CodeDom
 							ival = 0;
 							do {
 								if (ival <= 0x0fffffff) {
-									buffer.name[len++] = (char)ch;
+									pp.buffer.name[len++] = (char)ch;
 									if (ch >= '0' && ch <= '9') {
 										ii = ch - '0';
 									} else if (ch >= 'A' && ch <= 'F') {
@@ -178,8 +165,8 @@ namespace GLSLSyntaxAST.CodeDom
 							pp.parseContext.error(ppToken.loc, "bad digit in hexidecimal literal", "", "");
 						}
 						if (ch == 'u' || ch == 'U') {
-							if (len < MAX_TOKEN_LENGTH)
-								buffer.name[len++] = (char)ch;
+							if (len < NameBuffer.MAX_TOKEN_LENGTH)
+								pp.buffer.name[len++] = (char)ch;
 							isUnsigned = true;
 						} else
 							pp.ungetChar();
@@ -189,12 +176,10 @@ namespace GLSLSyntaxAST.CodeDom
 
 						if (isUnsigned)
 						{
-							ppToken.name = new string(buffer.name, 0, len);	
 							return (int)CppEnums.UINTCONSTANT;
 						}
 						else
-						{
-							ppToken.name = new string(buffer.name, 0, len);	
+						{	
 							return (int)CppEnums.INTCONSTANT;
 						}
 					} else {
@@ -207,8 +192,8 @@ namespace GLSLSyntaxAST.CodeDom
 
 						// see how much octal-like stuff we can read
 						while (ch >= '0' && ch <= '7') {
-							if (len < MAX_TOKEN_LENGTH)
-								buffer.name[len++] = (char)ch;
+							if (len < NameBuffer.MAX_TOKEN_LENGTH)
+								pp.buffer.name[len++] = (char)ch;
 							else if (! AlreadyComplained) {
 								pp.parseContext.error(ppToken.loc, "numeric literal too long", "", "");
 								AlreadyComplained = true;
@@ -225,8 +210,8 @@ namespace GLSLSyntaxAST.CodeDom
 						if (ch == '8' || ch == '9') {
 							nonOctal = true;
 							do {
-								if (len < MAX_TOKEN_LENGTH)
-									buffer.name[len++] = (char)ch;
+								if (len < NameBuffer.MAX_TOKEN_LENGTH)
+									pp.buffer.name[len++] = (char)ch;
 								else if (! AlreadyComplained) {
 									pp.parseContext.error(ppToken.loc, "numeric literal too long", "", "");
 									AlreadyComplained = true;
@@ -236,7 +221,7 @@ namespace GLSLSyntaxAST.CodeDom
 						}
 						if (ch == '.' || ch == 'e' || ch == 'f' || ch == 'E' || ch == 'F' || ch == 'l' || ch == 'L')
 						{
-							ppToken.name = new string(buffer.name, 0, len);	
+							ppToken.name = new string(pp.buffer.name, 0, len);	
 							return pp.lFloatConst (len, ch, ppToken);
 						}
 
@@ -245,8 +230,8 @@ namespace GLSLSyntaxAST.CodeDom
 							pp.parseContext.error(ppToken.loc, "octal literal digit too large", "", "");
 
 						if (ch == 'u' || ch == 'U') {
-							if (len < MAX_TOKEN_LENGTH)
-								buffer.name[len++] = (char)ch;
+							if (len < NameBuffer.MAX_TOKEN_LENGTH)
+								pp.buffer.name[len++] = (char)ch;
 							isUnsigned = true;
 						} else
 							pp.ungetChar();
@@ -257,7 +242,7 @@ namespace GLSLSyntaxAST.CodeDom
 							pp.parseContext.error(ppToken.loc, "octal literal too big", "", "");
 
 						ppToken.ival = (int)ival;
-						ppToken.name = new string(buffer.name, 0, len);	
+						ppToken.name = new string(pp.buffer.name, 0, len);	
 						if (isUnsigned)
 						{							
 							return (int)CppEnums.UINTCONSTANT;
@@ -277,82 +262,66 @@ namespace GLSLSyntaxAST.CodeDom
 				case '7':
 				case '8':
 				case '9':
-					return DoHexidecimal (buffer, ppToken, ch, ref AlreadyComplained, ref len, MAX_TOKEN_LENGTH);
+					return DoHexidecimal (pp.buffer, ppToken, ch, ref AlreadyComplained, ref len, NameBuffer.MAX_TOKEN_LENGTH);
 					break;
 				case '-':
 					ch = pp.getChar();
 					if (ch == '-') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.DEC_OP;
 					} else if (ch == '=') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.SUB_ASSIGN;
 					} else {
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return '-';
 					}
 				case '+':
 					ch = pp.getChar();
 					if (ch == '+') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.INC_OP;
 					} else if (ch == '=') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.ADD_ASSIGN;
 					} else {
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return '+';
 					}
 				case '*':
 					ch = pp.getChar();
 					if (ch == '=') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.MUL_ASSIGN;
 					} else {
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return '*';
 					}
 				case '%':
 					ch = pp.getChar();
 					if (ch == '=') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.MOD_ASSIGN;
 					} else if (ch == '>'){
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.RIGHT_BRACE;
 					} else {
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return '%';
 					}
 				case ':':
 					ch = pp.getChar();
 					if (ch == '>') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.RIGHT_BRACKET;
 					} else {
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return ':';
 					}
 				case '^':
 					ch = pp.getChar();
 					if (ch == '^') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.XOR_OP;
 					} else {
 						if (ch == '=')
 						{
-							ppToken.name = new string(buffer.name, 0, len);								
 							return (int)CppEnums.XOR_ASSIGN;
 						}
 						else
 						{
 							pp.ungetChar();
-							ppToken.name = new string(buffer.name, 0, len);	
 							return '^';
 						}
 					}
@@ -360,54 +329,44 @@ namespace GLSLSyntaxAST.CodeDom
 				case '=':
 					ch = pp.getChar();
 					if (ch == '=') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.EQ_OP;
 					} else {						
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return '=';
 					}
 				case '!':
 					ch = pp.getChar();
 					if (ch == '=') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.NE_OP;
 					} else {
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return '!';
 					}
 				case '|':
 					ch = pp.getChar();
 					if (ch == '|') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.OR_OP;
 					} else {
 						if (ch == '=')
-						{
-							ppToken.name = new string (buffer.name, 0, len);								
+						{	
 							return (int)CppEnums.OR_ASSIGN;
 						}
 						else{
 							pp.ungetChar();
-							ppToken.name = new string(buffer.name, 0, len);	
 							return '|';
 						}
 					}
 				case '&':
 					ch = pp.getChar();
 					if (ch == '&') {
-						ppToken.name = new string(buffer.name, 0, len);							
 						return (int) CppEnums.AND_OP;
 					} else {
 						if (ch == '=')
 						{
-							ppToken.name = new string(buffer.name, 0, len);								
 							return (int)CppEnums.AND_ASSIGN;
 						}
 						else{
 							pp.ungetChar();
-							ppToken.name = new string(buffer.name, 0, len);	
 							return '&';
 						}
 					}
@@ -417,36 +376,30 @@ namespace GLSLSyntaxAST.CodeDom
 						ch = pp.getChar();
 						if (ch == '=')
 						{
-							ppToken.name = new string(buffer.name, 0, len);								
 							return (int)CppEnums.LEFT_ASSIGN;
 						}
 						else
 						{
 							pp.ungetChar();
-							ppToken.name = new string(buffer.name, 0, len);	
 							return (int) CppEnums.LEFT_OP;
 						}
 					} else {
 						if (ch == '=')
 						{
-							ppToken.name = new string(buffer.name, 0, len);								
 							return (int) CppEnums.LE_OP;
 						} 
 						else 
 						{
 							if (ch == '%')
 							{
-								ppToken.name = new string (buffer.name, 0, len);									
 								return (int)CppEnums.LEFT_BRACE;
 							} else if (ch == ':')
 							{
-								ppToken.name = new string(buffer.name, 0, len);									
 								return (int)CppEnums.LEFT_BRACKET;
 							}
 							else
 							{
 								pp.ungetChar();
-								ppToken.name = new string(buffer.name, 0, len);	
 								return '<';
 							}
 						}
@@ -457,21 +410,17 @@ namespace GLSLSyntaxAST.CodeDom
 						ch = pp.getChar();
 						if (ch == '=')
 						{
-							ppToken.name = new string(buffer.name, 0, len);								
 							return (int)CppEnums.RIGHT_ASSIGN;
 						}
 						else{
 							pp.ungetChar();
-							ppToken.name = new string(buffer.name, 0, len);	
 							return (int) CppEnums.RIGHT_OP;
 						}
 					} else {
 						if (ch == '=') {
-							ppToken.name = new string(buffer.name, 0, len);								
 							return (int) CppEnums.GE_OP;
 						} else {
 							pp.ungetChar();
-							ppToken.name = new string(buffer.name, 0, len);	
 							return '>';
 						}
 					}
@@ -480,13 +429,11 @@ namespace GLSLSyntaxAST.CodeDom
 					if (ch >= '0' && ch <= '9')
 					{
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return pp.lFloatConst(0, '.', ppToken);
 					}
 					else
 					{
 						pp.ungetChar();
-						ppToken.name = new string(buffer.name, 0, len);	
 						return '.';
 					}
 				case '/':
@@ -499,7 +446,6 @@ namespace GLSLSyntaxAST.CodeDom
 						ppToken.space = true;
 						pp.inComment = false;
 
-						ppToken.name = new string (buffer.name, 0, len);
 						if (this.IsEOF (ch))
 						{	
 							return END_OF_INPUT;
@@ -513,7 +459,6 @@ namespace GLSLSyntaxAST.CodeDom
 								if (this.IsEOF(ch))
 								{
 									pp.parseContext.error(ppToken.loc, "EOF in comment", "comment", "");
-									ppToken.name = new string (buffer.name, 0, len);
 									return END_OF_INPUT;
 								}
 								ch = pp.getChar();
@@ -522,7 +467,6 @@ namespace GLSLSyntaxAST.CodeDom
 							if (this.IsEOF(ch))
 							{
 								pp.parseContext.error(ppToken.loc, "EOF in comment", "comment", "");
-								ppToken.name = new string (buffer.name, 0, len);
 								return END_OF_INPUT;
 							}
 						} while (ch != '/');
@@ -530,32 +474,30 @@ namespace GLSLSyntaxAST.CodeDom
 						// loop again to get the next token...
 						break;
 					} else if (ch == '=') {
-						ppToken.name = new string (buffer.name, 0, len);						
 						return (int) CppEnums.DIV_ASSIGN;
 					} else {
 						pp.ungetChar();
-						ppToken.name = new string (buffer.name, 0, len);
 						return '/';
 					}
 					break;
 				case '"':
 					ch = pp.getChar();
 					while (ch != '"' && ch != '\n' && this.IsEOF(ch)) {
-						if (len < MAX_TOKEN_LENGTH) {
-							tokenText[len] = (char)ch;
+						if (len < NameBuffer.MAX_TOKEN_LENGTH) {
+							pp.buffer.tokenText[len] = (char)ch;
 							len++;
 							ch = pp.getChar();
 						} else
 							break;
 					};
-					tokenText[len] = '\0';
+					//pp.buffer.tokenText[len] = '\0';
 					if (ch == '"') {
-						ppToken.atom = pp.LookUpAddString(new string(tokenText));
-						ppToken.name = new string (buffer.name, 0, len);
+						ppToken.atom = pp.LookUpAddString(new string(pp.buffer.tokenText, 0, len));
+						ppToken.name = new string (pp.buffer.name, 0, len);
 						return (int) CppEnums.STRCONSTANT;
 					} else {
 						pp.parseContext.error(ppToken.loc, "end of line in string", "string", "");
-						ppToken.name = new string (buffer.name, 0, len);
+						ppToken.name = new string (pp.buffer.name, 0, len);
 						return (int) CppEnums.ERROR_SY;
 					}
 				}
@@ -602,7 +544,7 @@ namespace GLSLSyntaxAST.CodeDom
 				const uint REMAINDERMAXINT = 0xFFFFFFFFu - 10 * ONETENTHMAXINT;
 				for (int i = 0; i < numericLen; i++) 
 				{
-					ch = ppToken.name[i] - '0';
+					ch = buffer.name[i] - '0';
 					if ((ival > ONETENTHMAXINT) || (ival == ONETENTHMAXINT && ch > REMAINDERMAXINT)) 
 					{
 						pp.parseContext.error(ppToken.loc, "numeric literal too big", "", "");

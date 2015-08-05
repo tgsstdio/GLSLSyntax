@@ -78,6 +78,8 @@
     <Compile Include="DoPreprocessing.cs" />
     <Compile Include="EShOptimizationLevel.cs" />
     <Compile Include="TScanContext.cs" />
+    <Compile Include="Standalone.cs" />
+    <Compile Include="NameBuffer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
