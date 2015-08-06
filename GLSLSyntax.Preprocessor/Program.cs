@@ -1,5 +1,6 @@
 ﻿using System;
 using GLSLSyntaxAST.CodeDom;
+using System.IO;
 
 namespace GLSLSyntax.Preprocessor
 {
@@ -9,9 +10,23 @@ namespace GLSLSyntax.Preprocessor
 		{
 			var preprocessor = new Standalone ();
 			string result = null;
-			if (preprocessor.Run ("Sample.vert", out result))
+
+			//const string fileName = "Sample.vert";
+			const string fileName = "notex.vert";
+			string original = null;
+			using (var fs = File.OpenRead (fileName))
+			using (var sr = new StreamReader(fs))				
+			{
+				original = sr.ReadToEnd ();
+			}
+
+			Console.WriteLine (original);
+			Console.WriteLine (original.Length);
+
+			if (preprocessor.Run (fileName, out result))
 			{
 				Console.WriteLine (result);
+				Console.WriteLine (result.Length);
 			}
 
 		}

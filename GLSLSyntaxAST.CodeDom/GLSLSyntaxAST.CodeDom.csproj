@@ -80,6 +80,7 @@
     <Compile Include="TScanContext.cs" />
     <Compile Include="Standalone.cs" />
     <Compile Include="NameBuffer.cs" />
+    <Compile Include="TBuiltins.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -865,8 +865,6 @@ namespace GLSLSyntaxAST.CodeDom
 		*/
 		void RecordToken(TokenStream pTok, int token, TPpToken ppToken)
 		{
-			string str = null;
-
 			if (token > 256)
 				lAddByte(pTok, (UInt16)((token & 0x7f) + 0x80));
 			else
@@ -886,7 +884,7 @@ namespace GLSLSyntaxAST.CodeDom
 			case (int) CppEnums.UINTCONSTANT:
 			case (int) CppEnums.FLOATCONSTANT:
 			case (int) CppEnums.DOUBLECONSTANT:
-				str = ppToken.name;
+				string str = ppToken.name;
 				foreach (var letter in str)
 				{
 					lAddByte(pTok, (UInt16) letter);
@@ -1249,8 +1247,9 @@ namespace GLSLSyntaxAST.CodeDom
 		//*/
 		public int ReadToken(TokenStream pTok, TPpToken ppToken)
 		{
-			char[] tokenText = new char[TPpToken.maxTokenLength];
-			int ltoken, len;
+			char[] tokenText = buffer.tokenText;
+			int ltoken = 0;
+			int len = 0;
 			int ch;
 
 			ltoken = lReadByte(pTok);
@@ -1298,7 +1297,7 @@ namespace GLSLSyntaxAST.CodeDom
 			// DY RESTRUCTURED CODE 
 			//tokenText[len] = 0;
 
-			string text = new string (tokenText);
+			string text = new string (tokenText, 0, len);
 			switch (ltoken) 
 			{
 				case (int) CppEnums.IDENTIFIER:
@@ -1495,6 +1494,39 @@ namespace GLSLSyntaxAST.CodeDom
 			popInput();
 
 			return n;
+		}
+
+		/// <summary>
+		/// Sets the program define as int.
+		/// Too slow to use to preamble; bypass normal processing 
+		/// </summary>
+		/// <param name="definedName">Defined name.</param>
+		/// <param name="value">Value.</param>
+		public void SetProgramDefineAsInt(string definedName, int value)
+		{
+			int atom = LookUpAddString (definedName);
+			Symbol sym = AddSymbol (atom);
+			sym.mac = new MacroSymbol ();
+			sym.mac.body = new TokenStream ();
+			var packet = new TPpToken ();
+			packet.name = value.ToString();
+			RecordToken (sym.mac.body, (int) CppEnums.INTCONSTANT, packet);
+		}
+		/// <summary>
+		/// Sets the program define as string.
+		/// Too slow to use to preamble; bypass normal processing 
+		/// </summary>
+		/// <param name="definedName">Defined name.</param>
+		/// <param name="valueString">Value string.</param>
+		public void SetProgramDefineAsString(string definedName, string valueString)
+		{
+			int atom = LookUpAddString (definedName);
+			Symbol sym = AddSymbol (atom);
+			sym.mac = new MacroSymbol ();
+			sym.mac.body = new TokenStream ();
+			var packet = new TPpToken ();
+			packet.atom = LookUpAddString (valueString);
+			RecordToken (sym.mac.body, (int) CppEnums.STRCONSTANT, packet);
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////

@@ -129,22 +129,6 @@ namespace GLSLSyntaxAST.CodeDom
 				return true;
 			}
 
-			// Move to length-based strings, rather than null-terminated strings.
-			// Also, add strings to include the preamble and to ensure the shader is not null,
-			// which lets the grammar accept what was a null (post preprocessing) shader.
-			//
-			// Shader will look like
-			//   string 0:                system preamble
-			//   string 1:                custom preamble
-			//   string 2...numStrings+1: user's shader
-			//   string numStrings+2:     "int;"
-			int numPre = 2;
-			int numPost = requireNonempty? 1 : 0;
-			var strings = new string[numStrings + numPre + numPost];
-			for (int s = 0; s < numStrings; ++s) {
-				strings[s + numPre] = shaderStrings[s];
-			}
-
 			// First, without using the preprocessor or parser, find the #version, so we know what
 			// symbol tables, processing rules, etc. to set up.  This does not need the extra strings
 			// outlined above, just the user shader.
@@ -219,19 +203,11 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 
 			parseContext.initializeExtensionBehavior();
+			// not recommended 
 
+			ppContext.SetProgramDefineAsInt ("GL_ARB_shader_storage_buffer_object", 1);
 
-			// Fill in the strings as outlined above.
-			strings[0] = ""; //parseContext.getPreamble();
-			strings[1] = customPreamble;
-			if (2 != numPre)
-			{
-				throw new Exception ("Preamble check");
-			}
-
-			if (requireNonempty) {
-				strings[numStrings + numPre] = "\n int;";
-			}
+			parseContext.SetPreambleManually ();
 			//var fullInput = new TInputScanner(strings, numPre, numPost);
 			var fullInput = new TInputScanner(shaderStrings, 0 , 0);
 

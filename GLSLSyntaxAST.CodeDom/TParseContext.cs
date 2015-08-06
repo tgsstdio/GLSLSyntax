@@ -26,9 +26,10 @@ namespace GLSLSyntaxAST.CodeDom
 			
 		}
 
+		private PreprocessorContext ppContext;
 		public void setPpContext(PreprocessorContext pp)
 		{
-
+			ppContext = pp;	
 		}
 
 		public void setLimits(TBuiltInResource resources)
@@ -530,6 +531,64 @@ namespace GLSLSyntaxAST.CodeDom
 				updateExtensionBehavior(line, "GL_OES_shader_io_blocks", behaviorString);
 		}
 
+		public void SetPreambleManually()
+		{
+			if (profile == Profile.EsProfile)
+			{
+				ppContext.SetProgramDefineAsInt ("GL_ES", 1);
+				ppContext.SetProgramDefineAsInt ("GL_FRAGMENT_PRECISION_HIGH", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_texture_3D", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_standard_derivatives", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_frag_depth", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_EGL_image_external", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_shader_texture_lod", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ANDROID_extension_pack_es31a", 1);
+				ppContext.SetProgramDefineAsInt ("GL_KHR_blend_equation_advanced", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_sample_variables", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_shader_image_atomic", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_shader_multisample_interpolation", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_texture_storage_multisample_2d_array", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_geometry_shader", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_geometry_point_size", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_gpu_shader5", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_primitive_bounding_box", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_shader_io_blocks", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_tessellation_shader", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_tessellation_point_size", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_texture_buffer", 1);
+				ppContext.SetProgramDefineAsInt ("GL_EXT_texture_cube_map_array", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_geometry_shader", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_geometry_point_size", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_gpu_shader5", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_primitive_bounding_box", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_shader_io_blocks", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_tessellation_shader", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_tessellation_point_size", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_texture_buffer", 1);
+				ppContext.SetProgramDefineAsInt ("GL_OES_texture_cube_map_array", 1);		
+			}
+			else
+			{
+				ppContext.SetProgramDefineAsInt ("GL_FRAGMENT_PRECISION_HIGH", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_texture_rectangle", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_shading_language_420pack", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_texture_gather", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_gpu_shader5", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_separate_shader_objects", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_compute_shader", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_tessellation_shader", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_enhanced_layouts", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_texture_cube_map_array", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_texture_lod", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_explicit_attrib_location", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_image_load_store", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_atomic_counters", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_derivative_control", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_texture_image_samples", 1);
+				ppContext.SetProgramDefineAsInt ("GL_ARB_viewport_array", 1);
+			}
+		}
+
 		// Get code that is not part of a shared symbol table, is specific to this shader,
 		// or needed by the preprocessor (which does not use a shared symbol table).
 		public string getPreamble()
@@ -546,7 +605,7 @@ namespace GLSLSyntaxAST.CodeDom
 #define GL_ANDROID_extension_pack_es31a 1
 #define GL_KHR_blend_equation_advanced 1
 #define GL_OES_sample_variables 1
-#define GL_OES_shader_image_atomic 1\
+#define GL_OES_shader_image_atomic 1
 #define GL_OES_shader_multisample_interpolation 1
 #define GL_OES_texture_storage_multisample_2d_array 1
 #define GL_EXT_geometry_shader 1
@@ -557,10 +616,10 @@ namespace GLSLSyntaxAST.CodeDom
 #define GL_EXT_tessellation_shader 1
 #define GL_EXT_tessellation_point_size 1
 #define GL_EXT_texture_buffer 1
-#define GL_EXT_texture_cube_map_array 1\
+#define GL_EXT_texture_cube_map_array 1
 #define GL_OES_geometry_shader 1
 #define GL_OES_geometry_point_size 1
-#define GL_OES_gpu_shader5 1\
+#define GL_OES_gpu_shader5 1
 #define GL_OES_primitive_bounding_box 1
 #define GL_OES_shader_io_blocks 1
 #define GL_OES_tessellation_shader 1
