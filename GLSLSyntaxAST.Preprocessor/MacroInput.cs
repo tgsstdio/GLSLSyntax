@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class MacroInput : BasePreprocessorInput
+	internal class MacroInput : BasePreprocessorInput
 	{
-		public MacroInput (PreprocessorContext pp) : base(pp)
+		internal MacroInput (PreprocessorContext pp) : base(pp)
 		{
 		}
 
-		public override int scan(ref PreprocessorToken ppToken)
+		internal override int scan(ref PreprocessorToken ppToken)
 		{
 			int token;
 			do {
@@ -35,18 +35,18 @@ namespace GLSLSyntaxAST.CodeDom
 			return token;
 		}
 
-		public override int getch() 
+		internal override int getch() 
 		{ 
 			throw new NotSupportedException ();
 		}
 
-		public override void ungetch() 
+		internal override void ungetch() 
 		{ 
 			throw new NotSupportedException ();
 		}
 
-		public MacroSymbol mac;
-		public List<TokenStream> args;
+		internal MacroSymbol mac;
+		internal List<TokenStream> args;
 	}
 }
 

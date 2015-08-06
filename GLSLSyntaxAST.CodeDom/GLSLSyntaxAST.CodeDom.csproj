@@ -45,36 +45,6 @@
     <Compile Include="GLSLUniformExtractor.cs" />
     <Compile Include="IGLSLUniformExtractor.cs" />
     <Compile Include="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" />
-    <Compile Include="IPreprocessorContext.cs" />
-    <Compile Include="PreprocessorContext.cs" />
-    <Compile Include="TParseContext.cs" />
-    <Compile Include="IScannableType.cs" />
-    <Compile Include="CppEnums.cs" />
-    <Compile Include="TokenStream.cs" />
-    <Compile Include="MacroSymbol.cs" />
-    <Compile Include="ExtensionBehavior.cs" />
-    <Compile Include="Profile.cs" />
-    <Compile Include="EvalPrecedence.cs" />
-    <Compile Include="TIntermediate.cs" />
-    <Compile Include="TShader.cs" />
-    <Compile Include="DoPreprocessing.cs" />
-    <Compile Include="Standalone.cs" />
-    <Compile Include="ShaderLanguage.cs" />
-    <Compile Include="ShaderMessages.cs" />
-    <Compile Include="InfoSink.cs" />
-    <Compile Include="InfoSinkBase.cs" />
-    <Compile Include="BasePreprocessorInput.cs" />
-    <Compile Include="InputScanner.cs" />
-    <Compile Include="MacroInput.cs" />
-    <Compile Include="ZeroInput.cs" />
-    <Compile Include="UngotTokenInput.cs" />
-    <Compile Include="TokenInput.cs" />
-    <Compile Include="StringInput.cs" />
-    <Compile Include="StringInputBuffer.cs" />
-    <Compile Include="Pragma.cs" />
-    <Compile Include="MarkerInput.cs" />
-    <Compile Include="SourceLocation.cs" />
-    <Compile Include="PreprocessorToken.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

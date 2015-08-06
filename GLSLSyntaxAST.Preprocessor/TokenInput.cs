@@ -1,24 +1,24 @@
 ﻿using System;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class TokenInput : BasePreprocessorInput {
-		public TokenInput(PreprocessorContext pp, TokenStream t) : base(pp)
+	internal class TokenInput : BasePreprocessorInput {
+		internal TokenInput(PreprocessorContext pp, TokenStream t) : base(pp)
 		{
 			tokens = t;
 		}
 
-		public override int scan(ref PreprocessorToken ppToken)
+		internal override int scan(ref PreprocessorToken ppToken)
 		{
 			return pp.ReadToken(tokens, ppToken);
 		}
 
-		public override int getch() 
+		internal override int getch() 
 		{
 			throw new NotSupportedException ();
 		}
 
-		public override void ungetch()
+		internal override void ungetch()
 		{
 			throw new NotSupportedException ();
 		}

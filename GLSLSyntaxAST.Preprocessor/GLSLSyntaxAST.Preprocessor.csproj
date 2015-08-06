@@ -32,6 +32,40 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BasePreprocessorInput.cs" />
+    <Compile Include="CppEnums.cs" />
+    <Compile Include="DoPreprocessing.cs" />
+    <Compile Include="ExtensionBehavior.cs" />
+    <Compile Include="InfoSink.cs" />
+    <Compile Include="InfoSinkBase.cs" />
+    <Compile Include="InputScanner.cs" />
+    <Compile Include="MacroInput.cs" />
+    <Compile Include="MacroSymbol.cs" />
+    <Compile Include="MarkerInput.cs" />
+    <Compile Include="Pragma.cs" />
+    <Compile Include="PreprocessorContext.cs" />
+    <Compile Include="PreprocessorToken.cs" />
+    <Compile Include="ShaderLanguage.cs" />
+    <Compile Include="SourceLocation.cs" />
+    <Compile Include="Standalone.cs" />
+    <Compile Include="StringInput.cs" />
+    <Compile Include="StringInputBuffer.cs" />
+    <Compile Include="TokenInput.cs" />
+    <Compile Include="TokenStream.cs" />
+    <Compile Include="TShader.cs" />
+    <Compile Include="UngotTokenInput.cs" />
+    <Compile Include="ZeroInput.cs" />
+    <Compile Include="Profile.cs" />
+    <Compile Include="EvalPrecedence.cs" />
+    <Compile Include="GLSLIntermediate.cs" />
+    <Compile Include="IInfoSinkComponent.cs" />
+    <Compile Include="PrefixType.cs" />
+    <Compile Include="SinkType.cs" />
+    <Compile Include="MessageType.cs" />
+    <Compile Include="SymbolLookup.cs" />
+    <Compile Include="Symbol.cs" />
+    <Compile Include="AtomLookup.cs" />
+    <Compile Include="ParseContext.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

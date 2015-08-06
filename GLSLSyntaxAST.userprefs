@@ -1,38 +1,51 @@
-﻿<Properties StartupItem="GLSLSyntax.Preprocessor\GLSLSyntax.Preprocessor.csproj">
+﻿<Properties StartupItem="GLSLSyntaxAST.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CodeDom\ExtensionBehavior.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="C:\Program Files (x86)\MSBuild\12.0\bin\Microsoft.Common.CurrentVersion.targets">
     <Files>
-      <File FileName="GLSLSyntaxAST.CodeDom\InfoSink.cs" Line="5" Column="22" />
-      <File FileName="GLSLSyntaxAST.CodeDom\MarkerInput.cs" Line="5" Column="26" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IScannableType.cs" Line="5" Column="2" />
-      <File FileName="GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" Line="279" Column="33" />
-      <File FileName="GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\BasePreprocessorInput.cs" Line="5" Column="55" />
-      <File FileName="GLSLSyntaxAST.CodeDom\InputScanner.cs" Line="5" Column="27" />
-      <File FileName="GLSLSyntaxAST.CodeDom\MacroInput.cs" Line="3" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\DesiredFormat.txt" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" Line="105" Column="8" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IPreprocessorContext.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\ZeroInput.cs" Line="5" Column="24" />
-      <File FileName="GLSLSyntaxAST.CodeDom\UngotTokenInput.cs" Line="5" Column="30" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TokenInput.cs" Line="26" Column="32" />
-      <File FileName="GLSLSyntaxAST.CodeDom\SourceLocation.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StringInput.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\Profile.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StringInputBuffer.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TParseContext.cs" Line="12" Column="27" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TShader.cs" Line="154" Column="38" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TIntermediate.cs" Line="19" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\PreprocessorToken.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TokenStream.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\Standalone.cs" Line="78" Column="11" />
-      <File FileName="GLSLSyntaxAST.UnitTests\ProprocessorTests.cs" Line="14" Column="4" />
-      <File FileName="GLSLSyntax.Preprocessor\Program.cs" Line="12" Column="43" />
-      <File FileName="GLSLSyntaxAST.CodeDom\CppEnums.cs" Line="40" Column="24" />
-      <File FileName="GLSLSyntaxAST.CodeDom\EvalPrecedence.cs" Line="12" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\ExampleProgram.cs.txt" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\ExtensionBehavior.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\MessageType.cs" Line="9" Column="25" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\TParseContext.cs" Line="175" Column="4" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\PreprocessorContext.cs" Line="37" Column="3" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\AtomLookup.cs" Line="84" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\StringInput.cs" Line="481" Column="14" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\TShader.cs" Line="161" Column="58" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\Standalone.cs" Line="105" Column="25" />
+      <File FileName="GLSLSyntaxAST.UnitTests\ProprocessorTests.cs" Line="12" Column="32" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\SymbolLookup.cs" Line="8" Column="28" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\Symbol.cs" Line="5" Column="12" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\TokenInput.cs" Line="21" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\IInfoSinkComponent.cs" Line="3" Column="37" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\SourceLocation.cs" Line="1" Column="37" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\PreprocessorToken.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\TokenStream.cs" Line="11" Column="9" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\ShaderLanguage.cs" Line="1" Column="37" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\Profile.cs" Line="6" Column="8" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\UngotTokenInput.cs" Line="31" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\BasePreprocessorInput.cs" Line="12" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\MacroInput.cs" Line="18" Column="4" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\MarkerInput.cs" Line="26" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\ZeroInput.cs" Line="31" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\InfoSink.cs" Line="18" Column="16" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\InfoSinkBase.cs" Line="6" Column="27" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\DoPreprocessing.cs" Line="131" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\MacroSymbol.cs" Line="14" Column="1" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\Pragma.cs" Line="15" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\PrefixType.cs" Line="6" Column="8" />
+      <File FileName="C:\Program Files (x86)\MSBuild\12.0\bin\Microsoft.Common.CurrentVersion.targets" Line="1703" Column="92" />
+      <File FileName="GLSLGrammar.cs" Line="403" Column="75" />
+      <File FileName="Irony\Parsing\Parser\Parser.cs" Line="159" Column="11" />
+      <File FileName="GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="68" Column="4" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="129" Column="7" />
+      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="26" Column="41" />
+      <File FileName="Irony\Parsing\Parser\ParserActions\ErrorRecoveryParserAction.cs" Line="7" Column="3" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\GLSLIntermediate.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\InputScanner.cs" Line="247" Column="11" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\ParseContext.cs" Line="552" Column="4" />
+      <File FileName="GLSLSyntaxAST.UnitTests\packages.config" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\CppEnums.cs" Line="3" Column="10" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\SinkType.cs" Line="15" Column="1" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\StringInputBuffer.cs" Line="1" Column="37" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\EvalPrecedence.cs" Line="3" Column="10" />
+      <File FileName="GLSLSyntaxAST.Preprocessor\ExtensionBehavior.cs" Line="3" Column="37" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

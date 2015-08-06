@@ -1,15 +1,15 @@
 ﻿using System;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class MarkerInput : BasePreprocessorInput
+	internal class MarkerInput : BasePreprocessorInput
 	{
-		public MarkerInput(PreprocessorContext pp) :base(pp)
+		internal MarkerInput(PreprocessorContext pp) :base(pp)
 		{
 				
 		}
 
-		public override int scan(ref PreprocessorToken ppToken)
+		internal override int scan(ref PreprocessorToken ppToken)
 		{
 			if (done)
 				return BasePreprocessorInput.END_OF_INPUT;
@@ -18,17 +18,17 @@ namespace GLSLSyntaxAST.CodeDom
 			return marker;
 		}
 
-		public override int getch()
+		internal override int getch()
 		{
 			throw new NotSupportedException ();
 		}
 
-		public override void ungetch()
+		internal override void ungetch()
 		{
 			throw new NotSupportedException ();
 		}
 
-		public static int marker = -3;
+		internal static int marker = -3;
 	}
 }
 

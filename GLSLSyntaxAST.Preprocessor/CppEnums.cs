@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.Preprocessor
 {
-	public enum CppEnums : int
+	internal enum CppEnums : int
 	{
 		 AND_OP = 257
 		, SUB_ASSIGN = 259

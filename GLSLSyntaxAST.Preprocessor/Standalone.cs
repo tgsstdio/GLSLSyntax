@@ -1,30 +1,34 @@
 ﻿using System;
 using System.IO;
-using System.Diagnostics;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
 	public class Standalone
 	{
 		private readonly InfoSink mInfoSink;
 		private GLSLIntermediate mIntermediate;
-		public Standalone (InfoSink infoSink, GLSLIntermediate intermediate)
+		private SymbolLookup mSymbols;
+		public Standalone (InfoSink infoSink, GLSLIntermediate intermediate, SymbolLookup symbols)
 		{
 			mInfoSink = infoSink;
 			mIntermediate = intermediate;
+			mSymbols = symbols;
 		}
 
-		//
-		//   Deduce the language from the filename.  Files must end in one of the
-		//   following extensions:
-		//
-		//   .vert = vertex
-		//   .tesc = tessellation control
-		//   .tese = tessellation evaluation
-		//   .geom = geometry
-		//   .frag = fragment
-		//   .comp = compute
-		//
+		/// <summary>
+		/// Finds the language.
+		/// Deduce the language from the filename.  Files must end in one of the
+		/// following extensions:
+		/// 
+		///  .vert = vertex
+		///  .tesc = tessellation control
+		///   .tese = tessellation evaluation
+		///   .geom = geometry
+		///   .frag = fragment
+		///   .comp = compute
+		/// </summary>
+		/// <returns>The language.</returns>
+		/// <param name="fileName">File name.</param>
 		public static ShaderLanguage FindLanguage(string fileName)
 		{
 			if (string.IsNullOrWhiteSpace(fileName))
@@ -32,7 +36,7 @@ namespace GLSLSyntaxAST.CodeDom
 				return ShaderLanguage.Vertex;
 			}
 
-			string suffix = System.IO.Path.GetExtension(fileName);
+			string suffix = Path.GetExtension(fileName);
 			if (suffix == ".vert")
 				return ShaderLanguage.Vertex;
 			else if (suffix == ".tesc")
@@ -72,30 +76,33 @@ namespace GLSLSyntaxAST.CodeDom
 		};
 
 		public int Options = 0;
-		//
-		// Translate the meaningful subset of command-line options to parser-behavior options.
-		//
-		private ShaderMessages SetMessageOptions(ShaderMessages messages)
+
+		/// <summary>
+		/// Translate the meaningful subset of command-line options to parser-behavior options.
+		/// </summary>
+		/// <returns>The message options.</returns>
+		/// <param name="messages">Messages.</param>
+		private MessageType SetMessageOptions(MessageType messages)
 		{
 			if ((Options & (int) TOptions.RelaxedErrors) > 0)
-				messages = messages | ShaderMessages.RelaxedErrors;
+				messages = messages | MessageType.RelaxedErrors;
 			if ((Options & (int) TOptions.Intermediate) > 0)
-				messages = messages | ShaderMessages.AST;
+				messages = messages | MessageType.AST;
 			if ((Options & (int) TOptions.SuppressWarnings) > 0)
-				messages = messages | ShaderMessages.SuppressWarnings;
+				messages = messages | MessageType.SuppressWarnings;
 			if ((Options & (int) TOptions.Spirv) > 0)
-				messages = messages | ShaderMessages.SPIRVRules;
+				messages = messages | MessageType.SPIRVRules;
 			if ((Options & (int) TOptions.VulkanRules) > 0)
-				messages = messages | ShaderMessages.VulkanRules;
+				messages = messages | MessageType.VulkanRules;
 			if ((Options & (int) TOptions.OutputPreprocessed) > 0)
-				messages = messages | ShaderMessages.OnlyPreprocessor;
+				messages = messages | MessageType.OnlyPreprocessor;
 			return messages;
 		}
 
 		public bool Preprocess (ShaderLanguage stage, string[] shaderStrings, out string result)
 		{
-			var messageType = SetMessageOptions(ShaderMessages.Default);
-			var shader = new TShader(mInfoSink, stage, mIntermediate);
+			var messageType = SetMessageOptions(MessageType.Default);
+			var shader = new TShader(mInfoSink, stage, mIntermediate, mSymbols);
 			shader.setStrings (shaderStrings);
 			int defaultVersion = (Options & (int) TOptions.DefaultDesktop) > 0 ? 110: 100;
 			return shader.preprocess (defaultVersion, Profile.NoProfile, false, false, messageType, out result);
@@ -105,15 +112,22 @@ namespace GLSLSyntaxAST.CodeDom
 		{
 			ShaderLanguage stage = FindLanguage(fileName);
 
-			string shaderStrings = null;
 			using(var fs = File.OpenRead(fileName))
+			{
+				return Run (fs, stage, out result);
+			}
+		}
+
+		public bool Run(Stream fs, ShaderLanguage stage, out string result)
+		{
+			string shaderStrings = null;
 			using(var sr = new StreamReader(fs))
 			{
-			//	shaderStrings = fs
+				//	shaderStrings = fs
 				shaderStrings = sr.ReadToEnd();
 			}
 
-			return Preprocess (stage, new string[]{shaderStrings}, out result);
+			return Preprocess (stage, new string[]{shaderStrings}, out result);			
 		}
 
 	}

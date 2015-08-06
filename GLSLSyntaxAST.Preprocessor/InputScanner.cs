@@ -1,10 +1,10 @@
 using System;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class InputScanner
+	internal class InputScanner
 	{
-		public InputScanner(string[] sources, int bias, int finale)
+		internal InputScanner(string[] sources, int bias, int finale)
 		{
 			mSources = sources;
 			currentSource = 0;
@@ -23,7 +23,7 @@ namespace GLSLSyntaxAST.CodeDom
 		// anything else is the next character
 
 		// retrieve the next character and advance one character
-		public int get()
+		internal int get()
 		{
 			if (currentSource >= mSources.Length)
 				return -1;
@@ -66,7 +66,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public void unget()
+		internal void unget()
 		{
 			if (currentChar > 0) {
 				--currentChar;
@@ -99,7 +99,7 @@ namespace GLSLSyntaxAST.CodeDom
 				--loc[currentSource].line;
 		}
 
-		public int peek()
+		internal int peek()
 		{
 			if (currentSource >= mSources.Length)
 				return -1;
@@ -107,12 +107,12 @@ namespace GLSLSyntaxAST.CodeDom
 			return mSources[currentSource][currentChar];
 		}
 
-		public void setLine(int newLine)
+		internal void setLine(int newLine)
 		{
 			loc[currentSource].line = newLine; 
 		}
 
-		public void setString(int newString)
+		internal void setString(int newString)
 		{
 			loc[currentSource].stringBias = newString; 
 		}
@@ -129,7 +129,7 @@ namespace GLSLSyntaxAST.CodeDom
 		int stringBias;   // the first string that is the user's string number 0
 		int mFinale;       // number of internal strings after user's last string
 
-		public SourceLocation getSourceLoc() { 
+		internal SourceLocation getSourceLoc() { 
 			return loc[Math.Max(0, Math.Min(currentSource, mSources.Length - mFinale - 1))]; 
 		}
 
@@ -244,7 +244,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 
-		public bool scanVersion(out int version, out Profile profile, out bool notFirstToken)
+		internal bool scanVersion(out int version, out Profile profile, out bool notFirstToken)
 		{
 			// This function doesn't have to get all the semantics correct,
 			// just find the #version if there is a correct one present.

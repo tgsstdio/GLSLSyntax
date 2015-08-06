@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class UngotTokenInput : BasePreprocessorInput {
-		public UngotTokenInput(PreprocessorContext pp, int t, PreprocessorToken p) 
+	internal class UngotTokenInput : BasePreprocessorInput {
+		internal UngotTokenInput(PreprocessorContext pp, int t, PreprocessorToken p) 
 			: base(pp)
 		{
 			token = t;
 			lval = p;
 		}
 
-		public override int scan(ref PreprocessorToken ppToken)
+		internal override int scan(ref PreprocessorToken ppToken)
 		{
 			if (done)
 				return BasePreprocessorInput.END_OF_INPUT;
@@ -23,12 +23,12 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 
-		public override int getch() 
+		internal override int getch() 
 		{
 			throw new NotSupportedException ();
 		}
 
-		public override void ungetch() 
+		internal override void ungetch() 
 		{ 
 			throw new NotSupportedException ();
 		}

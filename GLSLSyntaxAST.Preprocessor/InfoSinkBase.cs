@@ -1,125 +1,82 @@
 ﻿using System;
 using System.Text;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class InfoSinkBase
+	public class InfoSinkBase : IInfoSinkComponent
 	{
-//		public:
-//		TInfoSinkBase() : outputStream(4) {}
-//		void erase() { sink.erase(); }
-//		TInfoSinkBase& operator<<(const TPersistString& t) { append(t); return *this; }
-//		TInfoSinkBase& operator<<(char c)                  { append(1, c); return *this; }
-//		TInfoSinkBase& operator<<(const char* s)           { append(s); return *this; }
-//		TInfoSinkBase& operator<<(int n)                   { append(String(n)); return *this; }
-//		TInfoSinkBase& operator<<(unsigned int n)          { append(String(n)); return *this; }
-//		TInfoSinkBase& operator<<(long unsigned int n)     { append(String(n)); return *this; }
-//		TInfoSinkBase& operator<<(float n)                 { const int size = 40; char buf[size]; 
-//			snprintf(buf, size, (fabs(n) > 1e-8 && fabs(n) < 1e8) || n == 0.0f ? "%f" : "%g", n);
-//			append(buf); 
-//			return *this; }
-//		TInfoSinkBase& operator+(const TPersistString& t)  { append(t); return *this; }
-//		TInfoSinkBase& operator+(const TString& t)         { append(t); return *this; }
-//		TInfoSinkBase& operator<<(const TString& t)        { append(t); return *this; }
-//		TInfoSinkBase& operator+(const char* s)            { append(s); return *this; }
-//		const char* c_str() const { return sink.c_str(); }
-
 		private readonly StringBuilder sink;
-		public TOutputStream outputStream;
-		public InfoSinkBase ()
+		private SinkType mSinkType;
+		public InfoSinkBase (SinkType sinkType)
 		{
 			sink = new StringBuilder();
-			outputStream = TOutputStream.EString;
+			mSinkType = sinkType;
 		}
-
-		[Flags]
-		public enum TPrefixType : int
-		{
-			EPrefixNone = 0,
-			EPrefixWarning,
-			EPrefixError,
-			EPrefixInternalError,
-			EPrefixUnimplemented,
-			EPrefixNote
-		};
-
-		[Flags]
-		public enum TOutputStream : int
-		{
-			ENull = 0,
-			EDebugger = 0x01,
-			EStdOut = 0x02,
-			EString = 0x04,
-		};
 
 		public override string ToString()
 		{
 			return sink.ToString ();
 		}
 
-		public void prefix(TPrefixType message)
+		public IInfoSinkComponent AppendPrefix(PrefixType message)
 		{
 			switch(message) {
-				case TPrefixType.EPrefixNone:
+				case PrefixType.None:
 					break;
-				case TPrefixType.EPrefixWarning:
-					append("WARNING: ");
+				case PrefixType.Warning:
+					Append("WARNING: ");
 					break;
-				case TPrefixType.EPrefixError:
-					append("ERROR: ");
+				case PrefixType.Error:
+					Append("ERROR: ");
 					break;
-				case TPrefixType.EPrefixInternalError:
-					append("INTERNAL ERROR: ");
+				case PrefixType.InternalError:
+					Append("INTERNAL ERROR: ");
 					break;
-				case TPrefixType.EPrefixUnimplemented:
-					append("UNIMPLEMENTED: ");
+				case PrefixType.Unimplemented:
+					Append("UNIMPLEMENTED: ");
 					break;
-				case TPrefixType.EPrefixNote:
-					append("NOTE: ");
+				case PrefixType.Note:
+					Append("NOTE: ");
 					break;
 				default:
-					append("UNKOWN ERROR: ");
+					Append("UNKOWN ERROR: ");
 					break;
 			}
+			return this;
 		}
 
-		public void location(SourceLocation loc)
+		public IInfoSinkComponent AppendLocation(SourceLocation loc)
 		{
-			const int maxSize = 24;
 			string locText;
 			if (loc.name != null) {
-				append(loc.name);
+				Append(loc.name);
 				locText = loc.line.ToString();
 			} else {
 				locText = string.Format("{0}:{1}", loc.stringBias, loc.line);
 			}
-			append(locText);
-			append(": ");
+			Append(locText);
+			Append(": ");
+			return this;
 		}
 
-		public void message(TPrefixType message, string s) 
+		public void WriteMessage(PrefixType message, string s) 
 		{
-			prefix(message);
-			append(s);
-			append("\n");
+			AppendPrefix(message);
+			Append(s);
+			Append("\n");
 		}
 
-		public void message(TPrefixType message, string s, SourceLocation loc)
+		public void WriteMessage(PrefixType message, string s, SourceLocation loc)
 		{
-			prefix(message);
-			location(loc);
-			append(s);
-			append("\n");
+			AppendPrefix(message);
+			AppendLocation(loc);
+			Append(s);
+			Append("\n");
 		}
 
-		public void setOutputStream(TOutputStream output = TOutputStream.EString)
+		public IInfoSinkComponent Append(char[] s)           
 		{
-			outputStream = output;
-		}
-
-		protected void append(char[] s)           
-		{
-			if ((outputStream & TOutputStream.EString) > 0) {
+			if ((mSinkType & SinkType.String) > 0) {
 				sink.Append(s); 
 			}
 
@@ -128,18 +85,19 @@ namespace GLSLSyntaxAST.CodeDom
 			//        OutputDebugString(s);
 			//#endif
 
-			if ((outputStream & TOutputStream.EStdOut) > 0)
+			if ((mSinkType & SinkType.StdOut) > 0)
 			{
 				foreach (var letter in s)
 				{
 					Console.Write (letter);	
 				}
 			}
+			return this;
 		}
 
-		public InfoSinkBase append(string s)           
+		public IInfoSinkComponent Append(string s)           
 		{
-			if ((outputStream & TOutputStream.EString) > 0) {
+			if ((mSinkType & SinkType.String) > 0) {
 				sink.Append(s); 
 			}
 
@@ -148,14 +106,14 @@ namespace GLSLSyntaxAST.CodeDom
 			//        OutputDebugString(s);
 			//#endif
 
-			if ((outputStream & TOutputStream.EStdOut) > 0)
+			if ((mSinkType & SinkType.StdOut) > 0)
 				Console.Write(s);
 			return this;
 		}
 
-		protected void append(int count, char c)
+		public IInfoSinkComponent Append(int count, char c)
 		{ 
-			if ((outputStream & TOutputStream.EString) > 0){     
+			if ((mSinkType & SinkType.String) > 0){     
 				sink.Append(new String(c, count)); 
 			}
 
@@ -168,8 +126,9 @@ namespace GLSLSyntaxAST.CodeDom
 			//    }
 			//#endif
 
-			if ((outputStream & TOutputStream.EStdOut) > 0)
+			if ((mSinkType & SinkType.StdOut) > 0)
 				Console.Write(c);
+			return this;
 		}
 	};
 }

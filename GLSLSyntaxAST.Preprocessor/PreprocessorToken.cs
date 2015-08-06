@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.Preprocessor
 {
-	public class PreprocessorToken
+	internal class PreprocessorToken
 	{
-		public PreprocessorToken()
+		internal PreprocessorToken()
 		{
 			token = 0;
 			ival = 0; 
@@ -15,22 +13,15 @@ namespace GLSLSyntaxAST.CodeDom
 			name = "";
 		}
 
-		public bool Matches(PreprocessorToken right)
-		{
-			return token == right.token && atom == right.atom &&
-				ival == right.ival && Math.Abs (dval - right.dval) < Double.Epsilon &&
-				name == right.name;
-		}
+		internal static int maxTokenLength = 1024;
 
-		public static int maxTokenLength = 1024;
-
-		public SourceLocation loc;
-		public int    token;
-		public bool   space;  // true if a space (for white space or a removed comment) should also be recognized, in front of the token returned
-		public int    ival;
-		public double dval;
-		public int    atom;
-		public string name;	
+		internal SourceLocation loc;
+		internal int    token;
+		internal bool   space;  // true if a space (for white space or a removed comment) should also be recognized, in front of the token returned
+		internal int    ival;
+		internal double dval;
+		internal int    atom;
+		internal string name;	
 	}
 }
 

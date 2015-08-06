@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
 	public struct MacroSymbol {
 		public int argc;

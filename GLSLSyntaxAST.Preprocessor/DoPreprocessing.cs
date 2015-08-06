@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class DoPreprocessing
+	internal class DoPreprocessing
 	{
-		public DoPreprocessing ()
+		internal DoPreprocessing ()
 		{
 		}
 
-		public bool DoStuff (TParseContext parseContext, PreprocessorContext ppContext,
+		internal bool DoStuff (ParseContext parseContext, PreprocessorContext ppContext,
 		               InputScanner input, bool versionWillBeError)
 		{
 			//bool versionWillBeError = true;
@@ -128,7 +128,7 @@ namespace GLSLSyntaxAST.CodeDom
 			return true;
 		}
 
-		public string Output;
+		internal string Output;
 	}
 }
 

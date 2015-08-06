@@ -1,8 +1,5 @@
-﻿using System;
-using NUnit.Framework;
-using GLSLSyntaxAST.CodeDom;
-using System.Text;
-using System.Collections.Generic;
+﻿using NUnit.Framework;
+using GLSLSyntaxAST.Preprocessor;
 
 namespace GLSLSyntaxAST.UnitTests
 {
@@ -11,12 +8,16 @@ namespace GLSLSyntaxAST.UnitTests
 	{
 		[Test ()]
 		public void TestCase ()
-		{
-
-			var infoSink = new InfoSink {debug = new InfoSinkBase(), info = new InfoSinkBase()};
+		{			
+			var debug = new InfoSinkBase (SinkType.String);
+			var info = new InfoSinkBase (SinkType.String);
+			var infoSink = new InfoSink(info, debug);
 			var intermediate = new GLSLIntermediate ();
-			var preprocessor = new Standalone (infoSink, intermediate);
-			string result = null;
+			var symbols = new SymbolLookup ();
+			symbols.SetPreambleManually (Profile.CoreProfile);
+			symbols.DefineAs ("GL_ARB_shader_storage_buffer_object", 1);
+			var preprocessor = new Standalone (infoSink, intermediate, symbols);
+			string result;
 			Assert.IsTrue(preprocessor.Run("Sample.vert", out result));
 			Assert.IsNotNull (result);
 		}

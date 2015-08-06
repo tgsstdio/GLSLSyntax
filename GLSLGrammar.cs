@@ -400,7 +400,7 @@ namespace GLSLSyntaxAST
 			var initializer = new NonTerminal ("initializer"); // CHECKED 
 			var initializer_list = new NonTerminal ("initializer_list"); // CHECKED
 			var type_specifier = new NonTerminal ("type_specifier"); // CHECKED
-			var single_type_qualifier = new NonTerminal ("single_type_qualifier"); // TODO
+			var single_type_qualifier = new NonTerminal ("single_type_qualifier"); // CHECKED
 			var type_specifier_nonarray = new NonTerminal ("type_specifier_nonarray"); // CHECKED
 			var type_qualifier = new NonTerminal ("type_qualifier"); // CHECKED
 			var array_specifier = new NonTerminal ("array_specifier"); // CHECKED

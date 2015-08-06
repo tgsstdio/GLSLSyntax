@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.Preprocessor
 {
-	public abstract class BasePreprocessorInput : IScannableType
+	internal abstract class BasePreprocessorInput
 	{
 		protected BasePreprocessorInput(PreprocessorContext p) 
 		{
@@ -10,19 +8,19 @@ namespace GLSLSyntaxAST.CodeDom
 			pp = p;
 		}
 
-		public const int EOF = -12345;
-		public const int END_OF_INPUT = -1;
+		internal const int EOF = -12345;
+		internal const int END_OF_INPUT = -1;
 
 		protected bool done;
 		protected PreprocessorContext pp;
 
 		#region IScannableType implementation
 
-		public abstract int scan (ref PreprocessorToken ppToken);
+		internal abstract int scan (ref PreprocessorToken ppToken);
 
-		public abstract int getch ();
+		internal abstract int getch ();
 
-		public abstract void ungetch ();
+		internal abstract void ungetch ();
 
 		#endregion
 	};

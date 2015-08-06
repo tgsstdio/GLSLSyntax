@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class Pragma
+	internal class Pragma
 	{
-		public Pragma(bool o, bool d)
+		internal Pragma(bool o, bool d)
 		{
 			optimize = o;
 			debug = d;
 			pragmaTable = new Dictionary<string, string> ();
 		}
-		public bool optimize;
-		public bool debug;
-		public Dictionary<string, string> pragmaTable;
+		internal bool optimize;
+		internal bool debug;
+		internal Dictionary<string, string> pragmaTable;
 	}
 }

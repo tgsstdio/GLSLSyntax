@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class ZeroInput : BasePreprocessorInput
+	internal class ZeroInput : BasePreprocessorInput
 	{
-		public ZeroInput(PreprocessorContext pp) :base(pp)
+		internal ZeroInput(PreprocessorContext pp) :base(pp)
 		{
 
 		}
 
 		// return a zero, for scanning a macro that was never defined
-		public override int scan(ref PreprocessorToken ppToken)
+		internal override int scan(ref PreprocessorToken ppToken)
 		{
 			if (done)
 				return BasePreprocessorInput.END_OF_INPUT;
@@ -23,12 +23,12 @@ namespace GLSLSyntaxAST.CodeDom
 			return (int)CppEnums.INTCONSTANT;
 		}
 
-		public override int getch()
+		internal override int getch()
 		{ 
 			throw new NotSupportedException ();
 		}
 
-		public override void ungetch() {
+		internal override void ungetch() {
 			throw new NotSupportedException (); 
 		}
 	};

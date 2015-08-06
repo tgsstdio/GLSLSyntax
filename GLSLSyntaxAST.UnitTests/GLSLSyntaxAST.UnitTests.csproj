@@ -56,6 +56,10 @@
       <Project>{D5B25375-C28B-4544-A331-8BE9E6971719}</Project>
       <Name>GLSLSyntaxAST.CodeDom</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GLSLSyntaxAST.Preprocessor\GLSLSyntaxAST.Preprocessor.csproj">
+      <Project>{ED65DE39-181D-4C06-9BA9-6B568614652B}</Project>
+      <Name>GLSLSyntaxAST.Preprocessor</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

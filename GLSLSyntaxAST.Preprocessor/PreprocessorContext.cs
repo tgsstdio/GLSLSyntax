@@ -3,11 +3,11 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class PreprocessorContext : IPreprocessorContext
+	internal class PreprocessorContext
 	{
-		public void setInput (InputScanner input, bool versionWillBeError)
+		internal void setInput (InputScanner input, bool versionWillBeError)
 		{
 			if (inputStack.Count != 0)
 			{
@@ -29,13 +29,14 @@ namespace GLSLSyntaxAST.CodeDom
 
 		// Scanner data:
 		int previous_token;
-		public TParseContext parseContext;
-		public bool inComment;
+		public ParseContext parseContext;
+		internal bool inComment;
 
 		public StringInputBuffer buffer;
-
-		public PreprocessorContext (TParseContext pc)
+		public SymbolLookup Symbols { get; private set; }
+		public PreprocessorContext (ParseContext pc, SymbolLookup symbols)
 		{
+			Symbols = symbols;
 			parseContext = pc;
 			inComment = false;
 
@@ -49,7 +50,6 @@ namespace GLSLSyntaxAST.CodeDom
 			elsetracker = 0;
 
 			inputStack = new Stack<BasePreprocessorInput> ();
-			symbols = new Dictionary<int, Symbol> ();
 
 			buffer = new StringInputBuffer{ name = new char[StringInputBuffer.MAX_TOKEN_LENGTH], tokenText = new char[StringInputBuffer.MAX_TOKEN_LENGTH]};
 		}
@@ -61,14 +61,12 @@ namespace GLSLSyntaxAST.CodeDom
 			public Func<int, int, int> op;
 		}
 
-		private Dictionary<string, int> atomMap;
-		private Dictionary<int, string> stringMap;
+		//private Dictionary<string, int> atomMap;
+		//private Dictionary<int, string> stringMap;
 		private List<BinaryEvalOperation> binop;
-		private int nextAtom;
-		public void InitAtomTable()
+		//private int nextAtom;
+		private void InitAtomTable()
 		{
-			atomMap = new Dictionary<string, int> ();
-			stringMap = new Dictionary<int, string> ();
 
 			// Add single character tokens to the atom table:
 			string[] s = {"~","!","%","^","&","*","(",")","-","+","=","|",",",".","<",">","/","?",";",":","[","]","{","}","#"};
@@ -77,29 +75,30 @@ namespace GLSLSyntaxAST.CodeDom
 			foreach (var letter in s)
 			{
 				// TODO : make sure index doesn't clash
-				AddAtomFixed(letter,  char.ConvertToUtf32(letter, 0));
+				Symbols.Atoms.AddFixedAtom(letter,  char.ConvertToUtf32(letter, 0));
 				++key;
 			}			
 
 			binop = new List<BinaryEvalOperation> ();
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.OR_OP, precedence = EvalPrecedence.LOGOR, op = op_logor });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.AND_OP, precedence = EvalPrecedence.LOGAND, op = op_logand });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["|"], precedence = EvalPrecedence.OR, op = op_logand });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["^"], precedence = EvalPrecedence.XOR, op = op_xor });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["&"], precedence = EvalPrecedence.AND, op = op_and });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("|"), precedence = EvalPrecedence.OR, op = op_logand });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("^"), precedence = EvalPrecedence.XOR, op = op_xor });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("&"), precedence = EvalPrecedence.AND, op = op_and });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.EQ_OP, precedence = EvalPrecedence.EQUAL, op = op_eq });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.NE_OP, precedence = EvalPrecedence.EQUAL, op = op_ne });
-			binop.Add (new BinaryEvalOperation{ token = atomMap[">"], precedence = EvalPrecedence.RELATION, op = op_gt });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey(">"), precedence = EvalPrecedence.RELATION, op = op_gt });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.GE_OP, precedence = EvalPrecedence.RELATION, op = op_ge });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["<"], precedence = EvalPrecedence.RELATION, op = op_lt });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("<"), precedence = EvalPrecedence.RELATION, op = op_lt });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.LE_OP, precedence = EvalPrecedence.RELATION, op = op_le });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.LEFT_OP, precedence = EvalPrecedence.SHIFT, op = op_shl });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.RIGHT_OP, precedence = EvalPrecedence.SHIFT, op = op_shr });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["+"], precedence = EvalPrecedence.ADD, op = op_add });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["-"], precedence = EvalPrecedence.ADD, op = op_sub });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["*"], precedence = EvalPrecedence.MUL, op = op_mul });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["/"], precedence = EvalPrecedence.MUL, op = op_div });
-			binop.Add (new BinaryEvalOperation{ token = atomMap["%"], precedence = EvalPrecedence.MUL, op = op_mod });
+
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("+"), precedence = EvalPrecedence.ADD, op = op_add });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("-"), precedence = EvalPrecedence.ADD, op = op_sub });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("*"), precedence = EvalPrecedence.MUL, op = op_mul });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("/"), precedence = EvalPrecedence.MUL, op = op_div });
+			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("%"), precedence = EvalPrecedence.MUL, op = op_mod });
 
 			var tokens = new []
 			{
@@ -129,23 +128,11 @@ namespace GLSLSyntaxAST.CodeDom
 			// Add multiple character scanner tokens :
 			foreach (var token in tokens)
 			{
-				AddAtomFixed (token.str, (int) token.atom);
+				Symbols.Atoms.AddFixedAtom (token.str, (int) token.atom);
 			}
-
-			nextAtom = (int) CppEnums.FIRST_USER_TOKEN_SY;
 		}
 
-		//
-		// Add forced mapping of string to atom.
-		//
-		private int AddAtomFixed(string s, int atom)
-		{
-			atomMap.Add (s, atom);
-			stringMap.Add (atom, s);
-			return atom;
-		}
-
-		public int InitScanner()
+		internal int InitScanner()
 		{
 			// Add various atoms needed by the CPP line scanner:
 			if (!InitCPP())
@@ -155,7 +142,6 @@ namespace GLSLSyntaxAST.CodeDom
 
 			return 1;
 		}
-
 
 		//
 		// from Pp.cpp
@@ -189,56 +175,40 @@ namespace GLSLSyntaxAST.CodeDom
 		private bool InitCPP()
 		{
 			// Add various atoms needed by the CPP line scanner:
-			bindAtom = LookUpAddString("bind");
-			constAtom = LookUpAddString("const");
-			defaultAtom = LookUpAddString("default");
-			defineAtom = LookUpAddString("define");
-			definedAtom = LookUpAddString("defined");
-			elifAtom = LookUpAddString("elif");
-			elseAtom = LookUpAddString("else");
-			endifAtom = LookUpAddString("endif");
-			ifAtom = LookUpAddString("if");
-			ifdefAtom = LookUpAddString("ifdef");
-			ifndefAtom = LookUpAddString("ifndef");
-			includeAtom = LookUpAddString("include");
-			lineAtom = LookUpAddString("line");
-			pragmaAtom = LookUpAddString("pragma");
-			texunitAtom = LookUpAddString("texunit");
-			undefAtom = LookUpAddString("undef");
-			errorAtom = LookUpAddString("error");
-			__LINE__Atom = LookUpAddString("__LINE__");
-			__FILE__Atom = LookUpAddString("__FILE__");
-			__VERSION__Atom = LookUpAddString("__VERSION__");
-			versionAtom = LookUpAddString("version");
-			coreAtom = LookUpAddString("core");
-			compatibilityAtom = LookUpAddString("compatibility");
-			esAtom = LookUpAddString("es");
-			extensionAtom = LookUpAddString("extension");
+			bindAtom = Symbols.Atoms.LookUpAddString("bind");
+			constAtom = Symbols.Atoms.LookUpAddString("const");
+			defaultAtom = Symbols.Atoms.LookUpAddString("default");
+			defineAtom = Symbols.Atoms.LookUpAddString("define");
+			definedAtom = Symbols.Atoms.LookUpAddString("defined");
+			elifAtom = Symbols.Atoms.LookUpAddString("elif");
+			elseAtom = Symbols.Atoms.LookUpAddString("else");
+			endifAtom = Symbols.Atoms.LookUpAddString("endif");
+			ifAtom = Symbols.Atoms.LookUpAddString("if");
+			ifdefAtom = Symbols.Atoms.LookUpAddString("ifdef");
+			ifndefAtom = Symbols.Atoms.LookUpAddString("ifndef");
+			includeAtom = Symbols.Atoms.LookUpAddString("include");
+			lineAtom = Symbols.Atoms.LookUpAddString("line");
+			pragmaAtom = Symbols.Atoms.LookUpAddString("pragma");
+			texunitAtom = Symbols.Atoms.LookUpAddString("texunit");
+			undefAtom = Symbols.Atoms.LookUpAddString("undef");
+			errorAtom = Symbols.Atoms.LookUpAddString("error");
+			__LINE__Atom = Symbols.Atoms.LookUpAddString("__LINE__");
+			__FILE__Atom = Symbols.Atoms.LookUpAddString("__FILE__");
+			__VERSION__Atom = Symbols.Atoms.LookUpAddString("__VERSION__");
+			versionAtom = Symbols.Atoms.LookUpAddString("version");
+			coreAtom = Symbols.Atoms.LookUpAddString("core");
+			compatibilityAtom = Symbols.Atoms.LookUpAddString("compatibility");
+			esAtom = Symbols.Atoms.LookUpAddString("es");
+			extensionAtom = Symbols.Atoms.LookUpAddString("extension");
 			//pool = mem_CreatePool(0, 0);
 
 			return true;
 		}
 
-		//
-		// Map a new or existing string to an atom, inventing a new atom if necessary.
-		//
-		public int LookUpAddString(string s)
-		{
-			int result;
-			if (atomMap.TryGetValue (s, out result))
-			{
-				return result;
-			} 
-			else
-			{
-				return AddAtomFixed (s, nextAtom++);
-			}
-		}
-
 		private Stack<BasePreprocessorInput> inputStack;
 		private bool errorOnVersion;
 		private bool versionSeen;
-		public void SetInput(InputScanner input, bool versionWillBeError)
+		internal void SetInput(InputScanner input, bool versionWillBeError)
 		{
 			Debug.Assert(inputStack.Count == 0);
 
@@ -253,17 +223,17 @@ namespace GLSLSyntaxAST.CodeDom
 			inputStack.Push(item);
 		}
 
-		public int getChar()
+		internal int getChar()
 		{
 			return inputStack.Peek().getch();
 		}
 
-		public void ungetChar()
+		internal void ungetChar()
 		{
 			inputStack.Peek().ungetch();
 		}
 
-		public void popInput()
+		internal void popInput()
 		{
 			inputStack.Pop ();
 		}
@@ -271,7 +241,7 @@ namespace GLSLSyntaxAST.CodeDom
 		// Get the next token from *stack* of input sources, popping input sources
 		// that are out of tokens, down until an input sources is found that has a token.
 		// Return EOF when there are no more tokens to be found by doing this.
-		public int scanToken(ref PreprocessorToken ppToken)
+		internal int scanToken(ref PreprocessorToken ppToken)
 		{
 			int token = BasePreprocessorInput.EOF;
 
@@ -288,28 +258,7 @@ namespace GLSLSyntaxAST.CodeDom
 			return token;
 		}
 
-		//
-		// Map an already created atom to its string.
-		//
-		string GetAtomString(int atom)
-		{
-			if (atom == 0)
-				return "<null atom>";
-			if (atom < 0)
-				return "<EOF>";
-
-			string result;
-			if (stringMap.TryGetValue (atom, out result))
-			{
-				return result;
-			}
-			else
-			{
-				return "<invalid atom>";
-			}
-		}
-
-		public string tokenize(ref PreprocessorToken ppToken)
+		internal string tokenize(ref PreprocessorToken ppToken)
 		{    
 			int token = '\n';
 
@@ -330,7 +279,7 @@ namespace GLSLSyntaxAST.CodeDom
 						}
 						continue;
 					} else {
-						parseContext.error(ppToken.loc, "preprocessor directive cannot be preceded by another token", "#", "");
+						parseContext.Error(ppToken.loc, "preprocessor directive cannot be preceded by another token", "#", "");
 						return null;
 					}
 				}
@@ -344,18 +293,18 @@ namespace GLSLSyntaxAST.CodeDom
 					continue;
 
 				if (token == (int) CppEnums.IDENTIFIER)
-					tokenString = GetAtomString(ppToken.atom);
+					tokenString = Symbols.Atoms.GetAtomString(ppToken.atom);
 				else if (token == (int)  CppEnums.INTCONSTANT || token == (int) CppEnums.UINTCONSTANT ||
 					token == (int) CppEnums.FLOATCONSTANT || token == (int) CppEnums.DOUBLECONSTANT)
 					tokenString = ppToken.name;
 				else if (token == (int) CppEnums.STRCONSTANT) {
-					parseContext.error(ppToken.loc, "string literals not supported", "\"\"", "");
+					parseContext.Error(ppToken.loc, "string literals not supported", "\"\"", "");
 					tokenString = null;
 				} else if (token == '\'') {
-					parseContext.error(ppToken.loc, "character literals not supported", "\'", "");
+					parseContext.Error(ppToken.loc, "character literals not supported", "\'", "");
 					tokenString = null;
 				} else
-					tokenString = GetAtomString(token);
+					tokenString = Symbols.Atoms.GetAtomString(token);
 
 				if (tokenString != null) {
 					if (tokenString[0] != 0)
@@ -366,7 +315,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public int readCPPline(ref PreprocessorToken ppToken)
+		internal int readCPPline(ref PreprocessorToken ppToken)
 		{
 			int token = scanToken(ref ppToken);
 			bool isVersion = false;
@@ -377,20 +326,20 @@ namespace GLSLSyntaxAST.CodeDom
 				} else if (ppToken.atom == elseAtom) {
 					// ORIGINALLY if (elsetracker[elseSeen])
 					if (elseSeen[elsetracker])
-						parseContext.error(ppToken.loc, "#else after #else", "#else", "");
+						parseContext.Error(ppToken.loc, "#else after #else", "#else", "");
 					// ORIGINALLY elsetracker[elseSeen] = true;
 					elseSeen[elsetracker] = true;
 					//if (! ifdepth)
 					if (ifdepth <= 0)
-						parseContext.error(ppToken.loc, "mismatched statements", "#else", "");
+						parseContext.Error(ppToken.loc, "mismatched statements", "#else", "");
 					token = extraTokenCheck(elseAtom, ref ppToken, scanToken(ref ppToken));
 					token = CPPelse(false, ref ppToken);
 				} else if (ppToken.atom == elifAtom) {
 					// (! ifdepth) <==> (ifdepth <= 0)
 					if  (ifdepth <= 0)
-						parseContext.error(ppToken.loc, "mismatched statements", "#elif", "");
+						parseContext.Error(ppToken.loc, "mismatched statements", "#elif", "");
 					if (elseSeen[elsetracker])
-						parseContext.error(ppToken.loc, "#elif after #else", "#elif", "");
+						parseContext.Error(ppToken.loc, "#elif after #else", "#elif", "");
 					// this token is really a dont care, but we still need to eat the tokens
 					token = scanToken(ref ppToken); 
 					while (token != '\n')
@@ -400,7 +349,7 @@ namespace GLSLSyntaxAST.CodeDom
 					elseSeen[elsetracker] = false;
 					--elsetracker;
 					if (ifdepth <= 0)
-						parseContext.error(ppToken.loc, "mismatched statements", "#endif", "");
+						parseContext.Error(ppToken.loc, "mismatched statements", "#endif", "");
 					else
 						--ifdepth;
 					token = extraTokenCheck(endifAtom, ref ppToken, scanToken(ref ppToken));
@@ -424,10 +373,10 @@ namespace GLSLSyntaxAST.CodeDom
 				} else if (ppToken.atom == extensionAtom) {
 					token = CPPextension(ref ppToken);
 				} else {
-					parseContext.error(ppToken.loc, "invalid directive:", "#", GetAtomString(ppToken.atom));
+					parseContext.Error(ppToken.loc, "invalid directive:", "#", Symbols.Atoms.GetAtomString(ppToken.atom));
 				}
 			} else if (token != '\n' && token != BasePreprocessorInput.EOF)
-				parseContext.error(ppToken.loc, "invalid directive", "#", "");
+				parseContext.Error(ppToken.loc, "invalid directive", "#", "");
 
 			while (token != '\n' && token != 0 && token != BasePreprocessorInput.EOF)
 				token = scanToken(ref ppToken);
@@ -444,14 +393,14 @@ namespace GLSLSyntaxAST.CodeDom
 			// get macro name
 			int token = scanToken(ref ppToken);
 			if (token != (int) CppEnums.IDENTIFIER) {
-				parseContext.error(ppToken.loc, "must be followed by macro name", "#define", "");
+				parseContext.Error(ppToken.loc, "must be followed by macro name", "#define", "");
 				return token;
 			}
 			int atom = ppToken.atom;
-			string definedName = GetAtomString(atom);
+			string definedName = Symbols.Atoms.GetAtomString(atom);
 			if (ppToken.loc.stringBias >= 0) {
 				// We are in user code; check for reserved name use:
-				parseContext.reservedPpErrorCheck(ppToken.loc, definedName, "#define");
+				parseContext.ReservedPpErrorCheck(ppToken.loc, definedName, "#define");
 			}
 
 			// gather parameters to the macro, between (...)
@@ -464,7 +413,7 @@ namespace GLSLSyntaxAST.CodeDom
 					if (argc == 0 && token == ')') 
 						break;
 					if (token != (int) CppEnums.IDENTIFIER) {
-						parseContext.error(ppToken.loc, "bad argument", "#define", "");
+						parseContext.Error(ppToken.loc, "bad argument", "#define", "");
 
 						return token;
 					}
@@ -472,7 +421,7 @@ namespace GLSLSyntaxAST.CodeDom
 					bool duplicate = false;
 					for (int a = 0; a < argc; ++a) {
 						if (args[a] == ppToken.atom) {
-							parseContext.error(ppToken.loc, "duplicate macro parameter", "#define", "");
+							parseContext.Error(ppToken.loc, "duplicate macro parameter", "#define", "");
 							duplicate = true;
 							break;
 						}
@@ -481,12 +430,12 @@ namespace GLSLSyntaxAST.CodeDom
 						if (argc < maxMacroArgs)
 							args[argc++] = ppToken.atom;
 						else
-							parseContext.error(ppToken.loc, "too many macro parameters", "#define", "");                    
+							parseContext.Error(ppToken.loc, "too many macro parameters", "#define", "");                    
 					}
 					token = scanToken(ref ppToken);
 				} while (token == ',');
 				if (token != ')') {            
-					parseContext.error(ppToken.loc, "missing parenthesis", "#define", "");
+					parseContext.Error(ppToken.loc, "missing parenthesis", "#define", "");
 
 					return token;
 				}
@@ -499,28 +448,28 @@ namespace GLSLSyntaxAST.CodeDom
 			SourceLocation defineLoc = ppToken.loc; // because ppToken is going to go to the next line before we report errors
 			mac.body = new TokenStream();
 			while (token != '\n') {
-				RecordToken(mac.body, token, ppToken);
+				Symbols.Atoms.RecordToken(mac.body, token, ppToken);
 				token = scanToken(ref ppToken);
 				if (token != '\n' && ppToken.space)
-					RecordToken(mac.body, ' ', ppToken);
+					Symbols.Atoms.RecordToken(mac.body, ' ', ppToken);
 			}
 
 			// check for duplicate definition
-			symb = LookUpSymbol(atom);
+			symb = Symbols.LookUp(atom);
 			if (symb != null) {
 				if (! symb.mac.undef) {
 					// Already defined -- need to make sure they are identical:
 					// "Two replacement lists are identical if and only if the preprocessing tokens in both have the same number,
 					// ordering, spelling, and white-space separation, where all white-space separations are considered identical."
 					if (symb.mac.argc != mac.argc)
-						parseContext.error(defineLoc, "Macro redefined; different number of arguments:", "#define", GetAtomString(atom));
+						parseContext.Error(defineLoc, "Macro redefined; different number of arguments:", "#define", Symbols.Atoms.GetAtomString(atom));
 					else {
 						for (int argc = 0; argc < mac.argc; argc++) {
 							if (symb.mac.args[argc] != mac.args[argc])
-								parseContext.error(defineLoc, "Macro redefined; different argument names:", "#define", GetAtomString(atom));
+								parseContext.Error(defineLoc, "Macro redefined; different argument names:", "#define", Symbols.Atoms.GetAtomString(atom));
 						}
-						RewindTokenStream(symb.mac.body);
-						RewindTokenStream(mac.body);
+						symb.mac.body.Rewind();
+						mac.body.Rewind();
 						int newToken;
 						do {
 							int oldToken;
@@ -529,14 +478,14 @@ namespace GLSLSyntaxAST.CodeDom
 							oldToken = ReadToken(symb.mac.body, oldPpToken);
 							newToken = ReadToken(mac.body, newPpToken);
 							if (oldToken != newToken || oldPpToken != newPpToken) {
-								parseContext.error(defineLoc, "Macro redefined; different substitutions:", "#define", GetAtomString(atom));
+								parseContext.Error(defineLoc, "Macro redefined; different substitutions:", "#define", Symbols.Atoms.GetAtomString(atom));
 								break; 
 							}
 						} while (newToken > 0);
 					}
 				}
 			} else
-				symb = AddSymbol(atom);
+				symb = Symbols.Add(atom);
 
 			symb.mac.body = null;
 			symb.mac = mac;
@@ -555,7 +504,7 @@ namespace GLSLSyntaxAST.CodeDom
 			if (ifdepth++ <= 0)
 				ifloc = ppToken.loc;
 			if (ifdepth > MAXIFNESTING) {
-				parseContext.error(ppToken.loc, "maximum nesting depth exceeded", "#if", "");
+				parseContext.Error(ppToken.loc, "maximum nesting depth exceeded", "#if", "");
 				return 0;
 			}
 			int res = 0;
@@ -574,20 +523,20 @@ namespace GLSLSyntaxAST.CodeDom
 			int token = scanToken(ref ppToken);
 			int name = ppToken.atom;
 			if (++ifdepth > MAXIFNESTING) {
-				parseContext.error(ppToken.loc, "maximum nesting depth exceeded", "#ifdef", "");
+				parseContext.Error(ppToken.loc, "maximum nesting depth exceeded", "#ifdef", "");
 				return 0;
 			}
 			elsetracker++;
 			if (token != (int) CppEnums.IDENTIFIER) {
 				if (defined)
-					parseContext.error(ppToken.loc, "must be followed by macro name", "#ifdef", "");
+					parseContext.Error(ppToken.loc, "must be followed by macro name", "#ifdef", "");
 				else 
-					parseContext.error(ppToken.loc, "must be followed by macro name", "#ifndef", "");
+					parseContext.Error(ppToken.loc, "must be followed by macro name", "#ifndef", "");
 			} else {
-				Symbol s = LookUpSymbol(name);
+				Symbol s = Symbols.LookUp(name);
 				token = scanToken(ref ppToken);
 				if (token != '\n') {
-					parseContext.error(ppToken.loc, "unexpected tokens following #ifdef directive - expected a newline", "#ifdef", "");
+					parseContext.Error(ppToken.loc, "unexpected tokens following #ifdef directive - expected a newline", "#ifdef", "");
 					while (token != '\n')
 						token = scanToken(ref ppToken);
 				}
@@ -610,16 +559,16 @@ namespace GLSLSyntaxAST.CodeDom
 					token == (int) CppEnums.FLOATCONSTANT || token == (int) CppEnums.DOUBLECONSTANT) {
 					message.Append(ppToken.name);
 				} else if (token == (int) CppEnums.IDENTIFIER || token == (int) CppEnums.STRCONSTANT) {
-					message.Append(GetAtomString(ppToken.atom));
+					message.Append(Symbols.Atoms.GetAtomString(ppToken.atom));
 				} else {
-					message.Append(GetAtomString(token));
+					message.Append(Symbols.Atoms.GetAtomString(token));
 				}
 				message.Append(" ");
 				token = scanToken(ref ppToken);
 			}
 			parseContext.notifyErrorDirective(loc.line, message.ToString());
 			//store this msg into the shader's information log..set the Compile Error flag!!!!
-			parseContext.error(loc, message.ToString(), "#error", "");
+			parseContext.Error(loc, message.ToString(), "#error", "");
 
 			return '\n';
 		}
@@ -676,7 +625,7 @@ namespace GLSLSyntaxAST.CodeDom
 						break;
 					} else if (atom == elifAtom) {
 						if (elseSeen[elsetracker])
-							parseContext.error(ppToken.loc, "#elif after #else", "#elif", "");
+							parseContext.Error(ppToken.loc, "#elif after #else", "#elif", "");
 						/* we decrement ifdepth here, because CPPif will increment
                 * it and we really want to leave it alone */
 						//if (ifdepth) {
@@ -691,13 +640,13 @@ namespace GLSLSyntaxAST.CodeDom
 					}
 				} else if (atom == elseAtom) {
 					if (elseSeen[elsetracker])
-						parseContext.error(ppToken.loc, "#else after #else", "#else", "");
+						parseContext.Error(ppToken.loc, "#else after #else", "#else", "");
 					else
 						elseSeen[elsetracker] = true;
 					token = extraTokenCheck(atom, ref ppToken, scanToken(ref ppToken));
 				} else if (atom == elifAtom) {
 					if (elseSeen[elsetracker])
-						parseContext.error(ppToken.loc, "#elif after #else", "#elif", "");
+						parseContext.Error(ppToken.loc, "#elif after #else", "#elif", "");
 				}
 			}
 
@@ -711,34 +660,34 @@ namespace GLSLSyntaxAST.CodeDom
 			int token = scanToken(ref ppToken);
 
 			if (token=='\n') {
-				parseContext.error(ppToken.loc, "extension name not specified", "#extension", "");
+				parseContext.Error(ppToken.loc, "extension name not specified", "#extension", "");
 				return token;
 			}
 
 			if (token != (int) CppEnums.IDENTIFIER)
-				parseContext.error(ppToken.loc, "extension name expected", "#extension", "");
+				parseContext.Error(ppToken.loc, "extension name expected", "#extension", "");
 
-			string extensionName = GetAtomString(ppToken.atom);
+			string extensionName = Symbols.Atoms.GetAtomString(ppToken.atom);
 
 			token = scanToken(ref ppToken);
 			if (token != ':') {
-				parseContext.error(ppToken.loc, "':' missing after extension name", "#extension", "");
+				parseContext.Error(ppToken.loc, "':' missing after extension name", "#extension", "");
 				return token;
 			}
 
 			token = scanToken(ref ppToken);
 			if (token != (int) CppEnums.IDENTIFIER) {
-				parseContext.error(ppToken.loc, "behavior for extension not specified", "#extension", "");
+				parseContext.Error(ppToken.loc, "behavior for extension not specified", "#extension", "");
 				return token;
 			}
 
-			parseContext.updateExtensionBehavior(line, extensionName, GetAtomString(ppToken.atom));
+			parseContext.updateExtensionBehavior(line, extensionName, Symbols.Atoms.GetAtomString(ppToken.atom));
 
 			token = scanToken(ref ppToken);
 			if (token == '\n')
 				return token;
 			else
-				parseContext.error(ppToken.loc,  "extra tokens -- expected newline", "#extension","");
+				parseContext.Error(ppToken.loc,  "extra tokens -- expected newline", "#extension","");
 
 			return token;
 		}
@@ -752,7 +701,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 			int token = scanToken(ref ppToken);
 			if (token == '\n') {
-				parseContext.error(ppToken.loc, "must by followed by an integral literal", "#line", "");
+				parseContext.Error(ppToken.loc, "must by followed by an integral literal", "#line", "");
 				return token;
 			}
 
@@ -804,7 +753,7 @@ namespace GLSLSyntaxAST.CodeDom
 			while (token != '\n' && token != BasePreprocessorInput.EOF) {
 				switch (token) {
 				case (int) CppEnums.IDENTIFIER:
-					tokens.Add(GetAtomString(ppToken.atom));
+					tokens.Add(Symbols.Atoms.GetAtomString(ppToken.atom));
 					break;
 				case (int) CppEnums.INTCONSTANT:
 				case (int) CppEnums.UINTCONSTANT:
@@ -820,7 +769,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 
 			if (token == BasePreprocessorInput.EOF)
-				parseContext.error(loc, "directive must end with a newline", "#pragma", "");
+				parseContext.Error(loc, "directive must end with a newline", "#pragma", "");
 			else
 				parseContext.handlePragma(loc, tokens);
 
@@ -833,73 +782,24 @@ namespace GLSLSyntaxAST.CodeDom
 			int token = scanToken(ref ppToken);
 			Symbol symb;
 			if (token != (int) CppEnums.IDENTIFIER) {
-				parseContext.error(ppToken.loc, "must be followed by macro name", "#undef", "");
+				parseContext.Error(ppToken.loc, "must be followed by macro name", "#undef", "");
 
 				return token;
 			}
 
-			string name = GetAtomString(ppToken.atom); 
+			string name = Symbols.Atoms.GetAtomString(ppToken.atom); 
 			// TODO preprocessor simplification: the token text should have been built into the ppToken during scanToken()
-			parseContext.reservedPpErrorCheck(ppToken.loc, name, "#undef");
+			parseContext.ReservedPpErrorCheck(ppToken.loc, name, "#undef");
 
-			symb = LookUpSymbol(ppToken.atom);
+			symb = Symbols.LookUp(ppToken.atom);
 			if (symb != null) {
 				symb.mac.undef = true;
 			}
 			token = scanToken(ref ppToken);
 			if (token != '\n')
-				parseContext.error(ppToken.loc, "can only be followed by a single macro name", "#undef", "");
+				parseContext.Error(ppToken.loc, "can only be followed by a single macro name", "#undef", "");
 
 			return token;
-		}
-
-		/*
-		* Add a token to the end of a list for later playback.
-		*/
-		void RecordToken(TokenStream pTok, int token, PreprocessorToken ppToken)
-		{
-			if (token > 256)
-				lAddByte(pTok, (UInt16)((token & 0x7f) + 0x80));
-			else
-				lAddByte(pTok, (UInt16)(token & 0x7f));
-
-			switch (token) {
-			case (int) CppEnums.IDENTIFIER:
-			case (int) CppEnums.STRCONSTANT:
-				string s = GetAtomString(ppToken.atom);
-				foreach(var letter in s)
-				{
-					lAddByte(pTok, (UInt16) letter);
-				}
-				lAddByte(pTok, 0);
-				break;
-			case (int) CppEnums.INTCONSTANT:
-			case (int) CppEnums.UINTCONSTANT:
-			case (int) CppEnums.FLOATCONSTANT:
-			case (int) CppEnums.DOUBLECONSTANT:
-				string str = ppToken.name;
-				foreach (var letter in str)
-				{
-					lAddByte(pTok, (UInt16) letter);
-				}
-				lAddByte(pTok, 0);
-				break;
-			default:
-				break;
-			}
-		}
-
-		void lAddByte(TokenStream fTok, UInt16 fVal)
-		{
-			fTok.data.Add(fVal);
-		}
-
-		/*
-		* Reset a token stream in preperation for reading.
-		*/
-		void RewindTokenStream(TokenStream pTok)
-		{
-			pTok.current = 0;
 		}
 
 		// Call when there should be no more tokens left on a line.
@@ -922,10 +822,10 @@ namespace GLSLSyntaxAST.CodeDom
 				else
 					label = "";
 
-				if ((parseContext.messages & ShaderMessages.RelaxedErrors) > 0)
-					parseContext.warn(ppToken.loc, message, label, "");
+				if ((parseContext.messages & MessageType.RelaxedErrors) > 0)
+					parseContext.Warn(ppToken.loc, message, label, "");
 				else
-					parseContext.error(ppToken.loc, message, label, "");
+					parseContext.Error(ppToken.loc, message, label, "");
 
 				while (token != '\n')
 					token = scanToken(ref ppToken);
@@ -940,17 +840,17 @@ namespace GLSLSyntaxAST.CodeDom
 			int token = scanToken(ref ppToken);
 
 			if (errorOnVersion || versionSeen)
-				parseContext.error(ppToken.loc, "must occur first in shader", "#version", "");
+				parseContext.Error(ppToken.loc, "must occur first in shader", "#version", "");
 			versionSeen = true;
 
 			if (token == '\n') {
-				parseContext.error(ppToken.loc, "must be followed by version number", "#version", "");
+				parseContext.Error(ppToken.loc, "must be followed by version number", "#version", "");
 
 				return token;
 			}
 
 			if (token != (int) CppEnums.INTCONSTANT)
-				parseContext.error(ppToken.loc, "must be followed by version number", "#version", "");
+				parseContext.Error(ppToken.loc, "must be followed by version number", "#version", "");
 
 			ppToken.ival = int.Parse(ppToken.name);
 			int versionNumber = ppToken.ival;
@@ -964,14 +864,14 @@ namespace GLSLSyntaxAST.CodeDom
 				if (ppToken.atom != coreAtom &&
 					ppToken.atom != compatibilityAtom &&
 					ppToken.atom != esAtom)
-					parseContext.error(ppToken.loc, "bad profile name; use es, core, or compatibility", "#version", "");
-				parseContext.notifyVersion(line, versionNumber, GetAtomString(ppToken.atom));
+					parseContext.Error(ppToken.loc, "bad profile name; use es, core, or compatibility", "#version", "");
+				parseContext.notifyVersion(line, versionNumber, Symbols.Atoms.GetAtomString(ppToken.atom));
 				token = scanToken(ref ppToken);
 
 				if (token == '\n')
 					return token;
 				else
-					parseContext.error(ppToken.loc, "bad tokens following profile -- expected newline", "#version", "");
+					parseContext.Error(ppToken.loc, "bad tokens following profile -- expected newline", "#version", "");
 			}
 
 			return token;
@@ -1028,19 +928,19 @@ namespace GLSLSyntaxAST.CodeDom
 						token = scanToken(ref ppToken);
 					}
 					if (token != (int) CppEnums.IDENTIFIER) {
-						parseContext.error(loc, "incorrect directive, expected identifier", "preprocessor evaluation", "");
+						parseContext.Error(loc, "incorrect directive, expected identifier", "preprocessor evaluation", "");
 						err = true;
 						res = 0;
 
 						return token;
 					}
-					Symbol s = LookUpSymbol(ppToken.atom);
+					Symbol s = Symbols.LookUp(ppToken.atom);
 										// !s.mac.undef
 					res = (s != null) ? (s.mac.undef ? 0 : 1) : 0;
 					token = scanToken(ref ppToken);
 					if (needclose) {
 						if (token != ')') {
-							parseContext.error(loc, "expected ')'", "preprocessor evaluation", "");
+							parseContext.Error(loc, "expected ')'", "preprocessor evaluation", "");
 							err = true;
 							res = 0;
 
@@ -1060,7 +960,7 @@ namespace GLSLSyntaxAST.CodeDom
 				token = eval(token, EvalPrecedence.MIN_PRECEDENCE, shortCircuit, ref res, ref err, ref ppToken);
 				if (! err) {
 					if (token != ')') {
-						parseContext.error(loc, "expected ')'", "preprocessor evaluation", "");
+						parseContext.Error(loc, "expected ')'", "preprocessor evaluation", "");
 						err = true;
 						res = 0;
 
@@ -1079,7 +979,7 @@ namespace GLSLSyntaxAST.CodeDom
 					token = eval(token, EvalPrecedence.UNARY, shortCircuit, ref res, ref err, ref ppToken);
 					res = unop[op].op(res);
 				} else {
-					parseContext.error(loc, "bad expression", "preprocessor evaluation", "");
+					parseContext.Error(loc, "bad expression", "preprocessor evaluation", "");
 					err = true;
 					res = 0;
 
@@ -1125,7 +1025,7 @@ namespace GLSLSyntaxAST.CodeDom
 			while (token == (int) CppEnums.IDENTIFIER && ppToken.atom != definedAtom) {
 				int macroReturn = MacroExpand(ppToken.atom, ppToken, true, false);
 				if (macroReturn == 0) {
-					parseContext.error(ppToken.loc, "can't evaluate expression", "preprocessor evaluation", "");
+					parseContext.Error(ppToken.loc, "can't evaluate expression", "preprocessor evaluation", "");
 					err = true;
 					res = 0;
 					token = scanToken(ref ppToken);
@@ -1134,11 +1034,11 @@ namespace GLSLSyntaxAST.CodeDom
 				if (macroReturn == -1) {
 					if (! shortCircuit && parseContext.mProfile == Profile.EsProfile) {
 						const string message = "undefined macro in expression not allowed in es profile";
-						string name = GetAtomString(ppToken.atom);
-						if ((parseContext.messages & ShaderMessages.RelaxedErrors) > 0)
-							parseContext.warn(ppToken.loc, message, "preprocessor evaluation", name);
+						string name = Symbols.Atoms.GetAtomString(ppToken.atom);
+						if ((parseContext.messages & MessageType.RelaxedErrors) > 0)
+							parseContext.Warn(ppToken.loc, message, "preprocessor evaluation", name);
 						else
-							parseContext.error(ppToken.loc, message, "preprocessor evaluation", name);
+							parseContext.Error(ppToken.loc, message, "preprocessor evaluation", name);
 					}
 				}
 				token = scanToken(ref ppToken);
@@ -1147,87 +1047,17 @@ namespace GLSLSyntaxAST.CodeDom
 			return token;
 		}
 
-		Symbol AddSymbol(int atom)
-		{
-			Symbol lSymb;
-
-			lSymb = NewSymbol(atom);
-			symbols[lSymb.atom] = lSymb;
-
-			return lSymb;
-		}
-
-		/*
-		* Allocate a new symbol node;
-		*
-		*/
-		Symbol NewSymbol(int atom)
-		{
-			Symbol lSymb = new Symbol ();
-			lSymb.atom = atom;
-			// MEMORY POOL
-			//			Symbol* lSymb;
-			//			char* pch;
-			//			int ii;
-			//
-			//			lSymb = (Symbol *) mem_Alloc(pool, sizeof(Symbol));
-			//			lSymb->atom = atom;
-			//
-			//			// Clear macro
-			//			pch = (char*) &lSymb->mac;
-			//			for (ii = 0; ii < sizeof(lSymb->mac); ii++)
-			//				*pch++ = 0;
-
-			return lSymb;
-		}
-
 		// Checks if we've seen balanced #if...#endif
-		public void missingEndifCheck()
+		internal void missingEndifCheck()
 		{
 			if (ifdepth > 0)
-				parseContext.error(parseContext.getCurrentLoc(), "missing #endif", "", "");
+				parseContext.Error(parseContext.getCurrentLoc(), "missing #endif", "", "");
 		}
 
-		public class Symbol {
-			public int atom;
-			public MacroSymbol mac;
-		};
-
-		private Dictionary<int, Symbol> symbols;
-		Symbol LookUpSymbol(int atom)
-		{
-			Symbol result = null;
-			if(symbols.TryGetValue(atom, out result))
-			{	
-				return result;
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		public void pushTokenStreamInput(TokenStream ts)
+		internal void pushTokenStreamInput(TokenStream ts)
 		{
 			pushInput(new TokenInput(this, ts));
-			RewindTokenStream(ts);
-		}
-
-		///*
-		//* Get the next byte from a stream.
-		//*/
-		int lReadByte(TokenStream  pTok)
-		{
-			if (pTok.current < pTok.data.Count)
-				return pTok.data[pTok.current++];
-			else
-				return BasePreprocessorInput.END_OF_INPUT;
-		}
-
-		void lUnreadByte(TokenStream pTok)
-		{
-			if (pTok.current > 0)
-				--pTok.current;
+			ts.Rewind();
 		}
 
 		void UngetToken(int token, PreprocessorToken ppToken)
@@ -1238,28 +1068,28 @@ namespace GLSLSyntaxAST.CodeDom
 		///*
 		//* Read the next token from a token stream (not the source stream, but stream used to hold a tokenized macro).
 		//*/
-		public int ReadToken(TokenStream pTok, PreprocessorToken ppToken)
+		internal int ReadToken(TokenStream pTok, PreprocessorToken ppToken)
 		{
 			char[] tokenText = buffer.tokenText;
 			int ltoken = 0;
 			int len = 0;
 			int ch;
 
-			ltoken = lReadByte(pTok);
+			ltoken = pTok.lReadByte();
 			ppToken.loc = parseContext.getCurrentLoc();
 			if (ltoken > 127)
 				ltoken += 128;
 			switch (ltoken) 
 			{
 				case '#':        
-					if (lReadByte(pTok) == '#') {
+					if (pTok.lReadByte() == '#') {
 						parseContext.requireProfile(ppToken.loc, ~Profile.EsProfile, "token pasting (##)");
-						parseContext.profileRequires(ppToken.loc, ~Profile.EsProfile, 130, null, "token pasting (##)");
-						parseContext.error(ppToken.loc, "token pasting not implemented (internal error)", "##", "");
+						parseContext.ProfileRequires(ppToken.loc, ~Profile.EsProfile, 130, null, "token pasting (##)");
+						parseContext.Error(ppToken.loc, "token pasting not implemented (internal error)", "##", "");
 						//return CPP_TOKEN_PASTE;
 						return ReadToken(pTok, ppToken);
 					} else
-						lUnreadByte(pTok);
+						pTok.lUnreadByte();
 					break;
 				case (int) CppEnums.STRCONSTANT:
 				case (int) CppEnums.IDENTIFIER:
@@ -1268,17 +1098,17 @@ namespace GLSLSyntaxAST.CodeDom
 				case (int) CppEnums.INTCONSTANT:
 				case (int) CppEnums.UINTCONSTANT:
 					len = 0;
-					ch = lReadByte (pTok);
+				ch = pTok.lReadByte ();
 					while (ch != 0)
 					{
 						if (len < PreprocessorToken.maxTokenLength)
 						{
 							tokenText [len] = (char)ch;
 							len++;
-							ch = lReadByte (pTok);
+						ch = pTok.lReadByte();
 						} else
 						{
-							parseContext.error (ppToken.loc, "token too long", "", "");
+							parseContext.Error (ppToken.loc, "token too long", "", "");
 							break;
 						}
 					}
@@ -1295,7 +1125,7 @@ namespace GLSLSyntaxAST.CodeDom
 			{
 				case (int) CppEnums.IDENTIFIER:
 				case (int) CppEnums.STRCONSTANT:
-					ppToken.atom = LookUpAddString(text);
+					ppToken.atom = Symbols.Atoms.LookUpAddString(text);
 					break;
 				case (int) CppEnums.FLOATCONSTANT:
 				case (int) CppEnums.DOUBLECONSTANT:
@@ -1323,7 +1153,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		private int MacroExpand(int atom, PreprocessorToken ppToken, bool expandUndef, bool newLineOkay)
 		{
-			Symbol sym = LookUpSymbol(atom);
+			Symbol sym = Symbols.LookUp(atom);
 			int token;
 			int depth = 0;
 
@@ -1377,7 +1207,7 @@ namespace GLSLSyntaxAST.CodeDom
 						token = scanToken(ref ppToken);
 				}
 				if (token != '(') {
-					parseContext.error(loc, "expected '(' following", "macro expansion", GetAtomString(atom));
+					parseContext.Error(loc, "expected '(' following", "macro expansion", Symbols.Atoms.GetAtomString(atom));
 					UngetToken(token, ppToken);
 					ppToken.atom = atom;
 
@@ -1394,20 +1224,20 @@ namespace GLSLSyntaxAST.CodeDom
 					while (true) {
 						token = scanToken(ref ppToken);
 						if (token == BasePreprocessorInput.EOF) {
-							parseContext.error(loc, "EOF in macro", "macro expansion", GetAtomString(atom));
+							parseContext.Error(loc, "EOF in macro", "macro expansion", Symbols.Atoms.GetAtomString(atom));
 							inp = null;
 							return 0;
 						}
 						if (token == '\n') {
 							if (! newLineOkay) {
-								parseContext.error(loc, "end of line in macro substitution:", "macro expansion", GetAtomString(atom));
+								parseContext.Error(loc, "end of line in macro substitution:", "macro expansion", Symbols.Atoms.GetAtomString(atom));
 								inp = null;
 								return 0;
 							}
 							continue;
 						}
 						if (token == '#') {
-							parseContext.error(ppToken.loc, "unexpected '#'", "macro expansion", GetAtomString(atom));
+							parseContext.Error(ppToken.loc, "unexpected '#'", "macro expansion", Symbols.Atoms.GetAtomString(atom));
 							inp = null;
 							return 0;
 						}
@@ -1419,7 +1249,7 @@ namespace GLSLSyntaxAST.CodeDom
 							depth++;
 						if (token == ')')
 							depth--;
-						RecordToken(inp.args[arg], token, ppToken);
+						Symbols.Atoms.RecordToken(inp.args[arg], token, ppToken);
 						tokenRecorded = true;
 					}
 					if (token == ')') {
@@ -1432,7 +1262,7 @@ namespace GLSLSyntaxAST.CodeDom
 				} while (arg < inp.mac.argc);
 
 				if (arg < inp.mac.argc)
-					parseContext.error(loc, "Too few args in Macro", "macro expansion", GetAtomString(atom));
+					parseContext.Error(loc, "Too few args in Macro", "macro expansion", Symbols.Atoms.GetAtomString(atom));
 				else if (token != ')') {
 					depth=0;
 					while (token != BasePreprocessorInput.EOF && (depth > 0 || token != ')')) {
@@ -1444,11 +1274,11 @@ namespace GLSLSyntaxAST.CodeDom
 					}
 
 					if (token == BasePreprocessorInput.EOF) {
-						parseContext.error(loc, "EOF in macro", "macro expansion", GetAtomString(atom));
+						parseContext.Error(loc, "EOF in macro", "macro expansion", Symbols.Atoms.GetAtomString(atom));
 						inp = null;
 						return 0;
 					}
-					parseContext.error(loc, "Too many args in macro", "macro expansion", GetAtomString(atom));
+					parseContext.Error(loc, "Too many args in macro", "macro expansion", Symbols.Atoms.GetAtomString(atom));
 				}
 				for (int i = 0; i < inp.mac.argc; i++)
 				{
@@ -1458,18 +1288,18 @@ namespace GLSLSyntaxAST.CodeDom
 
 			pushInput(inp);
 			sym.mac.busy = true;
-			RewindTokenStream(sym.mac.body);
+			sym.mac.body.Rewind();
 
 			return 1;
 		}
 
-		public TokenStream PrescanMacroArg(TokenStream a, PreprocessorToken ppToken, bool newLineOkay)
+		internal TokenStream PrescanMacroArg(TokenStream a, PreprocessorToken ppToken, bool newLineOkay)
 		{
 			int token;
-			RewindTokenStream(a);
+			a.Rewind();
 			do {
 				token = ReadToken(a, ppToken);
-				if (token == (int) CppEnums.IDENTIFIER && LookUpSymbol(ppToken.atom) != null)
+				if (token == (int) CppEnums.IDENTIFIER && Symbols.LookUp(ppToken.atom) != null)
 					break;
 			} while (token != BasePreprocessorInput.END_OF_INPUT);
 
@@ -1482,44 +1312,11 @@ namespace GLSLSyntaxAST.CodeDom
 			while ((token = scanToken(ref ppToken)) != MarkerInput.marker) {
 				if (token == (int) CppEnums.IDENTIFIER && MacroExpand(ppToken.atom, ppToken, false, newLineOkay) != 0)
 					continue;
-				RecordToken(n, token, ppToken);
+				Symbols.Atoms.RecordToken(n, token, ppToken);
 			}
 			popInput();
 
 			return n;
-		}
-
-		/// <summary>
-		/// Sets the program define as int.
-		/// Too slow to use to preamble; bypass normal processing 
-		/// </summary>
-		/// <param name="definedName">Defined name.</param>
-		/// <param name="value">Value.</param>
-		public void SetProgramDefineAsInt(string definedName, int value)
-		{
-			int atom = LookUpAddString (definedName);
-			Symbol sym = AddSymbol (atom);
-			sym.mac = new MacroSymbol ();
-			sym.mac.body = new TokenStream ();
-			var packet = new PreprocessorToken ();
-			packet.name = value.ToString();
-			RecordToken (sym.mac.body, (int) CppEnums.INTCONSTANT, packet);
-		}
-		/// <summary>
-		/// Sets the program define as string.
-		/// Too slow to use to preamble; bypass normal processing 
-		/// </summary>
-		/// <param name="definedName">Defined name.</param>
-		/// <param name="valueString">Value string.</param>
-		public void SetProgramDefineAsString(string definedName, string valueString)
-		{
-			int atom = LookUpAddString (definedName);
-			Symbol sym = AddSymbol (atom);
-			sym.mac = new MacroSymbol ();
-			sym.mac.body = new TokenStream ();
-			var packet = new PreprocessorToken ();
-			packet.atom = LookUpAddString (valueString);
-			RecordToken (sym.mac.body, (int) CppEnums.STRCONSTANT, packet);
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1527,12 +1324,19 @@ namespace GLSLSyntaxAST.CodeDom
 		///////////////////////////////////////////////////////////////////////////////////////////////
 
 		/*
-		* lFloatConst() - Scan a single- or double-precision floating point constant.  Assumes that the scanner
-		*         has seen at least one digit, followed by either a decimal '.' or the
-		*         letter 'e', or a precision ending (e.g., F or LF).
+
 		*/
 
-		public int lFloatConst(int len, int ch, PreprocessorToken ppToken)
+		/// <summary>
+		///  Scan a single- or double-precision floating point constant.  Assumes that the scanner
+		/// has seen at least one digit, followed by either a decimal '.' or the
+		/// letter 'e', or a precision ending (e.g., F or LF).  
+		/// </summary>
+		/// <returns>The float const.</returns>
+		/// <param name="len">Length.</param>
+		/// <param name="ch">Ch.</param>
+		/// <param name="ppToken">Pp token.</param>
+		internal int lFloatConst(int len, int ch, PreprocessorToken ppToken)
 		{
 			bool HasDecimalOrExponent = false;
 			int declen, exp, ExpSign;
@@ -1564,7 +1368,7 @@ namespace GLSLSyntaxAST.CodeDom
 					} 
 					else 
 					{
-						parseContext.error( ppToken.loc, "float literal too long", "", "");
+						parseContext.Error( ppToken.loc, "float literal too long", "", "");
 						len = 1;
 						str_len = 1;
 					}
@@ -1578,7 +1382,7 @@ namespace GLSLSyntaxAST.CodeDom
 				HasDecimalOrExponent = true;
 				if (len >= MAX_TOKEN_LENGTH) 
 				{
-					parseContext.error( ppToken.loc, "float literal too long", "", "");
+					parseContext.Error( ppToken.loc, "float literal too long", "", "");
 					len = 1;
 					str_len=1;
 				} 
@@ -1610,7 +1414,7 @@ namespace GLSLSyntaxAST.CodeDom
 							} 
 							else
 							{
-								parseContext.error( ppToken.loc, "float literal too long", "", "");
+								parseContext.Error( ppToken.loc, "float literal too long", "", "");
 								len = 1;
 								str_len=1;
 							}
@@ -1618,7 +1422,7 @@ namespace GLSLSyntaxAST.CodeDom
 					}
 					else
 					{
-						parseContext.error( ppToken.loc, "bad character in float exponent", "", "");
+						parseContext.Error( ppToken.loc, "bad character in float exponent", "", "");
 					}
 					exp *= ExpSign;
 				}
@@ -1633,10 +1437,9 @@ namespace GLSLSyntaxAST.CodeDom
 			{
 				if (ch == 'l' || ch == 'L')
 				{
-					// TODO : figure this out
 					parseContext.doubleCheck( ppToken.loc, "double floating-point suffix");
 					if (! HasDecimalOrExponent)
-						parseContext.error( ppToken.loc, "float literal needs a decimal point or exponent", "", "");
+						parseContext.Error( ppToken.loc, "float literal needs a decimal point or exponent", "", "");
 					int ch2 = getChar();
 					if (ch2 != 'f' && ch2 != 'F')
 					{
@@ -1653,7 +1456,7 @@ namespace GLSLSyntaxAST.CodeDom
 						}
 						else
 						{
-							parseContext.error( ppToken.loc, "float literal too long", "", "");
+							parseContext.Error( ppToken.loc, "float literal too long", "", "");
 							len = 1;
 							str_len=1;
 						}
@@ -1661,16 +1464,16 @@ namespace GLSLSyntaxAST.CodeDom
 				}
 				else if (ch == 'f' || ch == 'F')
 				{
-					parseContext.profileRequires( ppToken.loc,  Profile.EsProfile, 300, null, "floating-point suffix");
-					if ((parseContext.messages &  ShaderMessages.RelaxedErrors) == 0)
-						parseContext.profileRequires (ppToken.loc, (Profile)~Profile.EsProfile, 120, null, "floating-point suffix");
+					parseContext.ProfileRequires( ppToken.loc,  Profile.EsProfile, 300, null, "floating-point suffix");
+					if ((parseContext.messages &  MessageType.RelaxedErrors) == 0)
+						parseContext.ProfileRequires (ppToken.loc, (Profile)~Profile.EsProfile, 120, null, "floating-point suffix");
 					if (! HasDecimalOrExponent)
-						parseContext.error( ppToken.loc, "float literal needs a decimal point or exponent", "", "");
+						parseContext.Error( ppToken.loc, "float literal needs a decimal point or exponent", "", "");
 					if (len < MAX_TOKEN_LENGTH)
 						str[len++] = (char)ch;
 					else
 					{
-						parseContext.error( ppToken.loc, "float literal too long", "", "");
+						parseContext.Error( ppToken.loc, "float literal too long", "", "");
 						len = 1;
 						str_len=1;
 					}

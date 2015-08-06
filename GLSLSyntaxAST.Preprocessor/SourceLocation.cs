@@ -1,4 +1,4 @@
-﻿namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.Preprocessor
 {
 	public struct SourceLocation
 	{

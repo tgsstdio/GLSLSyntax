@@ -1,32 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace GLSLSyntaxAST.CodeDom
+namespace GLSLSyntaxAST.Preprocessor
 {
-	public class TShader
+	internal class TShader
 	{
 		private readonly InfoSink mInfoSink;
 		private ShaderLanguage mLanguage;
 		private GLSLIntermediate mIntermediate;
-		public TShader (InfoSink sink, ShaderLanguage language, GLSLIntermediate intermediate)
+		private SymbolLookup mSymbols;
+		internal TShader (InfoSink sink, ShaderLanguage language, GLSLIntermediate intermediate, SymbolLookup symbols)
 		{
 			mInfoSink = sink;
 			mLanguage = language;
 			mIntermediate = intermediate;
+			mSymbols = symbols;
 		}
 
-		public string[] mStrings;
-		public void setStrings(string[] s)
+		internal string[] mStrings;
+		internal void setStrings(string[] s)
 		{
 			mStrings = s;
 		}
 
-		public bool preprocess (
+		internal bool preprocess (
 			int defaultVersion,
 			Profile defaultProfile,
 			bool forceDefaultVersionAndProfile,
 			bool forwardCompatible,
-			ShaderMessages message,
+			MessageType message,
 			out string outputString)
 		{
 			return PreprocessDeferred(
@@ -49,7 +50,7 @@ namespace GLSLSyntaxAST.CodeDom
 			Profile defaultProfile,
 			bool forceDefaultVersionAndProfile,
 			bool forwardCompatible,     // give errors for use of deprecated features
-			ShaderMessages messages,       // warnings/errors/AST; things to print out
+			MessageType messages,       // warnings/errors/AST; things to print out
 			out string outputString)
 		{
 			var parser = new DoPreprocessing();
@@ -85,14 +86,14 @@ namespace GLSLSyntaxAST.CodeDom
 		/// <param name="forwardCompatible">give errors for use of deprecated features</param>
 		/// <param name="messages">warnings/errors/AST; things to print out</param>
 		/// <param name="processingContext">Processing context.</param>
-		public bool ProcessDeferred(
+		private bool ProcessDeferred(
 			string[] shaderStrings,
 			int defaultVersion,
 			Profile defaultProfile,
 			bool forceDefaultVersionAndProfile,
 			bool forwardCompatible,
-			ShaderMessages messages,
-			Func<TParseContext,
+			MessageType messages,
+			Func<ParseContext,
 				PreprocessorContext,
 				InputScanner,
 				bool,
@@ -113,18 +114,18 @@ namespace GLSLSyntaxAST.CodeDom
 			bool versionNotFirst = userInput.scanVersion(out version, out profile, out versionNotFirstToken);
 			bool versionNotFound = version == 0;
 			if (forceDefaultVersionAndProfile) {
-				if (((messages & ShaderMessages.SuppressWarnings) == 0) && !versionNotFound &&
+				if (((messages & MessageType.SuppressWarnings) == 0) && !versionNotFound &&
 					(version != defaultVersion || profile != defaultProfile)) {
-					mInfoSink.info
-						.append ("Warning, (version, profile) forced to be (")
-						.append (defaultVersion.ToString ())
-						.append (", ")
-						.append (ProfileName (defaultProfile))
-						.append ("), while in source code it is (")
-						.append (version.ToString())
-						.append (", ")
-						.append (ProfileName(profile))
-						.append (")\n");
+					mInfoSink.Info
+						.Append ("Warning, (version, profile) forced to be (")
+						.Append (defaultVersion.ToString ())
+						.Append (", ")
+						.Append (ProfileName (defaultProfile))
+						.Append ("), while in source code it is (")
+						.Append (version.ToString())
+						.Append (", ")
+						.Append (ProfileName(profile))
+						.Append (")\n");
 				}
 
 				if (versionNotFound) {
@@ -145,7 +146,7 @@ namespace GLSLSyntaxAST.CodeDom
 			bool versionWillBeError = (versionNotFound || (profile == Profile.EsProfile && version >= 300 && versionNotFirst));
 			bool warnVersionNotFirst = false;
 			if (! versionWillBeError && versionNotFirstToken) {
-				if ((messages & ShaderMessages.RelaxedErrors) > 0)
+				if ((messages & MessageType.RelaxedErrors) > 0)
 					warnVersionNotFirst = true;
 				else
 					versionWillBeError = true;
@@ -156,23 +157,18 @@ namespace GLSLSyntaxAST.CodeDom
 			// Now we can process the full shader under proper symbols and rules.
 			//
 
-			var parseContext = new TParseContext(version, profile, mInfoSink, forwardCompatible);
-			var ppContext = new PreprocessorContext(parseContext);
+			var parseContext = new ParseContext(version, profile, mInfoSink, forwardCompatible, mSymbols, mIntermediate);
+			var ppContext = new PreprocessorContext(parseContext, mSymbols);
 			parseContext.setPpContext(ppContext);
 			if (! goodVersion)
 				parseContext.addError();
 			if (warnVersionNotFirst) {
 				SourceLocation loc = new SourceLocation ();
-				parseContext.warn(loc, "Illegal to have non-comment, non-whitespace tokens before #version", "#version", "");
+				parseContext.Warn(loc, "Illegal to have non-comment, non-whitespace tokens before #version", "#version", "");
 			}
 
 			parseContext.initializeExtensionBehavior();
-			// not recommended 
 
-			ppContext.SetProgramDefineAsInt ("GL_ARB_shader_storage_buffer_object", 1);
-
-			parseContext.SetPreambleManually ();
-			//var fullInput = new TInputScanner(strings, numPre, numPost);
 			var fullInput = new InputScanner(shaderStrings, 0 , 0);
 
 			bool success = processingContext(parseContext, ppContext, fullInput, versionWillBeError);
@@ -195,7 +191,7 @@ namespace GLSLSyntaxAST.CodeDom
 			if (profile == Profile.NoProfile) {
 				if (version == 300 || version == 310) {
 					correct = false;
-					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: versions 300 and 310 require specifying the 'es' profile");
+					infoSink.Info.WriteMessage(PrefixType.Error, "#version: versions 300 and 310 require specifying the 'es' profile");
 					profile = Profile.EsProfile;
 				} else if (version == 100)
 					profile = Profile.EsProfile;
@@ -207,7 +203,7 @@ namespace GLSLSyntaxAST.CodeDom
 				// a profile was provided...
 				if (version < 150) {
 					correct = false;
-					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: versions before 150 do not allow a profile token");
+					infoSink.Info.WriteMessage(PrefixType.Error, "#version: versions before 150 do not allow a profile token");
 					if (version == 100)
 						profile = Profile.EsProfile;
 					else
@@ -215,13 +211,13 @@ namespace GLSLSyntaxAST.CodeDom
 				} else if (version == 300 || version == 310) {
 					if (profile != Profile.EsProfile) {
 						correct = false;
-						infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: versions 300 and 310 support only the es profile");
+						infoSink.Info.WriteMessage(PrefixType.Error, "#version: versions 300 and 310 support only the es profile");
 					}
 					profile = Profile.EsProfile;
 				} else {
 					if (profile == Profile.EsProfile) {
 						correct = false;
-						infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: only version 300 and 310 support the es profile");
+						infoSink.Info.WriteMessage(PrefixType.Error, "#version: only version 300 and 310 support the es profile");
 						if (version >= FirstProfileVersion)
 							profile = Profile.CoreProfile;
 						else
@@ -237,7 +233,7 @@ namespace GLSLSyntaxAST.CodeDom
 				if ((profile == Profile.EsProfile && version < 310) ||
 					(profile != Profile.EsProfile && version < 150)) {
 					correct = false;
-					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: geometry shaders require es profile with version 310 or non-es profile with version 150 or above");
+					infoSink.Info.WriteMessage(PrefixType.Error, "#version: geometry shaders require es profile with version 310 or non-es profile with version 150 or above");
 					version = (profile == Profile.EsProfile) ? 310 : 150;
 					if (profile == Profile.EsProfile || profile == Profile.NoProfile)
 						profile = Profile.CoreProfile;
@@ -248,7 +244,7 @@ namespace GLSLSyntaxAST.CodeDom
 				if ((profile == Profile.EsProfile && version < 310) ||
 					(profile != Profile.EsProfile && version < 150)) {
 					correct = false;
-					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: tessellation shaders require es profile with version 310 or non-es profile with version 150 or above");
+					infoSink.Info.WriteMessage(PrefixType.Error, "#version: tessellation shaders require es profile with version 310 or non-es profile with version 150 or above");
 					version = (profile == Profile.EsProfile) ? 310 : 400; // 150 supports the extension, correction is to 400 which does not
 					if (profile == Profile.EsProfile || profile == Profile.NoProfile)
 						profile = Profile.CoreProfile;
@@ -258,7 +254,7 @@ namespace GLSLSyntaxAST.CodeDom
 				if ((profile == Profile.EsProfile && version < 310) ||
 					(profile != Profile.EsProfile && version < 420)) {
 					correct = false;
-					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: compute shaders require es profile with version 310 or above, or non-es profile with version 420 or above");
+					infoSink.Info.WriteMessage(PrefixType.Error, "#version: compute shaders require es profile with version 310 or above, or non-es profile with version 420 or above");
 					version = profile == Profile.EsProfile ? 310 : 430; // 420 supports the extension, correction is to 430 which does not
 					profile = Profile.CoreProfile;
 				}
@@ -269,7 +265,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 			if (profile == Profile.EsProfile && version >= 300 && versionNotFirst) {
 				correct = false;
-				infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: statement must appear first in es-profile shader; before comments or newlines");
+				infoSink.Info.WriteMessage(PrefixType.Error, "#version: statement must appear first in es-profile shader; before comments or newlines");
 			}
 
 			// A metacheck on the condition of the compiler itself...
@@ -298,17 +294,17 @@ namespace GLSLSyntaxAST.CodeDom
 			case 430:
 			case 440:
 			case 450:
-				infoSink.info
-					.append("Warning, version ")
-					.append(version.ToString())
-					.append(" is not yet complete; most version-specific features are present, but some are missing.\n");
+				infoSink.Info
+					.Append("Warning, version ")
+					.Append(version.ToString())
+					.Append(" is not yet complete; most version-specific features are present, but some are missing.\n");
 				break;
 
 			default:
-				infoSink.info
-					.append ("Warning, version ")
-					.append (version.ToString ())
-					.append (" is unknown.\n");
+				infoSink.Info
+					.Append ("Warning, version ")
+					.Append (version.ToString ())
+					.Append (" is unknown.\n");
 				break;
 
 			}

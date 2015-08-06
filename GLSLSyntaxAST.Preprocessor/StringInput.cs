@@ -1,16 +1,18 @@
-﻿namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.Preprocessor
 {
-	public class StringInput : BasePreprocessorInput 
+	internal class StringInput : BasePreprocessorInput 
 	{
-		//
-		// From PpScanner.cpp
-		//
-		public StringInput(PreprocessorContext pp, InputScanner i) : base(pp)
+		/// <summary>
+		/// From PpScanner.cpp
+		/// </summary>
+		/// <param name="pp">Pp.</param>
+		/// <param name="i">The index.</param>
+		internal StringInput(PreprocessorContext pp, InputScanner i) : base(pp)
 		{ 
 			input = i;
 		}
 
-		public override int scan(ref PreprocessorToken ppToken)
+		internal override int scan(ref PreprocessorToken ppToken)
 		{
 		//
 		// Scanner used to tokenize source stream.
@@ -104,7 +106,7 @@
 						{
 							if (!AlreadyComplained)
 							{
-								pp.parseContext.error (ppToken.loc, "name too long", "", "");
+								pp.parseContext.Error (ppToken.loc, "name too long", "", "");
 								AlreadyComplained = true;
 							}
 							ch = pp.getChar ();
@@ -120,7 +122,7 @@
 
 					pp.buffer.tokenText [len] = '\0';
 					pp.ungetChar ();
-					ppToken.atom = pp.LookUpAddString (new string (pp.buffer.tokenText, 0, len));
+					ppToken.atom = pp.Symbols.Atoms.LookUpAddString (new string (pp.buffer.tokenText, 0, len));
 					return (int) CppEnums.IDENTIFIER;
 				case '0':
 					pp.buffer.name[len++] = (char)ch;
@@ -146,11 +148,11 @@
 									} else if (ch >= 'a' && ch <= 'f') {
 										ii = ch - 'a' + 10;
 									} else
-										pp.parseContext.error(ppToken.loc, "bad digit in hexidecimal literal", "", "");
+										pp.parseContext.Error(ppToken.loc, "bad digit in hexidecimal literal", "", "");
 									ival = (uint)((ival << 4) | ii);
 								} else {
 									if (!AlreadyComplained) {
-										pp.parseContext.error(ppToken.loc, "hexidecimal literal too big", "", "");
+										pp.parseContext.Error(ppToken.loc, "hexidecimal literal too big", "", "");
 										AlreadyComplained = true;
 									}
 									ival = 0xffffffff;
@@ -160,7 +162,7 @@
 								(ch >= 'A' && ch <= 'F') ||
 								(ch >= 'a' && ch <= 'f'));
 						} else {
-							pp.parseContext.error(ppToken.loc, "bad digit in hexidecimal literal", "", "");
+							pp.parseContext.Error(ppToken.loc, "bad digit in hexidecimal literal", "", "");
 						}
 						if (ch == 'u' || ch == 'U') {
 							if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
@@ -193,7 +195,7 @@
 							if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
 								pp.buffer.name[len++] = (char)ch;
 							else if (! AlreadyComplained) {
-								pp.parseContext.error(ppToken.loc, "numeric literal too long", "", "");
+								pp.parseContext.Error(ppToken.loc, "numeric literal too long", "", "");
 								AlreadyComplained = true;
 							}
 							if (ival <= 0x1fffffff) {
@@ -211,7 +213,7 @@
 								if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
 									pp.buffer.name[len++] = (char)ch;
 								else if (! AlreadyComplained) {
-									pp.parseContext.error(ppToken.loc, "numeric literal too long", "", "");
+									pp.parseContext.Error(ppToken.loc, "numeric literal too long", "", "");
 									AlreadyComplained = true;
 								}
 								ch = pp.getChar();
@@ -225,7 +227,7 @@
 
 						// wasn't a float, so must be octal...
 						if (nonOctal)
-							pp.parseContext.error(ppToken.loc, "octal literal digit too large", "", "");
+							pp.parseContext.Error(ppToken.loc, "octal literal digit too large", "", "");
 
 						if (ch == 'u' || ch == 'U') {
 							if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
@@ -237,20 +239,12 @@
 						//ppToken.name[len] = '\0';
 
 						if (octalOverflow)
-							pp.parseContext.error(ppToken.loc, "octal literal too big", "", "");
+							pp.parseContext.Error(ppToken.loc, "octal literal too big", "", "");
 
 						ppToken.ival = (int)ival;
 						ppToken.name = new string(pp.buffer.name, 0, len);	
-						if (isUnsigned)
-						{							
-							return (int)CppEnums.UINTCONSTANT;
-						}
-						else
-						{
-							return (int)CppEnums.INTCONSTANT;
-						}
+						return isUnsigned ? (int)CppEnums.UINTCONSTANT : (int)CppEnums.INTCONSTANT;
 					}
-					break;
 				case '1':
 				case '2':
 				case '3':
@@ -261,7 +255,6 @@
 				case '8':
 				case '9':
 					return DoHexidecimal (pp.buffer, ppToken, ch, ref AlreadyComplained, ref len, StringInputBuffer.MAX_TOKEN_LENGTH);
-					break;
 				case '-':
 					ch = pp.getChar();
 					if (ch == '-') {
@@ -456,7 +449,7 @@
 							while (ch != '*') {
 								if (this.IsEOF(ch))
 								{
-									pp.parseContext.error(ppToken.loc, "EOF in comment", "comment", "");
+									pp.parseContext.Error(ppToken.loc, "EOF in comment", "comment", "");
 									return END_OF_INPUT;
 								}
 								ch = pp.getChar();
@@ -464,7 +457,7 @@
 							ch = pp.getChar();
 							if (this.IsEOF(ch))
 							{
-								pp.parseContext.error(ppToken.loc, "EOF in comment", "comment", "");
+								pp.parseContext.Error(ppToken.loc, "EOF in comment", "comment", "");
 								return END_OF_INPUT;
 							}
 						} while (ch != '/');
@@ -477,7 +470,6 @@
 						pp.ungetChar();
 						return '/';
 					}
-					break;
 				case '"':
 					ch = pp.getChar();
 					while (ch != '"' && ch != '\n' && this.IsEOF(ch)) {
@@ -490,11 +482,11 @@
 					};
 					//pp.buffer.tokenText[len] = '\0';
 					if (ch == '"') {
-						ppToken.atom = pp.LookUpAddString(new string(pp.buffer.tokenText, 0, len));
+						ppToken.atom = pp.Symbols.Atoms.LookUpAddString(new string(pp.buffer.tokenText, 0, len));
 						ppToken.name = new string (pp.buffer.name, 0, len);
 						return (int) CppEnums.STRCONSTANT;
 					} else {
-						pp.parseContext.error(ppToken.loc, "end of line in string", "string", "");
+						pp.parseContext.Error(ppToken.loc, "end of line in string", "string", "");
 						ppToken.name = new string (pp.buffer.name, 0, len);
 						return (int) CppEnums.ERROR_SY;
 					}
@@ -512,7 +504,7 @@
 				if (len < maxTokenLength)
 					buffer.name[len++] = (char)ch;
 				else if (! alreadyComplained) {
-					pp.parseContext.error(ppToken.loc, "numeric literal too long", "", "");
+					pp.parseContext.Error(ppToken.loc, "numeric literal too long", "", "");
 					alreadyComplained = true;
 				}
 				ch = pp.getChar();
@@ -545,7 +537,7 @@
 					ch = buffer.name[i] - '0';
 					if ((ival > ONETENTHMAXINT) || (ival == ONETENTHMAXINT && ch > REMAINDERMAXINT)) 
 					{
-						pp.parseContext.error(ppToken.loc, "numeric literal too big", "", "");
+						pp.parseContext.Error(ppToken.loc, "numeric literal too big", "", "");
 						ival = 0xFFFFFFFFu;
 						break;
 					} 
@@ -566,7 +558,7 @@
 		// Scanner used to get source stream characters.
 		//  - Escaped newlines are handled here, invisibly to the caller.
 		//  - All forms of newline are handled, and turned into just a '\n'.
-		public override int getch()
+		internal override int getch()
 		{
 			int ch = input.get();
 
@@ -604,7 +596,7 @@
 		// handled here, invisibly to the caller, meaning have to undo exactly
 		// what getch() above does (e.g., don't leave things in the middle of a
 		// sequence of escaped newlines).
-		public override void ungetch()
+		internal override void ungetch()
 		{
 			input.unget();
 
