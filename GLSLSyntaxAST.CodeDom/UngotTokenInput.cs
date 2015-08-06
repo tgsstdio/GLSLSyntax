@@ -2,19 +2,18 @@
 
 namespace GLSLSyntaxAST.CodeDom
 {
-
-	public class tUngotTokenInput : tInput {
-		public tUngotTokenInput(PreprocessorContext pp, int t, TPpToken p) 
+	public class UngotTokenInput : BasePreprocessorInput {
+		public UngotTokenInput(PreprocessorContext pp, int t, PreprocessorToken p) 
 			: base(pp)
 		{
 			token = t;
 			lval = p;
 		}
 
-		public override int scan(ref TPpToken ppToken)
+		public override int scan(ref PreprocessorToken ppToken)
 		{
 			if (done)
-				return tInput.END_OF_INPUT;
+				return BasePreprocessorInput.END_OF_INPUT;
 
 			int ret = token;
 			ppToken = lval;
@@ -35,7 +34,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		protected int token;
-		protected TPpToken lval;
+		protected PreprocessorToken lval;
 	};
 }
 

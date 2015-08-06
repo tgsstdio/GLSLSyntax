@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.CodeDom
 {
-	public struct TSourceLoc
+	public struct SourceLocation
 	{
 		public char[] name;
 		public int stringBias;

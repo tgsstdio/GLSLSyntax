@@ -1,29 +1,21 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 
 namespace GLSLSyntaxAST.CodeDom
 {
 	public class TParseContext
 	{
-
-		public bool parsingBuiltins; 
 		public TParseContext(
-			bool pb,
 			int version,
 			Profile profile,
-			EShLanguage language,
-			TInfoSink iSink,
+			InfoSink infoSink,
 			bool forwardCompatible)
 		{
-			parsingBuiltins = pb;
-			infoSink = iSink;
-			extensionBehavior = new Dictionary<string, ExtensionBehavior> ();
-		}
-
-		public void setScanContext(TScanContext c)
-		{
-			
+			mVersion = version;
+			mProfile = profile;
+			mInfoSink = infoSink;
+			mExtensionBehaviors = new Dictionary<string, ExtensionBehavior> ();
+			contextPragma = new Pragma (true, false);
 		}
 
 		private PreprocessorContext ppContext;
@@ -32,54 +24,49 @@ namespace GLSLSyntaxAST.CodeDom
 			ppContext = pp;	
 		}
 
-		public void setLimits(TBuiltInResource resources)
-		{
-
-		}
-
 		public int numErrors; 
 		public void addError() {
 			++numErrors; 
 		}
 
-		public void setScanner(TInputScanner scanner)
+		public void setScanner(InputScanner scanner)
 		{
 			currentScanner = scanner;
 		}
 
 		public bool tokensBeforeEOF;
-		public EShMessages messages;        // errors/warnings
+		public ShaderMessages messages;        // errors/warnings
 
 		public Action<int, string, string> ExtensionCallback {get;set;}
 
 		public Action<int, bool, int> LineCallback {get;set;}
-		public void notifyLineDirective(int line, bool has_source, int source)
+		public void notifyLineDirective(int line, bool hasSource, int source)
 		{
 			if (LineCallback != null) {
-				LineCallback(line, has_source, source);
+				LineCallback(line, hasSource, source);
 			}
 		}
 
 		public Action<int, int, string> VersionCallback {get;set;}
-		public void notifyVersion(int line, int version, string type_string)
+		public void notifyVersion(int line, int version, string typeString)
 		{
 			if (VersionCallback != null) {
-				VersionCallback(line, version, type_string);
+				VersionCallback(line, version, typeString);
 			}
 		}
 
 
 
 		public Action<int, string> ErrorCallback {get;set;}
-		public void notifyErrorDirective(int line, string error_message)
+		public void notifyErrorDirective(int line, string errorMessage)
 		{
 			if (ErrorCallback != null) {
-				ErrorCallback(line, error_message);
+				ErrorCallback(line, errorMessage);
 			}
 		}
 
-		TInputScanner currentScanner;
-		public TSourceLoc getCurrentLoc() {
+		InputScanner currentScanner;
+		public SourceLocation getCurrentLoc() {
 			return currentScanner.getSourceLoc(); 
 		}
 
@@ -93,29 +80,47 @@ namespace GLSLSyntaxAST.CodeDom
 			currentScanner.setString(stringBias); 
 		}
 
-		public void error(TSourceLoc location, string reason, string token,
-			string extraInfoFormat, params string[] args)
+		public void error(SourceLocation location, string reason, string token,
+			string extraInfoFormat, params object[] args)
 		{
-
+			mInfoSink.info.prefix(InfoSinkBase.TPrefixType.EPrefixError);
+			mInfoSink.info.location(location);
+			mInfoSink.info
+				.append ("'")
+				.append (token)
+				.append ("' : ")
+				.append (reason)
+				.append (" ")
+				.append (string.Format (extraInfoFormat, args))
+				.append ("\n");
 		}
 
-		public void warn(TSourceLoc location, string reason, string token,
-			string extraInfoFormat, params string[] args)
+		public void warn(SourceLocation location, string reason, string token,
+			string extraInfoFormat, params object[] args)
 		{
-
+			mInfoSink.info.prefix(InfoSinkBase.TPrefixType.EPrefixWarning);
+			mInfoSink.info.location(location);
+			mInfoSink.info
+				.append ("'")
+				.append (token)
+				.append ("' : ")
+				.append (reason)
+				.append (" ")
+				.append (string.Format (extraInfoFormat, args))
+				.append ("\n");
 		}
 
-		private TInfoSink infoSink;
-		public void profileRequires(TSourceLoc loc, Profile profileMask, int minVersion, int numExtensions, string[] extensions, string featureDesc)
+		private InfoSink mInfoSink;
+		public void profileRequires(SourceLocation loc, Profile profileMask, int minVersion, int numExtensions, string[] extensions, string featureDesc)
 		{
-			if ((profile & profileMask) > 0) {
+			if ((mProfile & profileMask) > 0) {
 				bool okay = false;
-				if (minVersion > 0 && version >= minVersion)
+				if (minVersion > 0 && mVersion >= minVersion)
 					okay = true;
 				for (int i = 0; i < numExtensions; ++i) {
 					switch (getExtensionBehavior(extensions[i])) {
 					case ExtensionBehavior.Warn:
-						infoSink.info.message (TInfoSinkBase.TPrefixType.EPrefixWarning, "extension " + extensions [i] + " is being used for " + featureDesc, loc);
+						mInfoSink.info.message (InfoSinkBase.TPrefixType.EPrefixWarning, "extension " + extensions [i] + " is being used for " + featureDesc, loc);
 						okay = true;
 						break;
 					case ExtensionBehavior.Require:
@@ -132,11 +137,11 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 
-		public Dictionary<string, ExtensionBehavior> extensionBehavior;    // for each extension string, what its current behavior is set to
+		public Dictionary<string, ExtensionBehavior> mExtensionBehaviors;    // for each extension string, what its current behavior is set to
 		ExtensionBehavior getExtensionBehavior(string extension)
 		{
 			ExtensionBehavior result;
-			if (extensionBehavior.TryGetValue (extension, out result))
+			if (mExtensionBehaviors.TryGetValue (extension, out result))
 			{
 				return result;			
 			} else
@@ -145,7 +150,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public void profileRequires(TSourceLoc loc, Profile profileMask, int minVersion, string extension, string featureDesc)
+		public void profileRequires(SourceLocation loc, Profile profileMask, int minVersion, string extension, string featureDesc)
 		{
 			if (extension != null)
 			{
@@ -157,22 +162,20 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public int version;                 // version, updated by #version in the shader
-		public Profile profile;            // the declared profile in the shader (core by default)
+		public int mVersion;                 // version, updated by #version in the shader
+		public Profile mProfile;            // the declared profile in the shader (core by default)
 
 		bool extensionsTurnedOn(int numExtensions, string extensions)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public bool lineContinuationCheck(TSourceLoc loc, bool endOfComment)
+		public bool lineContinuationCheck(SourceLocation loc, bool endOfComment)
 		{
-			const string GL_ARB_SHADING_LANGUAGE_420PACK = "GL_ARB_shading_language_420pack";
+			const string message = "line continuation";
 
-			string message = "line continuation";
-
-			bool lineContinuationAllowed = (profile == Profile.EsProfile && version >= 300) ||
-				(profile != Profile.EsProfile && (version >= 420 || extensionsTurnedOn(1, GL_ARB_SHADING_LANGUAGE_420PACK)));
+			bool lineContinuationAllowed = (mProfile == Profile.EsProfile && mVersion >= 300) ||
+				(mProfile != Profile.EsProfile && (mVersion >= 420 || extensionsTurnedOn(1, GL_ARB_shading_language_420pack)));
 
 			if (endOfComment) {
 				if (lineContinuationAllowed)
@@ -183,13 +186,13 @@ namespace GLSLSyntaxAST.CodeDom
 				return lineContinuationAllowed;
 			}
 
-			if ((messages & EShMessages.RelaxedErrors) > 0) {
+			if ((messages & ShaderMessages.RelaxedErrors) > 0) {
 				if (! lineContinuationAllowed)
 					warn(loc, "not allowed in this version", message, "");
 				return true;
 			} else {
 				profileRequires(loc, Profile.EsProfile, 300, null, message);
-				profileRequires(loc, ~ Profile.EsProfile, 420, GL_ARB_SHADING_LANGUAGE_420PACK, message);
+				profileRequires(loc, ~ Profile.EsProfile, 420, GL_ARB_shading_language_420pack, message);
 			}
 
 			return lineContinuationAllowed;
@@ -198,7 +201,7 @@ namespace GLSLSyntaxAST.CodeDom
 		//
 		// Reserved errors for the preprocessor.
 		//
-		public void reservedPpErrorCheck(TSourceLoc loc, string identifier, string op)
+		public void reservedPpErrorCheck(SourceLocation loc, string identifier, string op)
 		{
 			// "All macro names containing two consecutive underscores ( __ ) are reserved;
 			// defining such a name does not itself result in an error, but may result in
@@ -208,7 +211,7 @@ namespace GLSLSyntaxAST.CodeDom
 			if (identifier.StartsWith("GL_"))
 				error(loc, "names beginning with \"GL_\" can't be (un)defined:", op,  identifier);
 			else if (identifier.Contains("__")) {
-				if (profile == Profile.EsProfile && version >= 300 &&
+				if (mProfile == Profile.EsProfile && mVersion >= 300 &&
 					(identifier == "__LINE__" || identifier == "__FILE__" || identifier == "__VERSION__"))
 				{
 					error(loc, "predefined names can't be (un)defined:", op,  identifier);
@@ -218,9 +221,9 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		TPragma contextPragma;
+		Pragma contextPragma;
 		public Action<int, List<string>> PragmaCallback { get; set;}
-		public void handlePragma(TSourceLoc loc, List<string> tokens)
+		public void handlePragma(SourceLocation loc, List<string> tokens)
 		{
 			if (PragmaCallback != null)
 				PragmaCallback(loc.line, tokens);
@@ -280,6 +283,16 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
+		/// <summary>
+		/// Call for any operation needing GLSL double data-type support.
+		/// </summary>
+		public void doubleCheck(SourceLocation loc, string op)
+		{
+			requireProfile(loc, Profile.CoreProfile | Profile.CompatibilityProfile, op);
+			profileRequires(loc, Profile.CoreProfile, 400, null, op);
+			profileRequires(loc, Profile.CompatibilityProfile, 400, null, op);
+		}
+
 		//
 		// When to use requireProfile():
 		//
@@ -289,16 +302,16 @@ namespace GLSLSyntaxAST.CodeDom
 		// Operation:  If the current profile is not one of the profileMask,
 		// give an error message.
 		//
-		public void requireProfile(TSourceLoc loc, Profile profileMask, string featureDesc)
+		public void requireProfile(SourceLocation loc, Profile profileMask, string featureDesc)
 		{
-			if ((profile & profileMask) == 0)
-				error(loc, "not supported with this profile:", featureDesc, ProfileName(profile));
+			if ((mProfile & profileMask) == 0)
+				error(loc, "not supported with this profile:", featureDesc, ProfileName(mProfile));
 		}
 
 		//
 		// Map from profile enum to externally readable text name.
 		//
-		string ProfileName(Profile profile)
+		static string ProfileName(Profile profile)
 		{
 			switch (profile) {
 				case Profile.NoProfile:             return "none";
@@ -309,7 +322,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		private TIntermediate intermediate;
+		private GLSLIntermediate intermediate;
 		void updateExtensionBehavior(string extension, ExtensionBehavior behavior)
 		{
 			// Update the current behavior
@@ -322,11 +335,11 @@ namespace GLSLSyntaxAST.CodeDom
 				} 
 				else 
 				{					
-					string[] keys = new string[extensionBehavior.Keys.Count];
-					extensionBehavior.Keys.CopyTo (keys, 0);
+					string[] keys = new string[mExtensionBehaviors.Keys.Count];
+					mExtensionBehaviors.Keys.CopyTo (keys, 0);
 					foreach (string key in keys)
 					{
-						extensionBehavior[key] = behavior;
+						mExtensionBehaviors[key] = behavior;
 					}
 				}
 			} 
@@ -334,13 +347,13 @@ namespace GLSLSyntaxAST.CodeDom
 			{
 				// Do the update for this single extension
 				ExtensionBehavior found;
-				if (extensionBehavior.TryGetValue (extension, out found))
+				if (mExtensionBehaviors.TryGetValue (extension, out found))
 				{
 					if (found == ExtensionBehavior.DisablePartial)
 						warn (getCurrentLoc (), "extension is only partially supported:", "#extension", extension);
 					if (behavior == ExtensionBehavior.Enable || behavior == ExtensionBehavior.Require)
 						intermediate.addRequestedExtension (extension);
-					extensionBehavior[extension] = behavior;
+					mExtensionBehaviors[extension] = behavior;
 				} 
 				else
 				{
@@ -422,58 +435,58 @@ namespace GLSLSyntaxAST.CodeDom
 		//
 		public void initializeExtensionBehavior()
 		{
-			extensionBehavior[GL_OES_texture_3D]                   = ExtensionBehavior.Disable;
-			extensionBehavior[GL_OES_standard_derivatives]         = ExtensionBehavior.Disable;
-			extensionBehavior[GL_EXT_frag_depth]                   = ExtensionBehavior.Disable;
-			extensionBehavior[GL_OES_EGL_image_external]           = ExtensionBehavior.Disable;
-			extensionBehavior[GL_EXT_shader_texture_lod]           = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_texture_3D]                   = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_standard_derivatives]         = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_EXT_frag_depth]                   = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_EGL_image_external]           = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_EXT_shader_texture_lod]           = ExtensionBehavior.Disable;
 
-			extensionBehavior[GL_ARB_texture_rectangle]            = ExtensionBehavior.Disable;
-			extensionBehavior[GL_3DL_array_objects]                = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_shading_language_420pack]     = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_texture_gather]               = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_gpu_shader5]                  = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_ARB_separate_shader_objects]      = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_compute_shader]               = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_ARB_tessellation_shader]          = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_enhanced_layouts]             = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_texture_cube_map_array]       = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_shader_texture_lod]           = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_explicit_attrib_location]     = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_shader_image_load_store]      = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_shader_atomic_counters]       = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_derivative_control]           = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_shader_texture_image_samples] = ExtensionBehavior.Disable;
-			extensionBehavior[GL_ARB_viewport_array]               = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_texture_rectangle]            = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_3DL_array_objects]                = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_shading_language_420pack]     = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_texture_gather]               = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_gpu_shader5]                  = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_ARB_separate_shader_objects]      = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_compute_shader]               = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_ARB_tessellation_shader]          = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_enhanced_layouts]             = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_texture_cube_map_array]       = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_shader_texture_lod]           = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_explicit_attrib_location]     = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_shader_image_load_store]      = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_shader_atomic_counters]       = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_derivative_control]           = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_shader_texture_image_samples] = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_ARB_viewport_array]               = ExtensionBehavior.Disable;
 			//    extensionBehavior[GL_ARB_cull_distance]                = ExtensionBehavior.Disable;    // present for 4.5, but need extension control over block members
 
 			// AEP
-			extensionBehavior[GL_ANDROID_extension_pack_es31a]             = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_KHR_blend_equation_advanced]              = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_OES_sample_variables]                     = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_OES_shader_image_atomic]                  = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_OES_shader_multisample_interpolation]     = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_OES_texture_storage_multisample_2d_array] = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_EXT_geometry_shader]                      = ExtensionBehavior.Disable;
-			extensionBehavior[GL_EXT_geometry_point_size]                  = ExtensionBehavior.Disable;
-			extensionBehavior[GL_EXT_gpu_shader5]                          = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_EXT_primitive_bounding_box]               = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_EXT_shader_io_blocks]                     = ExtensionBehavior.Disable;
-			extensionBehavior[GL_EXT_tessellation_shader]                  = ExtensionBehavior.Disable;
-			extensionBehavior[GL_EXT_tessellation_point_size]              = ExtensionBehavior.Disable;
-			extensionBehavior[GL_EXT_texture_buffer]                       = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_EXT_texture_cube_map_array]               = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_ANDROID_extension_pack_es31a]             = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_KHR_blend_equation_advanced]              = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_sample_variables]                     = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_shader_image_atomic]                  = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_shader_multisample_interpolation]     = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_texture_storage_multisample_2d_array] = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_EXT_geometry_shader]                      = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_EXT_geometry_point_size]                  = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_EXT_gpu_shader5]                          = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_EXT_primitive_bounding_box]               = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_EXT_shader_io_blocks]                     = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_EXT_tessellation_shader]                  = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_EXT_tessellation_point_size]              = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_EXT_texture_buffer]                       = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_EXT_texture_cube_map_array]               = ExtensionBehavior.DisablePartial;
 
 			// OES matching AEP
-			extensionBehavior[GL_OES_geometry_shader]          = ExtensionBehavior.Disable;
-			extensionBehavior[GL_OES_geometry_point_size]      = ExtensionBehavior.Disable;
-			extensionBehavior[GL_OES_gpu_shader5]              = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_OES_primitive_bounding_box]   = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_OES_shader_io_blocks]         = ExtensionBehavior.Disable;
-			extensionBehavior[GL_OES_tessellation_shader]      = ExtensionBehavior.Disable;
-			extensionBehavior[GL_OES_tessellation_point_size]  = ExtensionBehavior.Disable;
-			extensionBehavior[GL_OES_texture_buffer]           = ExtensionBehavior.DisablePartial;
-			extensionBehavior[GL_OES_texture_cube_map_array]   = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_geometry_shader]          = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_geometry_point_size]      = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_gpu_shader5]              = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_primitive_bounding_box]   = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_shader_io_blocks]         = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_tessellation_shader]      = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_tessellation_point_size]  = ExtensionBehavior.Disable;
+			mExtensionBehaviors[GL_OES_texture_buffer]           = ExtensionBehavior.DisablePartial;
+			mExtensionBehaviors[GL_OES_texture_cube_map_array]   = ExtensionBehavior.DisablePartial;
 		}
 
 
@@ -504,150 +517,88 @@ namespace GLSLSyntaxAST.CodeDom
 			updateExtensionBehavior(extension, behavior);
 
 			// see if need to propagate to implicitly modified things
-			if (extension == "GL_ANDROID_extension_pack_es31a") {
+			if (extension == GL_ANDROID_extension_pack_es31a) {
 				// to everything in AEP
-				updateExtensionBehavior(line, "GL_KHR_blend_equation_advanced", behaviorString);
-				updateExtensionBehavior(line, "GL_OES_sample_variables", behaviorString);
-				updateExtensionBehavior(line, "GL_OES_shader_image_atomic", behaviorString);
-				updateExtensionBehavior(line, "GL_OES_shader_multisample_interpolation", behaviorString);
-				updateExtensionBehavior(line, "GL_OES_texture_storage_multisample_2d_array", behaviorString);
-				updateExtensionBehavior(line, "GL_EXT_geometry_shader", behaviorString);
-				updateExtensionBehavior(line, "GL_EXT_gpu_shader5", behaviorString);
-				updateExtensionBehavior(line, "GL_EXT_primitive_bounding_box", behaviorString);
-				updateExtensionBehavior(line, "GL_EXT_shader_io_blocks", behaviorString);
-				updateExtensionBehavior(line, "GL_EXT_tessellation_shader", behaviorString);
-				updateExtensionBehavior(line, "GL_EXT_texture_buffer", behaviorString);
-				updateExtensionBehavior(line, "GL_EXT_texture_cube_map_array", behaviorString);
+				updateExtensionBehavior(line, GL_KHR_blend_equation_advanced, behaviorString);
+				updateExtensionBehavior(line, GL_OES_sample_variables, behaviorString);
+				updateExtensionBehavior(line, GL_OES_shader_image_atomic, behaviorString);
+				updateExtensionBehavior(line, GL_OES_shader_multisample_interpolation, behaviorString);
+				updateExtensionBehavior(line, GL_OES_texture_storage_multisample_2d_array, behaviorString);
+				updateExtensionBehavior(line, GL_EXT_geometry_shader, behaviorString);
+				updateExtensionBehavior(line, GL_EXT_gpu_shader5, behaviorString);
+				updateExtensionBehavior(line, GL_EXT_primitive_bounding_box, behaviorString);
+				updateExtensionBehavior(line, GL_EXT_shader_io_blocks, behaviorString);
+				updateExtensionBehavior(line, GL_EXT_tessellation_shader, behaviorString);
+				updateExtensionBehavior(line, GL_EXT_texture_buffer, behaviorString);
+				updateExtensionBehavior(line, GL_EXT_texture_cube_map_array, behaviorString);
 			}
 			// geometry to io_blocks
-			else if (extension == "GL_EXT_geometry_shader")
-				updateExtensionBehavior(line, "GL_EXT_shader_io_blocks", behaviorString);
-			else if (extension == "GL_OES_geometry_shader")
-				updateExtensionBehavior(line, "GL_OES_shader_io_blocks", behaviorString);
+			else if (extension == GL_EXT_geometry_shader)
+				updateExtensionBehavior(line, GL_EXT_shader_io_blocks, behaviorString);
+			else if (extension == GL_OES_geometry_shader)
+				updateExtensionBehavior(line, GL_OES_shader_io_blocks, behaviorString);
 			// tessellation to io_blocks
-			else if (extension == "GL_EXT_tessellation_shader")
-				updateExtensionBehavior(line, "GL_EXT_shader_io_blocks", behaviorString);
-			else if (extension == "GL_OES_tessellation_shader")
-				updateExtensionBehavior(line, "GL_OES_shader_io_blocks", behaviorString);
+			else if (extension == GL_EXT_tessellation_shader)
+				updateExtensionBehavior(line, GL_EXT_shader_io_blocks, behaviorString);
+			else if (extension == GL_OES_tessellation_shader)
+				updateExtensionBehavior(line, GL_OES_shader_io_blocks, behaviorString);
 		}
 
 		public void SetPreambleManually()
 		{
-			if (profile == Profile.EsProfile)
+			if (mProfile == Profile.EsProfile)
 			{
 				ppContext.SetProgramDefineAsInt ("GL_ES", 1);
 				ppContext.SetProgramDefineAsInt ("GL_FRAGMENT_PRECISION_HIGH", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_texture_3D", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_standard_derivatives", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_frag_depth", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_EGL_image_external", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_shader_texture_lod", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ANDROID_extension_pack_es31a", 1);
-				ppContext.SetProgramDefineAsInt ("GL_KHR_blend_equation_advanced", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_sample_variables", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_shader_image_atomic", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_shader_multisample_interpolation", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_texture_storage_multisample_2d_array", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_geometry_shader", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_geometry_point_size", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_gpu_shader5", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_primitive_bounding_box", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_shader_io_blocks", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_tessellation_shader", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_tessellation_point_size", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_texture_buffer", 1);
-				ppContext.SetProgramDefineAsInt ("GL_EXT_texture_cube_map_array", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_geometry_shader", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_geometry_point_size", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_gpu_shader5", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_primitive_bounding_box", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_shader_io_blocks", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_tessellation_shader", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_tessellation_point_size", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_texture_buffer", 1);
-				ppContext.SetProgramDefineAsInt ("GL_OES_texture_cube_map_array", 1);		
+				ppContext.SetProgramDefineAsInt (GL_OES_texture_3D, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_standard_derivatives, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_frag_depth, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_EGL_image_external, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_shader_texture_lod, 1);
+				ppContext.SetProgramDefineAsInt (GL_ANDROID_extension_pack_es31a, 1);
+				ppContext.SetProgramDefineAsInt (GL_KHR_blend_equation_advanced, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_sample_variables, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_shader_image_atomic, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_shader_multisample_interpolation, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_texture_storage_multisample_2d_array, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_geometry_shader, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_geometry_point_size, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_gpu_shader5, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_primitive_bounding_box, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_shader_io_blocks, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_tessellation_shader, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_tessellation_point_size, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_texture_buffer, 1);
+				ppContext.SetProgramDefineAsInt (GL_EXT_texture_cube_map_array, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_geometry_shader, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_geometry_point_size, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_gpu_shader5, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_primitive_bounding_box, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_shader_io_blocks, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_tessellation_shader, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_tessellation_point_size, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_texture_buffer, 1);
+				ppContext.SetProgramDefineAsInt (GL_OES_texture_cube_map_array, 1);		
 			}
 			else
 			{
 				ppContext.SetProgramDefineAsInt ("GL_FRAGMENT_PRECISION_HIGH", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_texture_rectangle", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_shading_language_420pack", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_texture_gather", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_gpu_shader5", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_separate_shader_objects", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_compute_shader", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_tessellation_shader", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_enhanced_layouts", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_texture_cube_map_array", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_texture_lod", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_explicit_attrib_location", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_image_load_store", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_atomic_counters", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_derivative_control", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_shader_texture_image_samples", 1);
-				ppContext.SetProgramDefineAsInt ("GL_ARB_viewport_array", 1);
-			}
-		}
-
-		// Get code that is not part of a shared symbol table, is specific to this shader,
-		// or needed by the preprocessor (which does not use a shared symbol table).
-		public string getPreamble()
-		{
-			if (profile == Profile.EsProfile) {
-					return
-@"#define GL_ES 1
-#define GL_FRAGMENT_PRECISION_HIGH 1
-#define GL_OES_texture_3D 1
-#define GL_OES_standard_derivatives 1
-#define GL_EXT_frag_depth 1
-#define GL_OES_EGL_image_external 1
-#define GL_EXT_shader_texture_lod 1
-#define GL_ANDROID_extension_pack_es31a 1
-#define GL_KHR_blend_equation_advanced 1
-#define GL_OES_sample_variables 1
-#define GL_OES_shader_image_atomic 1
-#define GL_OES_shader_multisample_interpolation 1
-#define GL_OES_texture_storage_multisample_2d_array 1
-#define GL_EXT_geometry_shader 1
-#define GL_EXT_geometry_point_size 1
-#define GL_EXT_gpu_shader5 1
-#define GL_EXT_primitive_bounding_box 1
-#define GL_EXT_shader_io_blocks 1
-#define GL_EXT_tessellation_shader 1
-#define GL_EXT_tessellation_point_size 1
-#define GL_EXT_texture_buffer 1
-#define GL_EXT_texture_cube_map_array 1
-#define GL_OES_geometry_shader 1
-#define GL_OES_geometry_point_size 1
-#define GL_OES_gpu_shader5 1
-#define GL_OES_primitive_bounding_box 1
-#define GL_OES_shader_io_blocks 1
-#define GL_OES_tessellation_shader 1
-#define GL_OES_tessellation_point_size 1
-#define GL_OES_texture_buffer 1
-#define GL_OES_texture_cube_map_array 1";
-					
-			} else {
-				return
-@"#define GL_FRAGMENT_PRECISION_HIGH 1
-#define GL_ARB_texture_rectangle 1
-#define GL_ARB_shading_language_420pack 1
-#define GL_ARB_texture_gather 1
-#define GL_ARB_gpu_shader5 1
-#define GL_ARB_separate_shader_objects 1
-#define GL_ARB_compute_shader 1
-#define GL_ARB_tessellation_shader 1
-#define GL_ARB_enhanced_layouts 1
-#define GL_ARB_texture_cube_map_array 1
-#define GL_ARB_shader_texture_lod 1
-#define GL_ARB_explicit_attrib_location 1
-#define GL_ARB_shader_image_load_store 1
-#define GL_ARB_shader_atomic_counters 1
-#define GL_ARB_derivative_control 1
-#define GL_ARB_shader_texture_image_samples 1
-#define GL_ARB_viewport_array 1";
-					//            "#define GL_ARB_cull_distance 1\n"    // present for 4.5, but need extension control over block members
-				
+				ppContext.SetProgramDefineAsInt (GL_ARB_texture_rectangle, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_shading_language_420pack, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_texture_gather, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_gpu_shader5, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_separate_shader_objects, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_compute_shader, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_tessellation_shader, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_enhanced_layouts, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_texture_cube_map_array, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_shader_texture_lod, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_explicit_attrib_location, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_shader_image_load_store, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_shader_atomic_counters, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_derivative_control, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_shader_texture_image_samples, 1);
+				ppContext.SetProgramDefineAsInt (GL_ARB_viewport_array, 1);
 			}
 		}
 	}

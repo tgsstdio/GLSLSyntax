@@ -4,7 +4,7 @@ namespace GLSLSyntaxAST.CodeDom
 {
 	public interface IScannableType
 	{
-		int scan(ref TPpToken p);
+		int scan(ref PreprocessorToken p);
 		int getch();
 		void ungetch();
 	}

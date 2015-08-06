@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLSLSyntaxAST.CodeDom", "GL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLSLSyntax.Preprocessor", "GLSLSyntax.Preprocessor\GLSLSyntax.Preprocessor.csproj", "{0E5C2DE9-9D7F-4231-8741-EEE70DD638D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLSLSyntaxAST.Preprocessor", "GLSLSyntaxAST.Preprocessor\GLSLSyntaxAST.Preprocessor.csproj", "{ED65DE39-181D-4C06-9BA9-6B568614652B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -49,5 +51,9 @@ Global
 		{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}.Debug|x86.Build.0 = Debug|x86
 		{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}.Release|x86.ActiveCfg = Release|x86
 		{E145ECC1-4373-41E5-BBEA-2CE1E4051B9A}.Release|x86.Build.0 = Release|x86
+		{ED65DE39-181D-4C06-9BA9-6B568614652B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED65DE39-181D-4C06-9BA9-6B568614652B}.Debug|x86.Build.0 = Debug|Any CPU
+		{ED65DE39-181D-4C06-9BA9-6B568614652B}.Release|x86.ActiveCfg = Release|Any CPU
+		{ED65DE39-181D-4C06-9BA9-6B568614652B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

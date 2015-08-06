@@ -1,21 +1,43 @@
 ﻿<Properties StartupItem="GLSLSyntax.Preprocessor\GLSLSyntax.Preprocessor.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CodeDom\TBuiltins.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CodeDom\ExtensionBehavior.cs">
     <Files>
-      <File FileName="GLSLSyntaxAST.CodeDom\TParseContext.cs" Line="573" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" Line="91" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TShader.cs" Line="214" Column="60" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" Line="1506" Column="1" />
-      <File FileName="GLSLSyntax.Preprocessor\Program.cs" Line="28" Column="32" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TokenStream.cs" Line="14" Column="1" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TPpToken.cs" Line="16" Column="1" />
-      <File FileName="GLSLSyntax.Preprocessor\notex.vert" Line="5" Column="43" />
-      <File FileName="GLSLSyntaxAST.CodeDom\TBuiltins.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\InfoSink.cs" Line="5" Column="22" />
+      <File FileName="GLSLSyntaxAST.CodeDom\MarkerInput.cs" Line="5" Column="26" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IScannableType.cs" Line="5" Column="2" />
+      <File FileName="GLSLSyntaxAST.CodeDom\PreprocessorContext.cs" Line="279" Column="33" />
+      <File FileName="GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\BasePreprocessorInput.cs" Line="5" Column="55" />
+      <File FileName="GLSLSyntaxAST.CodeDom\InputScanner.cs" Line="5" Column="27" />
+      <File FileName="GLSLSyntaxAST.CodeDom\MacroInput.cs" Line="3" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\DesiredFormat.txt" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\DoPreprocessing.cs" Line="105" Column="8" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IPreprocessorContext.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\ZeroInput.cs" Line="5" Column="24" />
+      <File FileName="GLSLSyntaxAST.CodeDom\UngotTokenInput.cs" Line="5" Column="30" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TokenInput.cs" Line="26" Column="32" />
+      <File FileName="GLSLSyntaxAST.CodeDom\SourceLocation.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StringInput.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\Profile.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StringInputBuffer.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TParseContext.cs" Line="12" Column="27" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TShader.cs" Line="154" Column="38" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TIntermediate.cs" Line="19" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\PreprocessorToken.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\TokenStream.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\Standalone.cs" Line="78" Column="11" />
+      <File FileName="GLSLSyntaxAST.UnitTests\ProprocessorTests.cs" Line="14" Column="4" />
+      <File FileName="GLSLSyntax.Preprocessor\Program.cs" Line="12" Column="43" />
+      <File FileName="GLSLSyntaxAST.CodeDom\CppEnums.cs" Line="40" Column="24" />
+      <File FileName="GLSLSyntaxAST.CodeDom\EvalPrecedence.cs" Line="12" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\ExampleProgram.cs.txt" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\ExtensionBehavior.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="210" column="31" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="174" column="31" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

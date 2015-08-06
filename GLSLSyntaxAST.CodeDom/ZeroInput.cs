@@ -2,18 +2,18 @@
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class tZeroInput : tInput
+	public class ZeroInput : BasePreprocessorInput
 	{
-		public tZeroInput(PreprocessorContext pp) :base(pp)
+		public ZeroInput(PreprocessorContext pp) :base(pp)
 		{
 
 		}
 
 		// return a zero, for scanning a macro that was never defined
-		public override int scan(ref TPpToken ppToken)
+		public override int scan(ref PreprocessorToken ppToken)
 		{
 			if (done)
-				return tInput.END_OF_INPUT;
+				return BasePreprocessorInput.END_OF_INPUT;
 
 			ppToken.name = "0";
 			ppToken.ival = 0;

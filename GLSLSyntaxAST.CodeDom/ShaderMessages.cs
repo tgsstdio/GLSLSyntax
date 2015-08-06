@@ -6,7 +6,7 @@ namespace GLSLSyntaxAST.CodeDom
 	/// Message choices for what errors and warnings are given.
 	/// </summary>
 	[Flags]
-	public enum EShMessages : int
+	public enum ShaderMessages : int
 	{
 		/// <summary>
 		/// default is to give all required errors and extra warnings
@@ -19,23 +19,23 @@ namespace GLSLSyntaxAST.CodeDom
 		/// <summary>
 		/// suppress all warnings, except those required by the specification
 		/// </summary>
-		EShMsgSuppressWarnings = (1 << 1),
+		SuppressWarnings = (1 << 1),
 		/// <summary>
 		/// print the AST intermediate representation
 		/// </summary>
-		EShMsgAST              = (1 << 2),
+		AST              = (1 << 2),
 		/// <summary>
 		/// issue messages for SPIR-V generation
 		/// </summary>
-		EShMsgSpvRules         = (1 << 3), 
+		SPIRVRules         = (1 << 3), 
 		/// <summary>
 		/// issue messages for Vulkan-requirements of GLSL for SPIR-V
 		/// </summary>
-		EShMsgVulkanRules      = (1 << 4),
+		VulkanRules      = (1 << 4),
 		/// <summary>
 		/// only print out errors produced by the preprocessor
 		/// </summary>
-		EShMsgOnlyPreprocessor = (1 << 5), 
+		OnlyPreprocessor = (1 << 5), 
 	};
 }
 

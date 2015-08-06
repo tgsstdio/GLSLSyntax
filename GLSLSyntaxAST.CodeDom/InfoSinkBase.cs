@@ -3,7 +3,7 @@ using System.Text;
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class TInfoSinkBase
+	public class InfoSinkBase
 	{
 //		public:
 //		TInfoSinkBase() : outputStream(4) {}
@@ -26,7 +26,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		private readonly StringBuilder sink;
 		public TOutputStream outputStream;
-		public TInfoSinkBase ()
+		public InfoSinkBase ()
 		{
 			sink = new StringBuilder();
 			outputStream = TOutputStream.EString;
@@ -83,7 +83,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public void location(TSourceLoc loc)
+		public void location(SourceLocation loc)
 		{
 			const int maxSize = 24;
 			string locText;
@@ -104,7 +104,7 @@ namespace GLSLSyntaxAST.CodeDom
 			append("\n");
 		}
 
-		public void message(TPrefixType message, string s, TSourceLoc loc)
+		public void message(TPrefixType message, string s, SourceLocation loc)
 		{
 			prefix(message);
 			location(loc);
@@ -137,7 +137,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public TInfoSinkBase append(string s)           
+		public InfoSinkBase append(string s)           
 		{
 			if ((outputStream & TOutputStream.EString) > 0) {
 				sink.Append(s); 

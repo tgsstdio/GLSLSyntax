@@ -2,17 +2,17 @@
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class tMarkerInput : tInput
+	public class MarkerInput : BasePreprocessorInput
 	{
-		public tMarkerInput(PreprocessorContext pp) :base(pp)
+		public MarkerInput(PreprocessorContext pp) :base(pp)
 		{
 				
 		}
 
-		public override int scan(ref TPpToken ppToken)
+		public override int scan(ref PreprocessorToken ppToken)
 		{
 			if (done)
-				return tInput.END_OF_INPUT;
+				return BasePreprocessorInput.END_OF_INPUT;
 			done = true;
 
 			return marker;

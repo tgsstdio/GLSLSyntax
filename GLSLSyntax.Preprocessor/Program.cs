@@ -8,7 +8,9 @@ namespace GLSLSyntax.Preprocessor
 	{
 		public static void Main (string[] args)
 		{
-			var preprocessor = new Standalone ();
+			var infoSink = new InfoSink {debug = new InfoSinkBase(), info = new InfoSinkBase()};
+			var intermediate = new GLSLIntermediate ();
+			var preprocessor = new Standalone (infoSink, intermediate);
 			string result = null;
 
 			//const string fileName = "Sample.vert";

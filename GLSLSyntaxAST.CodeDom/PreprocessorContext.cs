@@ -7,14 +7,14 @@ namespace GLSLSyntaxAST.CodeDom
 {
 	public class PreprocessorContext : IPreprocessorContext
 	{
-		public void setInput (TInputScanner input, bool versionWillBeError)
+		public void setInput (InputScanner input, bool versionWillBeError)
 		{
 			if (inputStack.Count != 0)
 			{
 				throw new Exception ("Stack is use");
 			}
 
-			pushInput(new tStringInput(this, input));
+			pushInput(new StringInput(this, input));
 
 			errorOnVersion = versionWillBeError;
 			versionSeen = false;
@@ -23,23 +23,16 @@ namespace GLSLSyntaxAST.CodeDom
 		const int maxMacroArgs = 64;
 		const int MAXIFNESTING = 64;
 
-		string preamble; // string to parse, all before line 1 of string 0, it is 0 if no preamble
-		int preambleLength;
-		string[] strings; // official strings of shader, starting a string 0 line 1
-		int[] 	lengths;
-		int numStrings; // how many official strings there are
-		int currentString; // which string we're currently parsing (-1 for preamble)
 		int ifdepth;  // current #if-#else-#endif nesting in the cpp.c file (pre-processor)
 		bool[] elseSeen; 			 // Keep a track of whether an else has been seen at a particular depth
 		int elsetracker; // #if-#else and #endif constructs...Counter.
-		string ErrMsg;
 
 		// Scanner data:
 		int previous_token;
 		public TParseContext parseContext;
 		public bool inComment;
 
-		public NameBuffer buffer;
+		public StringInputBuffer buffer;
 
 		public PreprocessorContext (TParseContext pc)
 		{
@@ -55,10 +48,10 @@ namespace GLSLSyntaxAST.CodeDom
 				elseSeen[elsetracker] = false;
 			elsetracker = 0;
 
-			inputStack = new Stack<tInput> ();
+			inputStack = new Stack<BasePreprocessorInput> ();
 			symbols = new Dictionary<int, Symbol> ();
 
-			buffer = new NameBuffer{ name = new char[NameBuffer.MAX_TOKEN_LENGTH], tokenText = new char[NameBuffer.MAX_TOKEN_LENGTH]};
+			buffer = new StringInputBuffer{ name = new char[StringInputBuffer.MAX_TOKEN_LENGTH], tokenText = new char[StringInputBuffer.MAX_TOKEN_LENGTH]};
 		}
 
 		private class BinaryEvalOperation
@@ -242,20 +235,20 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		private Stack<tInput> inputStack;
+		private Stack<BasePreprocessorInput> inputStack;
 		private bool errorOnVersion;
 		private bool versionSeen;
-		public void SetInput(TInputScanner input, bool versionWillBeError)
+		public void SetInput(InputScanner input, bool versionWillBeError)
 		{
 			Debug.Assert(inputStack.Count == 0);
 
-			pushInput(new tStringInput(this, input));
+			pushInput(new StringInput(this, input));
 
 			errorOnVersion = versionWillBeError;
 			versionSeen = false;
 		}
 
-		void pushInput(tInput item)
+		void pushInput(BasePreprocessorInput item)
 		{
 			inputStack.Push(item);
 		}
@@ -278,19 +271,19 @@ namespace GLSLSyntaxAST.CodeDom
 		// Get the next token from *stack* of input sources, popping input sources
 		// that are out of tokens, down until an input sources is found that has a token.
 		// Return EOF when there are no more tokens to be found by doing this.
-		public int scanToken(ref TPpToken ppToken)
+		public int scanToken(ref PreprocessorToken ppToken)
 		{
-			int token = tInput.EOF;
+			int token = BasePreprocessorInput.EOF;
 
 			while (inputStack.Count > 0) {
 				token = inputStack.Peek().scan(ref ppToken);
-				if (token != tInput.END_OF_INPUT)
+				if (token != BasePreprocessorInput.END_OF_INPUT)
 					break;
 				popInput();
 			}
 
-			if (token == tInput.END_OF_INPUT)
-				return tInput.EOF;
+			if (token == BasePreprocessorInput.END_OF_INPUT)
+				return BasePreprocessorInput.EOF;
 
 			return token;
 		}
@@ -316,7 +309,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public string tokenize(ref TPpToken ppToken)
+		public string tokenize(ref PreprocessorToken ppToken)
 		{    
 			int token = '\n';
 
@@ -324,14 +317,14 @@ namespace GLSLSyntaxAST.CodeDom
 				string tokenString = null;
 				token = scanToken(ref ppToken);
 				ppToken.token = token;
-				if (token == tInput.EOF) {
+				if (token == BasePreprocessorInput.EOF) {
 					missingEndifCheck();
 					return null;
 				}
 				if (token == '#') {
 					if (previous_token == '\n') {
 						token = readCPPline(ref ppToken);
-						if (token == tInput.EOF) {
+						if (token == BasePreprocessorInput.EOF) {
 							missingEndifCheck();
 							return null;
 						}
@@ -373,7 +366,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		public int readCPPline(ref TPpToken ppToken)
+		public int readCPPline(ref PreprocessorToken ppToken)
 		{
 			int token = scanToken(ref ppToken);
 			bool isVersion = false;
@@ -433,17 +426,17 @@ namespace GLSLSyntaxAST.CodeDom
 				} else {
 					parseContext.error(ppToken.loc, "invalid directive:", "#", GetAtomString(ppToken.atom));
 				}
-			} else if (token != '\n' && token != tInput.EOF)
+			} else if (token != '\n' && token != BasePreprocessorInput.EOF)
 				parseContext.error(ppToken.loc, "invalid directive", "#", "");
 
-			while (token != '\n' && token != 0 && token != tInput.EOF)
+			while (token != '\n' && token != 0 && token != BasePreprocessorInput.EOF)
 				token = scanToken(ref ppToken);
 
 			return token;
 		}
 
 		// Handle #define
-		int CPPdefine(ref TPpToken ppToken)
+		int CPPdefine(ref PreprocessorToken ppToken)
 		{
 			MacroSymbol mac = new MacroSymbol ();
 			Symbol symb;
@@ -503,7 +496,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 
 			// record the definition of the macro
-			TSourceLoc defineLoc = ppToken.loc; // because ppToken is going to go to the next line before we report errors
+			SourceLocation defineLoc = ppToken.loc; // because ppToken is going to go to the next line before we report errors
 			mac.body = new TokenStream();
 			while (token != '\n') {
 				RecordToken(mac.body, token, ppToken);
@@ -531,8 +524,8 @@ namespace GLSLSyntaxAST.CodeDom
 						int newToken;
 						do {
 							int oldToken;
-							TPpToken oldPpToken = new TPpToken();
-							TPpToken newPpToken = new TPpToken();                    
+							PreprocessorToken oldPpToken = new PreprocessorToken();
+							PreprocessorToken newPpToken = new PreprocessorToken();                    
 							oldToken = ReadToken(symb.mac.body, oldPpToken);
 							newToken = ReadToken(mac.body, newPpToken);
 							if (oldToken != newToken || oldPpToken != newPpToken) {
@@ -551,9 +544,9 @@ namespace GLSLSyntaxAST.CodeDom
 			return '\n';
 		}
 
-		TSourceLoc ifloc; /* outermost #if */
+		SourceLocation ifloc; /* outermost #if */
 		// Handle #if
-		int CPPif(ref TPpToken ppToken) 
+		int CPPif(ref PreprocessorToken ppToken) 
 		{
 			int token = scanToken(ref ppToken);
 			elsetracker++;
@@ -576,7 +569,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Handle #ifdef
-		int CPPifdef(bool defined, ref TPpToken ppToken)
+		int CPPifdef(bool defined, ref PreprocessorToken ppToken)
 		{
 			int token = scanToken(ref ppToken);
 			int name = ppToken.atom;
@@ -606,11 +599,11 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Handle #error
-		int CPPerror(ref TPpToken ppToken) 
+		int CPPerror(ref PreprocessorToken ppToken) 
 		{
 			int token = scanToken(ref ppToken);
 			StringBuilder message = new StringBuilder();
-			TSourceLoc loc = ppToken.loc;
+			SourceLocation loc = ppToken.loc;
 
 			while (token != '\n') {
 				if (token == (int) CppEnums.INTCONSTANT || token == (int) CppEnums.UINTCONSTANT ||
@@ -636,19 +629,19 @@ namespace GLSLSyntaxAST.CodeDom
 		//** to skip to a #endif after seeing an #else, AND to skip to a #else,
 		//** #elif, or #endif after a #if/#ifdef/#ifndef/#elif test was false.
 		//
-		int CPPelse(bool matchelse,ref TPpToken ppToken)
+		int CPPelse(bool matchelse,ref PreprocessorToken ppToken)
 		{
 			int atom;
 			int depth = 0;
 			int token = scanToken(ref ppToken);
 
-			while (token != tInput.EOF) {
+			while (token != BasePreprocessorInput.EOF) {
 				if (token != '#') {
-					while (token != '\n' && token != tInput.EOF)
+					while (token != '\n' && token != BasePreprocessorInput.EOF)
 						token = scanToken(ref ppToken);
 
-					if (token == tInput.EOF)
-						return tInput.EOF;
+					if (token == BasePreprocessorInput.EOF)
+						return BasePreprocessorInput.EOF;
 
 					token = scanToken(ref ppToken);
 					continue;
@@ -712,7 +705,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Handle #extension
-		int CPPextension(ref TPpToken ppToken)
+		int CPPextension(ref PreprocessorToken ppToken)
 		{
 			int line = ppToken.loc.line;
 			int token = scanToken(ref ppToken);
@@ -751,7 +744,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Handle #line
-		int CPPline(ref TPpToken ppToken) 
+		int CPPline(ref PreprocessorToken ppToken) 
 		{
 			// "#line must have, after macro substitution, one of the following forms:
 			// "#line line
@@ -782,7 +775,7 @@ namespace GLSLSyntaxAST.CodeDom
 				// Desktop, version 3.30 and later, and ES:  "After processing this directive
 				// (including its new-line), the implementation will behave as if it is compiling at line number line and
 				// source string number source-string-number.
-				if (parseContext.profile == Profile.EsProfile || parseContext.version >= 330)
+				if (parseContext.mProfile == Profile.EsProfile || parseContext.mVersion >= 330)
 					--lineRes;
 				parseContext.setCurrentLine(lineRes);
 
@@ -802,13 +795,13 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Handle #pragma
-		int CPPpragma(ref TPpToken ppToken)
+		int CPPpragma(ref PreprocessorToken ppToken)
 		{
 			var tokens = new List<string>();
 
-			TSourceLoc loc = ppToken.loc;  // because we go to the next line before processing
+			SourceLocation loc = ppToken.loc;  // because we go to the next line before processing
 			int token = scanToken(ref ppToken);
-			while (token != '\n' && token != tInput.EOF) {
+			while (token != '\n' && token != BasePreprocessorInput.EOF) {
 				switch (token) {
 				case (int) CppEnums.IDENTIFIER:
 					tokens.Add(GetAtomString(ppToken.atom));
@@ -826,7 +819,7 @@ namespace GLSLSyntaxAST.CodeDom
 				token = scanToken(ref ppToken);
 			}
 
-			if (token == tInput.EOF)
+			if (token == BasePreprocessorInput.EOF)
 				parseContext.error(loc, "directive must end with a newline", "#pragma", "");
 			else
 				parseContext.handlePragma(loc, tokens);
@@ -835,7 +828,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Handle #undef
-		int CPPundef(ref TPpToken ppToken)
+		int CPPundef(ref PreprocessorToken ppToken)
 		{
 			int token = scanToken(ref ppToken);
 			Symbol symb;
@@ -863,7 +856,7 @@ namespace GLSLSyntaxAST.CodeDom
 		/*
 		* Add a token to the end of a list for later playback.
 		*/
-		void RecordToken(TokenStream pTok, int token, TPpToken ppToken)
+		void RecordToken(TokenStream pTok, int token, PreprocessorToken ppToken)
 		{
 			if (token > 256)
 				lAddByte(pTok, (UInt16)((token & 0x7f) + 0x80));
@@ -910,7 +903,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Call when there should be no more tokens left on a line.
-		int extraTokenCheck(int atom, ref TPpToken ppToken, int token)
+		int extraTokenCheck(int atom, ref PreprocessorToken ppToken, int token)
 		{
 			if (token != '\n') {
 				const string message = "unexpected tokens following directive";
@@ -929,7 +922,7 @@ namespace GLSLSyntaxAST.CodeDom
 				else
 					label = "";
 
-				if ((parseContext.messages & EShMessages.RelaxedErrors) > 0)
+				if ((parseContext.messages & ShaderMessages.RelaxedErrors) > 0)
 					parseContext.warn(ppToken.loc, message, label, "");
 				else
 					parseContext.error(ppToken.loc, message, label, "");
@@ -942,7 +935,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// #version: This is just for error checking: the version and profile are decided before preprocessing starts
-		int CPPversion(ref TPpToken ppToken)
+		int CPPversion(ref PreprocessorToken ppToken)
 		{
 			int token = scanToken(ref ppToken);
 
@@ -1015,7 +1008,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 
 
-		int eval(int token, EvalPrecedence precedence, bool shortCircuit, ref int res, ref bool err, ref TPpToken ppToken)
+		int eval(int token, EvalPrecedence precedence, bool shortCircuit, ref int res, ref bool err, ref PreprocessorToken ppToken)
 		{
 			UnaryEvalOperation[] unop =   {
 				new UnaryEvalOperation{ token='+', op= op_pos },
@@ -1025,7 +1018,7 @@ namespace GLSLSyntaxAST.CodeDom
 			};
 
 
-			TSourceLoc loc = ppToken.loc;  // because we sometimes read the newline before reporting the error
+			SourceLocation loc = ppToken.loc;  // because we sometimes read the newline before reporting the error
 			if (token == (int) CppEnums.IDENTIFIER) {
 				if (ppToken.atom == definedAtom) {
 					bool needclose = false;
@@ -1126,7 +1119,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		// Expand macros, skipping empty expansions, to get to the first real token in those expansions.
-		int evalToToken(int token, bool shortCircuit, ref int res, ref bool err, ref TPpToken ppToken)
+		int evalToToken(int token, bool shortCircuit, ref int res, ref bool err, ref PreprocessorToken ppToken)
 		{
 			bool escapedLoop = false;
 			while (token == (int) CppEnums.IDENTIFIER && ppToken.atom != definedAtom) {
@@ -1139,10 +1132,10 @@ namespace GLSLSyntaxAST.CodeDom
 					break;
 				}
 				if (macroReturn == -1) {
-					if (! shortCircuit && parseContext.profile == Profile.EsProfile) {
+					if (! shortCircuit && parseContext.mProfile == Profile.EsProfile) {
 						const string message = "undefined macro in expression not allowed in es profile";
 						string name = GetAtomString(ppToken.atom);
-						if ((parseContext.messages & EShMessages.RelaxedErrors) > 0)
+						if ((parseContext.messages & ShaderMessages.RelaxedErrors) > 0)
 							parseContext.warn(ppToken.loc, message, "preprocessor evaluation", name);
 						else
 							parseContext.error(ppToken.loc, message, "preprocessor evaluation", name);
@@ -1216,7 +1209,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		public void pushTokenStreamInput(TokenStream ts)
 		{
-			pushInput(new tTokenInput(this, ts));
+			pushInput(new TokenInput(this, ts));
 			RewindTokenStream(ts);
 		}
 
@@ -1228,7 +1221,7 @@ namespace GLSLSyntaxAST.CodeDom
 			if (pTok.current < pTok.data.Count)
 				return pTok.data[pTok.current++];
 			else
-				return tInput.END_OF_INPUT;
+				return BasePreprocessorInput.END_OF_INPUT;
 		}
 
 		void lUnreadByte(TokenStream pTok)
@@ -1237,15 +1230,15 @@ namespace GLSLSyntaxAST.CodeDom
 				--pTok.current;
 		}
 
-		void UngetToken(int token, TPpToken ppToken)
+		void UngetToken(int token, PreprocessorToken ppToken)
 		{
-			pushInput(new tUngotTokenInput(this, token, ppToken));
+			pushInput(new UngotTokenInput(this, token, ppToken));
 		}
 
 		///*
 		//* Read the next token from a token stream (not the source stream, but stream used to hold a tokenized macro).
 		//*/
-		public int ReadToken(TokenStream pTok, TPpToken ppToken)
+		public int ReadToken(TokenStream pTok, PreprocessorToken ppToken)
 		{
 			char[] tokenText = buffer.tokenText;
 			int ltoken = 0;
@@ -1278,7 +1271,7 @@ namespace GLSLSyntaxAST.CodeDom
 					ch = lReadByte (pTok);
 					while (ch != 0)
 					{
-						if (len < TPpToken.maxTokenLength)
+						if (len < PreprocessorToken.maxTokenLength)
 						{
 							tokenText [len] = (char)ch;
 							len++;
@@ -1328,7 +1321,7 @@ namespace GLSLSyntaxAST.CodeDom
 			return ltoken;
 		}
 
-		private int MacroExpand(int atom, TPpToken ppToken, bool expandUndef, bool newLineOkay)
+		private int MacroExpand(int atom, PreprocessorToken ppToken, bool expandUndef, bool newLineOkay)
 		{
 			Symbol sym = LookUpSymbol(atom);
 			int token;
@@ -1352,7 +1345,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 
 			if (atom == __VERSION__Atom) {
-				ppToken.ival = parseContext.version;
+				ppToken.ival = parseContext.mVersion;
 				ppToken.name = ppToken.ival.ToString ();
 				UngetToken ((int)CppEnums.INTCONSTANT, ppToken);
 
@@ -1369,13 +1362,13 @@ namespace GLSLSyntaxAST.CodeDom
 
 			// 0 is the value of an undefined macro
 			if ((sym == null || sym.mac.undef) && expandUndef) {
-				pushInput(new tZeroInput(this));
+				pushInput(new ZeroInput(this));
 				return -1;
 			}
 
-			tMacroInput inp = new tMacroInput(this);
+			MacroInput inp = new MacroInput(this);
 
-			TSourceLoc loc = ppToken.loc;  // in case we go to the next line before discovering the error
+			SourceLocation loc = ppToken.loc;  // in case we go to the next line before discovering the error
 			inp.mac = sym.mac;
 			if (sym.mac.args != null && sym.mac.args.Length > 0) {
 				token = scanToken(ref ppToken);
@@ -1400,7 +1393,7 @@ namespace GLSLSyntaxAST.CodeDom
 					depth = 0;
 					while (true) {
 						token = scanToken(ref ppToken);
-						if (token == tInput.EOF) {
+						if (token == BasePreprocessorInput.EOF) {
 							parseContext.error(loc, "EOF in macro", "macro expansion", GetAtomString(atom));
 							inp = null;
 							return 0;
@@ -1442,7 +1435,7 @@ namespace GLSLSyntaxAST.CodeDom
 					parseContext.error(loc, "Too few args in Macro", "macro expansion", GetAtomString(atom));
 				else if (token != ')') {
 					depth=0;
-					while (token != tInput.EOF && (depth > 0 || token != ')')) {
+					while (token != BasePreprocessorInput.EOF && (depth > 0 || token != ')')) {
 						if (token == ')')
 							depth--;
 						token = scanToken(ref ppToken);
@@ -1450,7 +1443,7 @@ namespace GLSLSyntaxAST.CodeDom
 							depth++;
 					}
 
-					if (token == tInput.EOF) {
+					if (token == BasePreprocessorInput.EOF) {
 						parseContext.error(loc, "EOF in macro", "macro expansion", GetAtomString(atom));
 						inp = null;
 						return 0;
@@ -1470,7 +1463,7 @@ namespace GLSLSyntaxAST.CodeDom
 			return 1;
 		}
 
-		public TokenStream PrescanMacroArg(TokenStream a, TPpToken ppToken, bool newLineOkay)
+		public TokenStream PrescanMacroArg(TokenStream a, PreprocessorToken ppToken, bool newLineOkay)
 		{
 			int token;
 			RewindTokenStream(a);
@@ -1478,15 +1471,15 @@ namespace GLSLSyntaxAST.CodeDom
 				token = ReadToken(a, ppToken);
 				if (token == (int) CppEnums.IDENTIFIER && LookUpSymbol(ppToken.atom) != null)
 					break;
-			} while (token != tInput.END_OF_INPUT);
+			} while (token != BasePreprocessorInput.END_OF_INPUT);
 
-			if (token == tInput.END_OF_INPUT)
+			if (token == BasePreprocessorInput.END_OF_INPUT)
 				return a;
 
 			TokenStream n = new TokenStream ();
-			pushInput(new tMarkerInput(this));
+			pushInput(new MarkerInput(this));
 			pushTokenStreamInput(a);
-			while ((token = scanToken(ref ppToken)) != tMarkerInput.marker) {
+			while ((token = scanToken(ref ppToken)) != MarkerInput.marker) {
 				if (token == (int) CppEnums.IDENTIFIER && MacroExpand(ppToken.atom, ppToken, false, newLineOkay) != 0)
 					continue;
 				RecordToken(n, token, ppToken);
@@ -1508,7 +1501,7 @@ namespace GLSLSyntaxAST.CodeDom
 			Symbol sym = AddSymbol (atom);
 			sym.mac = new MacroSymbol ();
 			sym.mac.body = new TokenStream ();
-			var packet = new TPpToken ();
+			var packet = new PreprocessorToken ();
 			packet.name = value.ToString();
 			RecordToken (sym.mac.body, (int) CppEnums.INTCONSTANT, packet);
 		}
@@ -1524,7 +1517,7 @@ namespace GLSLSyntaxAST.CodeDom
 			Symbol sym = AddSymbol (atom);
 			sym.mac = new MacroSymbol ();
 			sym.mac.body = new TokenStream ();
-			var packet = new TPpToken ();
+			var packet = new PreprocessorToken ();
 			packet.atom = LookUpAddString (valueString);
 			RecordToken (sym.mac.body, (int) CppEnums.STRCONSTANT, packet);
 		}
@@ -1539,7 +1532,7 @@ namespace GLSLSyntaxAST.CodeDom
 		*         letter 'e', or a precision ending (e.g., F or LF).
 		*/
 
-		public int lFloatConst(int len, int ch, TPpToken ppToken)
+		public int lFloatConst(int len, int ch, PreprocessorToken ppToken)
 		{
 			bool HasDecimalOrExponent = false;
 			int declen, exp, ExpSign;
@@ -1641,7 +1634,7 @@ namespace GLSLSyntaxAST.CodeDom
 				if (ch == 'l' || ch == 'L')
 				{
 					// TODO : figure this out
-					//parseContext.doubleCheck( ppToken.loc, "double floating-point suffix");
+					parseContext.doubleCheck( ppToken.loc, "double floating-point suffix");
 					if (! HasDecimalOrExponent)
 						parseContext.error( ppToken.loc, "float literal needs a decimal point or exponent", "", "");
 					int ch2 = getChar();
@@ -1668,11 +1661,9 @@ namespace GLSLSyntaxAST.CodeDom
 				}
 				else if (ch == 'f' || ch == 'F')
 				{
-					// TODO : figure out EEsProfile
-					const int EEsProfile = 0;
-					parseContext.profileRequires( ppToken.loc,  EEsProfile, 300, null, "floating-point suffix");
-					if ((parseContext.messages &  EShMessages.RelaxedErrors) == 0)
-						parseContext.profileRequires (ppToken.loc, (Profile)~EEsProfile, 120, null, "floating-point suffix");
+					parseContext.profileRequires( ppToken.loc,  Profile.EsProfile, 300, null, "floating-point suffix");
+					if ((parseContext.messages &  ShaderMessages.RelaxedErrors) == 0)
+						parseContext.profileRequires (ppToken.loc, (Profile)~Profile.EsProfile, 120, null, "floating-point suffix");
 					if (! HasDecimalOrExponent)
 						parseContext.error( ppToken.loc, "float literal needs a decimal point or exponent", "", "");
 					if (len < MAX_TOKEN_LENGTH)

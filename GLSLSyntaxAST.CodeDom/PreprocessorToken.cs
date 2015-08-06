@@ -2,9 +2,9 @@
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class TPpToken
+	public class PreprocessorToken
 	{
-		public TPpToken()
+		public PreprocessorToken()
 		{
 			token = 0;
 			ival = 0; 
@@ -15,7 +15,7 @@ namespace GLSLSyntaxAST.CodeDom
 			name = "";
 		}
 
-		public bool Matches(TPpToken right)
+		public bool Matches(PreprocessorToken right)
 		{
 			return token == right.token && atom == right.atom &&
 				ival == right.ival && Math.Abs (dval - right.dval) < Double.Epsilon &&
@@ -24,7 +24,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		public static int maxTokenLength = 1024;
 
-		public TSourceLoc loc;
+		public SourceLocation loc;
 		public int    token;
 		public bool   space;  // true if a space (for white space or a removed comment) should also be recognized, in front of the token returned
 		public int    ival;

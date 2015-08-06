@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.CodeDom
 {
-	public class NameBuffer
+	public class StringInputBuffer
 	{
 		public char[] name;
 		public static int MAX_TOKEN_LENGTH = 1024;

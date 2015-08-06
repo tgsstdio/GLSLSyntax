@@ -11,7 +11,7 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 		public bool DoStuff (TParseContext parseContext, PreprocessorContext ppContext,
-		               TInputScanner input, bool versionWillBeError)
+		               InputScanner input, bool versionWillBeError)
 		{
 			//bool versionWillBeError = true;
 			var unNeededSpaceTokens = new HashSet<char>(new char[]{';','(',')','[',']'});
@@ -85,7 +85,7 @@ namespace GLSLSyntaxAST.CodeDom
 				outputStream.Append("#error ").Append(errorMessage);
 			};
 
-			var token = new TPpToken();
+			var token = new PreprocessorToken();
 			string tok = ppContext.tokenize (ref token);
 			while (tok != null) {
 				int tokenLine = token.loc.line - 1;  // start at 0;

@@ -3,10 +3,10 @@ using System.Collections.Specialized;
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class TIntermediate
+	public class GLSLIntermediate
 	{
 		private readonly StringCollection requestedExtensions;		
-		public TIntermediate ()
+		public GLSLIntermediate ()
 		{
 			requestedExtensions = new StringCollection ();
 		}

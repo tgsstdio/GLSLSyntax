@@ -1,18 +1,16 @@
-﻿using System;
-
-namespace GLSLSyntaxAST.CodeDom
+﻿namespace GLSLSyntaxAST.CodeDom
 {
-	public class tStringInput : tInput 
+	public class StringInput : BasePreprocessorInput 
 	{
 		//
 		// From PpScanner.cpp
 		//
-		public tStringInput(PreprocessorContext pp, TInputScanner i) : base(pp)
+		public StringInput(PreprocessorContext pp, InputScanner i) : base(pp)
 		{ 
 			input = i;
 		}
 
-		public override int scan(ref TPpToken ppToken)
+		public override int scan(ref PreprocessorToken ppToken)
 		{
 		//
 		// Scanner used to tokenize source stream.
@@ -98,7 +96,7 @@ namespace GLSLSyntaxAST.CodeDom
 				case 'z':
 					do
 					{
-						if (len < NameBuffer.MAX_TOKEN_LENGTH)
+						if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
 						{
 							pp.buffer.tokenText [len++] = (char)ch;
 							ch = pp.getChar ();					
@@ -165,7 +163,7 @@ namespace GLSLSyntaxAST.CodeDom
 							pp.parseContext.error(ppToken.loc, "bad digit in hexidecimal literal", "", "");
 						}
 						if (ch == 'u' || ch == 'U') {
-							if (len < NameBuffer.MAX_TOKEN_LENGTH)
+							if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
 								pp.buffer.name[len++] = (char)ch;
 							isUnsigned = true;
 						} else
@@ -192,7 +190,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 						// see how much octal-like stuff we can read
 						while (ch >= '0' && ch <= '7') {
-							if (len < NameBuffer.MAX_TOKEN_LENGTH)
+							if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
 								pp.buffer.name[len++] = (char)ch;
 							else if (! AlreadyComplained) {
 								pp.parseContext.error(ppToken.loc, "numeric literal too long", "", "");
@@ -210,7 +208,7 @@ namespace GLSLSyntaxAST.CodeDom
 						if (ch == '8' || ch == '9') {
 							nonOctal = true;
 							do {
-								if (len < NameBuffer.MAX_TOKEN_LENGTH)
+								if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
 									pp.buffer.name[len++] = (char)ch;
 								else if (! AlreadyComplained) {
 									pp.parseContext.error(ppToken.loc, "numeric literal too long", "", "");
@@ -230,7 +228,7 @@ namespace GLSLSyntaxAST.CodeDom
 							pp.parseContext.error(ppToken.loc, "octal literal digit too large", "", "");
 
 						if (ch == 'u' || ch == 'U') {
-							if (len < NameBuffer.MAX_TOKEN_LENGTH)
+							if (len < StringInputBuffer.MAX_TOKEN_LENGTH)
 								pp.buffer.name[len++] = (char)ch;
 							isUnsigned = true;
 						} else
@@ -262,7 +260,7 @@ namespace GLSLSyntaxAST.CodeDom
 				case '7':
 				case '8':
 				case '9':
-					return DoHexidecimal (pp.buffer, ppToken, ch, ref AlreadyComplained, ref len, NameBuffer.MAX_TOKEN_LENGTH);
+					return DoHexidecimal (pp.buffer, ppToken, ch, ref AlreadyComplained, ref len, StringInputBuffer.MAX_TOKEN_LENGTH);
 					break;
 				case '-':
 					ch = pp.getChar();
@@ -483,7 +481,7 @@ namespace GLSLSyntaxAST.CodeDom
 				case '"':
 					ch = pp.getChar();
 					while (ch != '"' && ch != '\n' && this.IsEOF(ch)) {
-						if (len < NameBuffer.MAX_TOKEN_LENGTH) {
+						if (len < StringInputBuffer.MAX_TOKEN_LENGTH) {
 							pp.buffer.tokenText[len] = (char)ch;
 							len++;
 							ch = pp.getChar();
@@ -506,7 +504,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		private int DoHexidecimal(NameBuffer buffer, TPpToken ppToken, int ch, ref bool alreadyComplained, ref int len, int maxTokenLength)
+		private int DoHexidecimal(StringInputBuffer buffer, PreprocessorToken ppToken, int ch, ref bool alreadyComplained, ref int len, int maxTokenLength)
 		{
 			// can't be hexidecimal or octal, is either decimal or floating point
 
@@ -632,7 +630,7 @@ namespace GLSLSyntaxAST.CodeDom
 			} while (true);
 		}
 
-		protected TInputScanner input;
+		protected InputScanner input;
 	}
 }
 

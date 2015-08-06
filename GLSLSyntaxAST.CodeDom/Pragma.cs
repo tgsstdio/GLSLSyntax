@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class TPragma
+	public class Pragma
 	{
-		public TPragma(bool o, bool d)
+		public Pragma(bool o, bool d)
 		{
 			optimize = o;
 			debug = d;

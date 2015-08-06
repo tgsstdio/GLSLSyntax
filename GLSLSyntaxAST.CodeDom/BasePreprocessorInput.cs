@@ -2,9 +2,9 @@
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public abstract class tInput : IScannableType
+	public abstract class BasePreprocessorInput : IScannableType
 	{
-		protected tInput(PreprocessorContext p) 
+		protected BasePreprocessorInput(PreprocessorContext p) 
 		{
 			done = false;
 			pp = p;
@@ -18,7 +18,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		#region IScannableType implementation
 
-		public abstract int scan (ref TPpToken ppToken);
+		public abstract int scan (ref PreprocessorToken ppToken);
 
 		public abstract int getch ();
 

@@ -4,7 +4,7 @@ namespace GLSLSyntaxAST.CodeDom
 {
 	public interface IPreprocessorContext
 	{
-		void SetInput(TInputScanner input, bool versionWillBeError);
+		void SetInput(InputScanner input, bool versionWillBeError);
 	}
 }
 

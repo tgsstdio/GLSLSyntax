@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class tMacroInput : tInput
+	public class MacroInput : BasePreprocessorInput
 	{
-		public tMacroInput (PreprocessorContext pp) : base(pp)
+		public MacroInput (PreprocessorContext pp) : base(pp)
 		{
 		}
 
-		public override int scan(ref TPpToken ppToken)
+		public override int scan(ref PreprocessorToken ppToken)
 		{
 			int token;
 			do {
@@ -30,7 +29,7 @@ namespace GLSLSyntaxAST.CodeDom
 				}
 			}
 
-			if (token == tInput.END_OF_INPUT)
+			if (token == BasePreprocessorInput.END_OF_INPUT)
 				mac.busy = false;
 
 			return token;

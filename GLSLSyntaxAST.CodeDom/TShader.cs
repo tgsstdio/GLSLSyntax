@@ -5,43 +5,38 @@ namespace GLSLSyntaxAST.CodeDom
 {
 	public class TShader
 	{
-		private readonly TInfoSink infoSink;
-		private readonly TDeferredCompiler compiler;
-		private EShLanguage stage;
-		private TIntermediate intermediate;
-		public TShader (EShLanguage s, TInfoSink sink, TDeferredCompiler c, TIntermediate i)
+		private readonly InfoSink mInfoSink;
+		private ShaderLanguage mLanguage;
+		private GLSLIntermediate mIntermediate;
+		public TShader (InfoSink sink, ShaderLanguage language, GLSLIntermediate intermediate)
 		{
-			stage = s;
-			infoSink = sink;
-			compiler = c;
-			intermediate = i;
+			mInfoSink = sink;
+			mLanguage = language;
+			mIntermediate = intermediate;
 		}
 
-		public string[] strings;
-		public int numStrings;
-		public void setStrings(string s, int n)
+		public string[] mStrings;
+		public void setStrings(string[] s)
 		{
-			strings = new string[]{s};
-			numStrings = n;
-			//lengths = nullptr;
+			mStrings = s;
 		}
 
-		public string preamble = null;
 		public bool preprocess (
-			TBuiltInResource builtInResources,
 			int defaultVersion,
 			Profile defaultProfile,
 			bool forceDefaultVersionAndProfile,
 			bool forwardCompatible,
-			EShMessages message, out string output_string)
+			ShaderMessages message,
+			out string outputString)
 		{
-			if (preamble == null)
-				preamble = "";
-
-			return PreprocessDeferred(compiler, strings, numStrings,
-				null, preamble, EShOptimizationLevel.EShOptNone, builtInResources,
-				defaultVersion, defaultProfile, forceDefaultVersionAndProfile, forwardCompatible, message,
-				out intermediate, out output_string);
+			return PreprocessDeferred(
+				mStrings,
+				defaultVersion,
+				defaultProfile,
+				forceDefaultVersionAndProfile,
+				forwardCompatible,
+				message,
+				out outputString);
 		}
 
 		// Take a single compilation unit, and run the preprocessor on it.
@@ -49,25 +44,17 @@ namespace GLSLSyntaxAST.CodeDom
 		//         False if during preprocessing any unknown version, pragmas or
 		//         extensions were found.
 		bool PreprocessDeferred(
-			TDeferredCompiler compiler,
 			string[] shaderStrings,
-			int numStrings,
-			int[] inputLengths,
-			string preamble,
-			EShOptimizationLevel optLevel,
-			TBuiltInResource resources,
 			int defaultVersion,         // use 100 for ES environment, 110 for desktop
 			Profile defaultProfile,
 			bool forceDefaultVersionAndProfile,
 			bool forwardCompatible,     // give errors for use of deprecated features
-			EShMessages messages,       // warnings/errors/AST; things to print out
-			out TIntermediate intermediate, // returned tree, etc.
+			ShaderMessages messages,       // warnings/errors/AST; things to print out
 			out string outputString)
 		{
 			var parser = new DoPreprocessing();
-			bool result = ProcessDeferred(compiler, shaderStrings, numStrings, inputLengths,
-				preamble, optLevel, resources, defaultVersion, defaultProfile, forceDefaultVersionAndProfile,
-				forwardCompatible, messages, out intermediate, parser.DoStuff, false);
+			bool result = ProcessDeferred(shaderStrings, defaultVersion, defaultProfile, forceDefaultVersionAndProfile,
+				forwardCompatible, messages, parser.DoStuff);
 			outputString = parser.Output;
 			return result;
 		}
@@ -87,44 +74,31 @@ namespace GLSLSyntaxAST.CodeDom
 				return "unknown profile";
 			}
 		}
-
 		/// <summary>
-		/// This is the common setup and cleanup code for PreprocessDeferred and
-		/// CompileDeferred.
-		/// It takes any callable with a signature of
-		/// bool (TParseContext& parseContext, TPpContext& ppContext,
-		///               TInputScanner& input, bool versionWillBeError,
-		///               TSymbolTable& , TIntermediate& ,
-		///               EShOptimizationLevel , EShMessages );
-		/// Which returns false if a failure was detected and true otherwise.		
+		/// Processes the deferred.
 		/// </summary>
 		/// <returns><c>true</c>, if deferred was processed, <c>false</c> otherwise.</returns>
+		/// <param name="shaderStrings">Shader strings.</param>
+		/// <param name="defaultVersion">use 100 for ES environment, 110 for desktop</param>
+		/// <param name="defaultProfile">Default profile.</param>
+		/// <param name="forceDefaultVersionAndProfile">set version/profile to defaultVersion/defaultProfile regardless of the #version directive in the source code </param>
+		/// <param name="forwardCompatible">give errors for use of deprecated features</param>
+		/// <param name="messages">warnings/errors/AST; things to print out</param>
+		/// <param name="processingContext">Processing context.</param>
 		public bool ProcessDeferred(
-			TDeferredCompiler compiler,
 			string[] shaderStrings,
-			int numStrings,
-			int[] inputLengths,
-			string customPreamble,
-			EShOptimizationLevel optLevel,
-			TBuiltInResource resources,
-			int defaultVersion,         // use 100 for ES environment, 110 for desktop
+			int defaultVersion,
 			Profile defaultProfile,
-			// set version/profile to defaultVersion/defaultProfile regardless of the #version
-			// directive in the source code
 			bool forceDefaultVersionAndProfile,
-			bool forwardCompatible,     // give errors for use of deprecated features
-			EShMessages messages,       // warnings/errors/AST; things to print out
-			out TIntermediate intermediate, // returned tree, etc.
+			bool forwardCompatible,
+			ShaderMessages messages,
 			Func<TParseContext,
 				PreprocessorContext,
-				TInputScanner,
+				InputScanner,
 				bool,
-				bool> processingContext,
-			bool requireNonempty)
+				bool> processingContext)
 		{
-			intermediate = null;
-
-			if (numStrings == 0)
+			if (shaderStrings.Length == 0)
 			{				
 				return true;
 			}
@@ -134,14 +108,14 @@ namespace GLSLSyntaxAST.CodeDom
 			// outlined above, just the user shader.
 			int version;
 			Profile profile;
-			var userInput = new TInputScanner(shaderStrings, 0 , 0);  // no preamble
+			var userInput = new InputScanner(shaderStrings, 0 , 0);  // no preamble
 			bool versionNotFirstToken;
 			bool versionNotFirst = userInput.scanVersion(out version, out profile, out versionNotFirstToken);
 			bool versionNotFound = version == 0;
 			if (forceDefaultVersionAndProfile) {
-				if (((messages & EShMessages.EShMsgSuppressWarnings) == 0) && !versionNotFound &&
+				if (((messages & ShaderMessages.SuppressWarnings) == 0) && !versionNotFound &&
 					(version != defaultVersion || profile != defaultProfile)) {
-					compiler.infoSink.info
+					mInfoSink.info
 						.append ("Warning, (version, profile) forced to be (")
 						.append (defaultVersion.ToString ())
 						.append (", ")
@@ -162,8 +136,8 @@ namespace GLSLSyntaxAST.CodeDom
 				profile = defaultProfile;
 			}
 			bool goodVersion = DeduceVersionProfile(
-				compiler.infoSink,
-				compiler.getLanguage(), 
+				mInfoSink,
+				mLanguage, 
 				versionNotFirst,
 				defaultVersion, 
 				ref version,
@@ -171,34 +145,24 @@ namespace GLSLSyntaxAST.CodeDom
 			bool versionWillBeError = (versionNotFound || (profile == Profile.EsProfile && version >= 300 && versionNotFirst));
 			bool warnVersionNotFirst = false;
 			if (! versionWillBeError && versionNotFirstToken) {
-				if ((messages & EShMessages.RelaxedErrors) > 0)
+				if ((messages & ShaderMessages.RelaxedErrors) > 0)
 					warnVersionNotFirst = true;
 				else
 					versionWillBeError = true;
 			}
-
-			//intermediate.setVersion(version);
-			//intermediate.setProfile(profile);
-
-
-			// Add built-in symbols that are potentially context dependent;
-			// they get popped again further down.
-			//AddContextSpecificSymbols(resources, compiler.infoSink, symbolTable, version, profile, compiler.getLanguage());
-
+			mIntermediate.setVersion(version);
+			mIntermediate.setProfile(profile);
 			//
 			// Now we can process the full shader under proper symbols and rules.
 			//
 
-			var parseContext = new TParseContext(false, version, profile, compiler.getLanguage(), compiler.infoSink, forwardCompatible);
-			var scanContext = new TScanContext(parseContext);
+			var parseContext = new TParseContext(version, profile, mInfoSink, forwardCompatible);
 			var ppContext = new PreprocessorContext(parseContext);
-			parseContext.setScanContext(scanContext);
 			parseContext.setPpContext(ppContext);
-			parseContext.setLimits(resources);
 			if (! goodVersion)
 				parseContext.addError();
 			if (warnVersionNotFirst) {
-				TSourceLoc loc = new TSourceLoc ();
+				SourceLocation loc = new SourceLocation ();
 				parseContext.warn(loc, "Illegal to have non-comment, non-whitespace tokens before #version", "#version", "");
 			}
 
@@ -209,14 +173,14 @@ namespace GLSLSyntaxAST.CodeDom
 
 			parseContext.SetPreambleManually ();
 			//var fullInput = new TInputScanner(strings, numPre, numPost);
-			var fullInput = new TInputScanner(shaderStrings, 0 , 0);
+			var fullInput = new InputScanner(shaderStrings, 0 , 0);
 
 			bool success = processingContext(parseContext, ppContext, fullInput, versionWillBeError);
 
 			return success;
 		}
 
-		static bool DeduceVersionProfile(TInfoSink infoSink, EShLanguage stage, bool versionNotFirst, int defaultVersion, ref int version, ref Profile profile)
+		static bool DeduceVersionProfile(InfoSink infoSink, ShaderLanguage stage, bool versionNotFirst, int defaultVersion, ref int version, ref Profile profile)
 		{
 			const int FirstProfileVersion = 150;
 			bool correct = true;
@@ -231,7 +195,7 @@ namespace GLSLSyntaxAST.CodeDom
 			if (profile == Profile.NoProfile) {
 				if (version == 300 || version == 310) {
 					correct = false;
-					infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: versions 300 and 310 require specifying the 'es' profile");
+					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: versions 300 and 310 require specifying the 'es' profile");
 					profile = Profile.EsProfile;
 				} else if (version == 100)
 					profile = Profile.EsProfile;
@@ -243,7 +207,7 @@ namespace GLSLSyntaxAST.CodeDom
 				// a profile was provided...
 				if (version < 150) {
 					correct = false;
-					infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: versions before 150 do not allow a profile token");
+					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: versions before 150 do not allow a profile token");
 					if (version == 100)
 						profile = Profile.EsProfile;
 					else
@@ -251,13 +215,13 @@ namespace GLSLSyntaxAST.CodeDom
 				} else if (version == 300 || version == 310) {
 					if (profile != Profile.EsProfile) {
 						correct = false;
-						infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: versions 300 and 310 support only the es profile");
+						infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: versions 300 and 310 support only the es profile");
 					}
 					profile = Profile.EsProfile;
 				} else {
 					if (profile == Profile.EsProfile) {
 						correct = false;
-						infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: only version 300 and 310 support the es profile");
+						infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: only version 300 and 310 support the es profile");
 						if (version >= FirstProfileVersion)
 							profile = Profile.CoreProfile;
 						else
@@ -269,32 +233,32 @@ namespace GLSLSyntaxAST.CodeDom
 
 			// Correct for stage type...
 			switch (stage) {
-			case EShLanguage.EShLangGeometry:
+			case ShaderLanguage.Geometry:
 				if ((profile == Profile.EsProfile && version < 310) ||
 					(profile != Profile.EsProfile && version < 150)) {
 					correct = false;
-					infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: geometry shaders require es profile with version 310 or non-es profile with version 150 or above");
+					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: geometry shaders require es profile with version 310 or non-es profile with version 150 or above");
 					version = (profile == Profile.EsProfile) ? 310 : 150;
 					if (profile == Profile.EsProfile || profile == Profile.NoProfile)
 						profile = Profile.CoreProfile;
 				}
 				break;
-			case EShLanguage.EShLangTessControl:
-			case EShLanguage.EShLangTessEvaluation:
+			case ShaderLanguage.TessControl:
+			case ShaderLanguage.TessEvaluation:
 				if ((profile == Profile.EsProfile && version < 310) ||
 					(profile != Profile.EsProfile && version < 150)) {
 					correct = false;
-					infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: tessellation shaders require es profile with version 310 or non-es profile with version 150 or above");
+					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: tessellation shaders require es profile with version 310 or non-es profile with version 150 or above");
 					version = (profile == Profile.EsProfile) ? 310 : 400; // 150 supports the extension, correction is to 400 which does not
 					if (profile == Profile.EsProfile || profile == Profile.NoProfile)
 						profile = Profile.CoreProfile;
 				}
 				break;
-			case EShLanguage.EShLangCompute:
+			case ShaderLanguage.Compute:
 				if ((profile == Profile.EsProfile && version < 310) ||
 					(profile != Profile.EsProfile && version < 420)) {
 					correct = false;
-					infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: compute shaders require es profile with version 310 or above, or non-es profile with version 420 or above");
+					infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: compute shaders require es profile with version 310 or above, or non-es profile with version 420 or above");
 					version = profile == Profile.EsProfile ? 310 : 430; // 420 supports the extension, correction is to 430 which does not
 					profile = Profile.CoreProfile;
 				}
@@ -305,7 +269,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 			if (profile == Profile.EsProfile && version >= 300 && versionNotFirst) {
 				correct = false;
-				infoSink.info.message(TInfoSinkBase.TPrefixType.EPrefixError, "#version: statement must appear first in es-profile shader; before comments or newlines");
+				infoSink.info.message(InfoSinkBase.TPrefixType.EPrefixError, "#version: statement must appear first in es-profile shader; before comments or newlines");
 			}
 
 			// A metacheck on the condition of the compiler itself...
@@ -351,60 +315,6 @@ namespace GLSLSyntaxAST.CodeDom
 
 			return correct;
 		}
-
-		// only one of these needed for non-ES; ES needs 2 for different precision defaults of built-ins
-		enum EPrecisionClass : int
-		{
-			EPcGeneral = 0,
-			EPcFragment,
-			EPcCount
-		};
-
-		/// <summary>
-		/// Local mapping functions for making arrays of symbol tables....
-		/// </summary>
-		/// <returns>The version to index.</returns>
-		/// <param name="version">Version.</param>
-		static int MapVersionToIndex(int version)
-		{
-			switch (version) {
-			case 100: return  0;
-			case 110: return  1;
-			case 120: return  2;
-			case 130: return  3;
-			case 140: return  4;
-			case 150: return  5;
-			case 300: return  6;
-			case 330: return  7;
-			case 400: return  8;
-			case 410: return  9;
-			case 420: return 10;
-			case 430: return 11;
-			case 440: return 12;
-			case 310: return 13;
-			case 450: return 14;
-			default:       // |
-				return  0; // |
-			}              // |
-		}                      // V
-
-		static int MapProfileToIndex(Profile profile)
-		{
-			switch (profile) {
-			case Profile.NoProfile: 
-				return 0;
-			case Profile.CoreProfile: 
-				return 1;
-			case Profile.CompatibilityProfile:
-				return 2;
-			case Profile.EsProfile:
-				return 3;
-			default:                         // |
-				return 0;                    // |
-			}                                // |
-		}   
-
-
 	}
 }
 

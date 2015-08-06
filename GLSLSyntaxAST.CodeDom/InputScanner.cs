@@ -2,18 +2,18 @@ using System;
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class TInputScanner
+	public class InputScanner
 	{
-		public TInputScanner(string[] s, int b, int f)
+		public InputScanner(string[] sources, int bias, int finale)
 		{
-			sources = s;
+			mSources = sources;
 			currentSource = 0;
 			currentChar = 0;
-			stringBias = b;
-			finale = f;
+			stringBias = bias;
+			mFinale = finale;
 
 			// loc[0]
-			loc = new TSourceLoc[sources.Length];
+			loc = new SourceLocation[mSources.Length];
 			loc[currentSource].stringBias = -stringBias;
 			loc[currentSource].line = 1;
 			loc[currentSource].column = 0;
@@ -25,13 +25,13 @@ namespace GLSLSyntaxAST.CodeDom
 		// retrieve the next character and advance one character
 		public int get()
 		{
-			if (currentSource >= sources.Length)
+			if (currentSource >= mSources.Length)
 				return -1;
 
-			if (sources [currentSource].Length == 0)
+			if (mSources [currentSource].Length == 0)
 				return -1;
 
-			int ret = sources[currentSource][currentChar];
+			int ret = mSources[currentSource][currentChar];
 			++loc[currentSource].column;
 			if (ret == '\n') {
 				++loc[currentSource].line;
@@ -46,17 +46,17 @@ namespace GLSLSyntaxAST.CodeDom
 		void advance()
 		{
 			++currentChar;
-			var length = sources [currentSource].Length;
+			var length = mSources [currentSource].Length;
 			if (currentChar >= length) {
 				++currentSource;
-				if (currentSource < sources.Length) {
+				if (currentSource < mSources.Length) {
 					loc[currentSource].stringBias = loc[currentSource - 1].stringBias + 1;
 					loc[currentSource].line = 1;
 					loc[currentSource].column = 0;
 				}
-				while (currentSource < sources.Length && length == 0) {
+				while (currentSource < mSources.Length && length == 0) {
 					++currentSource;
-					if (currentSource < sources.Length) {
+					if (currentSource < mSources.Length) {
 						loc[currentSource].stringBias = loc[currentSource - 1].stringBias + 1;
 						loc[currentSource].line = 1;
 						loc[currentSource].column = 0;
@@ -77,7 +77,7 @@ namespace GLSLSyntaxAST.CodeDom
 					// the column count on the now current line.
 					int ch = currentChar;
 					while(ch > 0) {
-						if (sources[currentSource][ch] == '\n') {
+						if (mSources[currentSource][ch] == '\n') {
 							break;
 						}
 						--ch;
@@ -85,7 +85,7 @@ namespace GLSLSyntaxAST.CodeDom
 					loc[currentSource].column = currentChar - ch;
 				}
 			} else {
-				var strLength = sources [currentSource].Length;
+				var strLength = mSources [currentSource].Length;
 				do {
 					--currentSource;
 				} while (currentSource > 0 && strLength == 0);
@@ -101,10 +101,10 @@ namespace GLSLSyntaxAST.CodeDom
 
 		public int peek()
 		{
-			if (currentSource >= sources.Length)
+			if (currentSource >= mSources.Length)
 				return -1;
 
-			return sources[currentSource][currentChar];
+			return mSources[currentSource][currentChar];
 		}
 
 		public void setLine(int newLine)
@@ -117,20 +117,20 @@ namespace GLSLSyntaxAST.CodeDom
 			loc[currentSource].stringBias = newString; 
 		}
 
-		string [] sources; // array of strings
+		string [] mSources; // array of strings
 		int currentSource;
 		int currentChar;
 
 		// This is for reporting what string/line an error occurred on, and can be overridden by #line.
 		// It remembers the last state of each source string as it is left for the next one, so unget() 
 		// can restore that state.
-		TSourceLoc[] loc;  // an array
+		SourceLocation[] loc;  // an array
 
 		int stringBias;   // the first string that is the user's string number 0
-		int finale;       // number of internal strings after user's last string
+		int mFinale;       // number of internal strings after user's last string
 
-		public TSourceLoc getSourceLoc() { 
-			return loc[Math.Max(0, Math.Min(currentSource, sources.Length - finale - 1))]; 
+		public SourceLocation getSourceLoc() { 
+			return loc[Math.Max(0, Math.Min(currentSource, mSources.Length - mFinale - 1))]; 
 		}
 
 		// Returns true if there was non-white space (e.g., a comment, newline) before the #version
