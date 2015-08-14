@@ -45,6 +45,9 @@
     <Compile Include="GLSLUniformExtractor.cs" />
     <Compile Include="IGLSLUniformExtractor.cs" />
     <Compile Include="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" />
+    <Compile Include="GLSLStructGenerator.cs" />
+    <Compile Include="InputAttribute.cs" />
+    <Compile Include="LayoutInformation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

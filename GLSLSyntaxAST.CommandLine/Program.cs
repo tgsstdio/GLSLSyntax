@@ -4,6 +4,8 @@ using System.Diagnostics;
 using GLSLSyntaxAST.CodeDom;
 using System.Reflection;
 using System.IO;
+using Microsoft.CSharp;
+using System.CodeDom.Compiler;
 
 namespace GLSLSyntaxAST.CommandLine
 {
@@ -30,7 +32,7 @@ namespace GLSLSyntaxAST.CommandLine
 
 				IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
 				lookup.Initialize ();
-				IGLSLUniformExtractor extractor = new GLSLUniformExtractor (lookup);
+				var extractor = new GLSLUniformExtractor (lookup);
 				extractor.Initialize ();
 
 				for (int i = 1; i < args.Length; ++i)
@@ -50,7 +52,13 @@ namespace GLSLSyntaxAST.CommandLine
 				output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
 
 				IGLSLStructGenerator generator = new GLSLStructGenerator(extractor);
-				generator.SaveAsAssembly (output);
+				using (var provider = new CSharpCodeProvider ())
+				{
+					//generator.SaveAsAssembly (provider, output);
+					var options = new CodeGeneratorOptions();
+					options.BlankLinesBetweenMembers = true;
+					generator.SaveAsCode(provider, output, extractor, options);
+				}
 
 				return 0;
 			}

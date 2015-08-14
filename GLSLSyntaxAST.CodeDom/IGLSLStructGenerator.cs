@@ -1,14 +1,12 @@
-using System;
-using System.IO;
-using System.Collections.Generic;
+using System.CodeDom.Compiler;
 
 namespace GLSLSyntaxAST.CodeDom
 {
 	public interface IGLSLStructGenerator
 	{
 		void Initialize();
-		void SaveAsAssembly(GLSLAssembly assembly);
-		string SaveAsText();
+		void SaveAsAssembly(CodeDomProvider provider, GLSLAssembly assembly);
+		void SaveAsCode(CodeDomProvider provider, GLSLAssembly assembly, IGLSLUniformExtractor extractor, CodeGeneratorOptions options);
 	}
 
 }

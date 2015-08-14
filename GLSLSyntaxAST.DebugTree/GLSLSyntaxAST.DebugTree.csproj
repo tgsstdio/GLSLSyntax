@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{8936293E-A966-4521-A4BE-4015601F2F2F}</ProjectGuid>
+    <ProjectGuid>{EF3CC87A-2F73-4F80-87FB-7AFC4AF0DDE7}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>GLSLSyntaxAST.CommandLine</RootNamespace>
-    <AssemblyName>GLSLSyntaxAST.CommandLine</AssemblyName>
+    <RootNamespace>GLSLSyntaxAST.DebugTree</RootNamespace>
+    <AssemblyName>GLSLSyntaxAST.DebugTree</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -31,12 +31,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="OpenTK">
-      <HintPath>..\packages\OpenTK.1.1.1589.5942\lib\NET40\OpenTK.dll</HintPath>
-    </Reference>
-    <Reference Include="GLSLOutput">
-      <HintPath>bin\Debug\GLSLOutput.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -44,10 +38,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Irony\Irony.csproj">
-      <Project>{0A832F99-F59C-4D75-B5CC-9CD3317060A6}</Project>
-      <Name>Irony</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GLSLSyntaxAST.csproj">
       <Project>{B23CADAF-63EE-4EEB-9BD8-FC452BFC5D5C}</Project>
       <Name>GLSLSyntaxAST</Name>
@@ -56,37 +46,5 @@
       <Project>{D5B25375-C28B-4544-A331-8BE9E6971719}</Project>
       <Name>GLSLSyntaxAST.CodeDom</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Shaders\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Shaders\phong_linked_list.frag.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\phong_linked_list.vert.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\ToScreen.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\ToScreen.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\PassThru.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\PassThru.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\fullscreen_blend.frag.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\fullscreen_blend.vert.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 </Project>

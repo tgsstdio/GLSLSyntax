@@ -1,30 +1,21 @@
 ﻿using System;
 using System.Diagnostics;
-using Irony.Parsing;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.CSharp;
 using System.CodeDom.Compiler;
 using System.CodeDom;
 using System.Reflection;
-using System.Runtime.InteropServices;
+using System.IO;
 
 namespace GLSLSyntaxAST.CodeDom
 {
 	public class GLSLStructGenerator : IGLSLStructGenerator
 	{
-		private IGLSLUniformExtractor mExtractor;
+		private readonly IGLSLUniformExtractor mExtractor;
 		public GLSLStructGenerator (IGLSLUniformExtractor extractor)
 		{
 			mExtractor = extractor;
 		}
 
 		#region IStructGenerator implementation
-
-		public string SaveAsText ()
-		{
-			throw new NotImplementedException ();
-		}
 
 		public void Initialize ()
 		{
@@ -93,80 +84,88 @@ namespace GLSLSyntaxAST.CodeDom
 //			folder.Members.Add (property1);
 		}
 
-		public void SaveAsAssembly (GLSLAssembly assembly)
+		public void SaveAsAssembly (CodeDomProvider provider, GLSLAssembly assembly)
 		{
-			using (CSharpCodeProvider provider = new CSharpCodeProvider ())
+			// Build the parameters for source compilation.
+			var cp = new CompilerParameters();
+
+			// Add an assembly reference.
+			cp.ReferencedAssemblies.Add( "System.dll" );
+			cp.ReferencedAssemblies.Add ("System.Runtime.InteropServices.dll");
+
+			if (assembly.ReferencedAssemblies != null)
 			{
-				// Build the parameters for source compilation.
-				CompilerParameters cp = new CompilerParameters();
-
-				// Add an assembly reference.
-				cp.ReferencedAssemblies.Add( "System.dll" );
-				cp.ReferencedAssemblies.Add ("System.Runtime.InteropServices.dll");
-
-				if (assembly.ReferencedAssemblies != null)
+				foreach (var assemblyName in assembly.ReferencedAssemblies)
 				{
-					foreach (var assemblyName in assembly.ReferencedAssemblies)
-					{
-						cp.ReferencedAssemblies.Add( assemblyName );
-					}
+					cp.ReferencedAssemblies.Add( assemblyName );
 				}
-
-				// Generate an executable instead of
-				// a class library.
-				cp.GenerateExecutable = false;
-
-				// Set the assembly file name to generate.
-				cp.OutputAssembly = System.IO.Path.Combine(assembly.Path,assembly.OutputAssembly);
-
-				// Save the assembly as a physical file.
-				cp.GenerateInMemory = false;
-
-				var contentUnit = new CodeCompileUnit ();
-
-				SetVersionNumber (contentUnit, assembly.Version);
-
-				string nameSpace = assembly.Namespace;
-				if (string.IsNullOrWhiteSpace (nameSpace))
-				{
-					nameSpace = System.IO.Path.GetFileNameWithoutExtension (assembly.OutputAssembly);
-				}
-
-				var contentNs  = new CodeNamespace(nameSpace);
-				contentUnit.Namespaces.Add (contentNs);
-
-				var uniforms = CreateClass (contentNs, "Uniforms");
-				CodeTypeConstructor defaultConstructor = new CodeTypeConstructor ();	
-				defaultConstructor.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-				uniforms.Members.Add (defaultConstructor);
-			
-				defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (typeof(int), "testInt", new CodePrimitiveExpression (0)));
-
-				foreach (var block in mExtractor.Blocks)
-				{
-					AddStruct (contentNs, uniforms, block);
-				}
-
-				// Invoke compilation.
-				CompilerResults cr = provider.CompileAssemblyFromDom(cp, contentUnit);
-	
-				if (cr.Errors.Count > 0)
-				{
-					Debug.WriteLine(string.Format("Source built into {0} unsuccessfully.", cr.PathToAssembly));				
-					// Display compilation errors.
-					foreach (CompilerError ce in cr.Errors)
-					{
-						Debug.WriteLine("  {0}", ce.ToString());		
-					}
-				}
-				else
-				{
-					Debug.WriteLine(string.Format("Source built into {0} successfully.", cr.PathToAssembly));
-				}				
 			}
 
+			// Generate an executable instead of
+			// a class library.
+			cp.GenerateExecutable = false;
+
+			// Set the assembly file name to generate.
+			cp.OutputAssembly = System.IO.Path.Combine(assembly.Path,assembly.OutputAssembly);
+
+			// Save the assembly as a physical file.
+			cp.GenerateInMemory = false;
+
+			var contentUnit = InitialiseCompileUnit (assembly);
+
+			// Invoke compilation.
+			CompilerResults cr = provider.CompileAssemblyFromDom(cp, contentUnit);
+
+			if (cr.Errors.Count > 0)
+			{
+				Debug.WriteLine(string.Format("Source built into {0} unsuccessfully.", cr.PathToAssembly));				
+				// Display compilation errors.
+				foreach (CompilerError ce in cr.Errors)
+				{
+					Debug.WriteLine("  {0}", ce.ToString());		
+				}
+			}
+			else
+			{
+				Debug.WriteLine(string.Format("Source built into {0} successfully.", cr.PathToAssembly));
+			}
 		}
 
+		public void SaveAsCode (CodeDomProvider provider, GLSLAssembly assembly, IGLSLUniformExtractor extractor, CodeGeneratorOptions options)
+		{
+			string outputFile = System.IO.Path.GetFileNameWithoutExtension (assembly.OutputAssembly) + ".cs";
+			string absolutePath = System.IO.Path.Combine(assembly.Path,outputFile);
+
+			using (var fs = File.OpenWrite (absolutePath))
+			using (var writer = new StreamWriter(fs))
+			{
+				var contentUnit = InitialiseCompileUnit (assembly);
+				provider.GenerateCodeFromCompileUnit (contentUnit, writer, options);
+			}
+		}
+
+		public CodeCompileUnit InitialiseCompileUnit (GLSLAssembly assembly)
+		{
+			var contentUnit = new CodeCompileUnit ();
+			SetVersionNumber (contentUnit, assembly.Version);
+			string nameSpace = assembly.Namespace;
+			if (string.IsNullOrWhiteSpace (nameSpace))
+			{
+				nameSpace = System.IO.Path.GetFileNameWithoutExtension (assembly.OutputAssembly);
+			}
+			var contentNs = new CodeNamespace (nameSpace);
+			contentUnit.Namespaces.Add (contentNs);
+			var uniforms = CreateClass (contentNs, "Uniforms");
+			var defaultConstructor = new CodeTypeConstructor ();
+			defaultConstructor.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+			uniforms.Members.Add (defaultConstructor);
+			defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (typeof(int), "testInt", new CodePrimitiveExpression (0)));
+			foreach (var block in mExtractor.Blocks)
+			{
+				AddStruct (contentNs, uniforms, block);
+			}
+			return contentUnit;
+		}
 		#endregion
 	}
 }

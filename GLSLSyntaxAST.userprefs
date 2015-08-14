@@ -1,65 +1,79 @@
-﻿<Properties StartupItem="GLSLSyntaxAST.csproj">
+﻿<Properties StartupItem="GLSLSyntaxAST.DebugTree\GLSLSyntaxAST.DebugTree.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="C:\Program Files (x86)\MSBuild\12.0\bin\Microsoft.Common.CurrentVersion.targets">
+  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CodeDom\IGLSLUniformExtractor.cs">
     <Files>
-      <File FileName="GLSLSyntaxAST.Preprocessor\MessageType.cs" Line="9" Column="25" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\TParseContext.cs" Line="175" Column="4" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\PreprocessorContext.cs" Line="37" Column="3" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\AtomLookup.cs" Line="84" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\StringInput.cs" Line="481" Column="14" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\TShader.cs" Line="161" Column="58" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\Standalone.cs" Line="105" Column="25" />
-      <File FileName="GLSLSyntaxAST.UnitTests\ProprocessorTests.cs" Line="12" Column="32" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\SymbolLookup.cs" Line="8" Column="28" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\Symbol.cs" Line="5" Column="12" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\TokenInput.cs" Line="21" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\IInfoSinkComponent.cs" Line="3" Column="37" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\SourceLocation.cs" Line="1" Column="37" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\PreprocessorToken.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\TokenStream.cs" Line="11" Column="9" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\ShaderLanguage.cs" Line="1" Column="37" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\Profile.cs" Line="6" Column="8" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\UngotTokenInput.cs" Line="31" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\BasePreprocessorInput.cs" Line="12" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\MacroInput.cs" Line="18" Column="4" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\MarkerInput.cs" Line="26" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\ZeroInput.cs" Line="31" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\InfoSink.cs" Line="18" Column="16" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\InfoSinkBase.cs" Line="6" Column="27" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\DoPreprocessing.cs" Line="131" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\MacroSymbol.cs" Line="14" Column="1" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\Pragma.cs" Line="15" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\PrefixType.cs" Line="6" Column="8" />
-      <File FileName="C:\Program Files (x86)\MSBuild\12.0\bin\Microsoft.Common.CurrentVersion.targets" Line="1703" Column="92" />
-      <File FileName="GLSLGrammar.cs" Line="403" Column="75" />
-      <File FileName="Irony\Parsing\Parser\Parser.cs" Line="159" Column="11" />
-      <File FileName="GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="68" Column="4" />
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="129" Column="7" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="26" Column="41" />
-      <File FileName="Irony\Parsing\Parser\ParserActions\ErrorRecoveryParserAction.cs" Line="7" Column="3" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\GLSLIntermediate.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\InputScanner.cs" Line="247" Column="11" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\ParseContext.cs" Line="552" Column="4" />
-      <File FileName="GLSLSyntaxAST.UnitTests\packages.config" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\CppEnums.cs" Line="3" Column="10" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\SinkType.cs" Line="15" Column="1" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\StringInputBuffer.cs" Line="1" Column="37" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\EvalPrecedence.cs" Line="3" Column="10" />
-      <File FileName="GLSLSyntaxAST.Preprocessor\ExtensionBehavior.cs" Line="3" Column="37" />
+      <File FileName="GLSLGrammar.cs" Line="1001" Column="47" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="50" Column="3" />
+      <File FileName="GLSLSyntaxAST.CodeDom\EmptyStruct.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\DesiredFormat.txt" Line="8" Column="37" />
+      <File FileName="GLSLSyntaxAST.DebugTree\Program.cs" Line="18" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="143" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\InputAttribute.cs" Line="10" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLUniformExtractor.cs" Line="11" Column="50" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="13" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StructMember.cs" Line="7" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\LayoutInformation.cs" Line="5" Column="32" />
+      <File FileName="GLSLSyntaxAST.UnitTests\CodeDomTest.cs" Line="47" Column="39" />
+      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLStructGenerator.cs" Line="9" Column="68" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State name="__root__">
+          <Node name="GLSLSyntaxAST" expanded="True">
+            <Node name="GLSLSyntaxAST.UnitTests" expanded="True">
+              <Node name="GLSLSyntaxAST" expanded="True">
+                <Node name="UnitTests" expanded="True">
+                  <Node name="CodeDomTest" expanded="True">
+                    <Node name="TestAttributes" selected="True" />
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\TShader.cs" line="174" column="31" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" line="143" column="73" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="38" column="28" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="28" column="25" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="57" column="37" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="47" column="26" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="42" column="31" />
+      <Breakpoint file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="340" column="23" />
+      <Breakpoint file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="339" column="23" />
+      <Breakpoint file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="341" column="24" />
+      <Breakpoint file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="105" column="24" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\CodeDomTest.cs" line="32" column="19" />
+      <Breakpoint file="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="232" column="29" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="312" column="13" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="270" column="29" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="292" column="44" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="285" column="24" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="283" column="26" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="274" column="13" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="332" column="17" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.GLSLSyntaxAST.CommandLine>
     <MonoDevelop.Ide.CustomExecutionModes>
-      <Data Name="2 shaders (Custom)" Id="c0d9b50c-5b5c-404d-90c3-3203c5f39328" ModeId="Default">
+      <Data Name="phong_linked_list DEBUGGING" Id="c0d9b50c-5b5c-404d-90c3-3203c5f39328" ModeId="Microsoft .NET Debugger">
         <CommandData>
           <Item Key="MonoDevelop.Ide.Execution.CustomArgsCustomizer">
-            <Value Arguments="ShaderData.dll &quot;Shaders/phong_linked_list.frag.glsl&quot; &quot;Shaders/phong_linked_list.vert.glsl&quot;" ctype="CustomArgsExecutionModeData">
+            <Value Arguments="phong_linked_list.dll &quot;Shaders/phong_linked_list.frag.glsl&quot; &quot;Shaders/phong_linked_list.vert.glsl&quot;" ctype="CustomArgsExecutionModeData">
+              <EnvironmentVariables />
+            </Value>
+          </Item>
+        </CommandData>
+      </Data>
+      <Data Name="PassThru - DEBUGGING" Id="8a5801ca-41e2-4da8-8d0e-a959c3a5cdb2" ModeId="Microsoft .NET Debugger">
+        <CommandData>
+          <Item Key="MonoDevelop.Ide.Execution.CustomArgsCustomizer">
+            <Value Arguments="PassThru.dll &quot;Shaders/PassThru.frag&quot; &quot;Shaders/PassThru.vert&quot;" ctype="CustomArgsExecutionModeData">
               <EnvironmentVariables />
             </Value>
           </Item>

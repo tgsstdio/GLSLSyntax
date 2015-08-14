@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GLSLSyntaxAST.CodeDom
 {
 	public class StructInfo
 	{
-		public string Name;
-		public string LayoutFormat;
-		public List<StructMember> Members;
+		public StructInfo ()
+		{
+			Members = new List<StructMember> ();
+		}
+		public string Name {get;set;}
+		public LayoutInformation Layout {get;set;}
+		public List<StructMember> Members {get; private set;}
 	}
 }
 

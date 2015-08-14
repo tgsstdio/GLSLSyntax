@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Irony.Parsing;
 
 namespace GLSLSyntaxAST
@@ -61,7 +61,7 @@ namespace GLSLSyntaxAST
 			var WHILE = ToTerm ("while", "WHILE");
 			var FOR_STM = ToTerm ("for", "FOR");
 			var DO_STM = ToTerm ("do", "DO");
-			var IDENTIFIER = TerminalFactory.CreateCSharpIdentifier("IDENTIFIER");
+			IDENTIFIER = TerminalFactory.CreateCSharpIdentifier("IDENTIFIER");
 
 			var VOID_STM = ToTerm ("void", "VOID");
 			var FLOAT_TKN = ToTerm ("float", "FLOAT");
@@ -184,9 +184,9 @@ namespace GLSLSyntaxAST
 			var UIMAGE2DMSARRAY = ToTerm ("uimage2dmsarray", "UIMAGE2DMSARRAY");
 			var SAMPLEREXTERNALOES = ToTerm ("samplerexternaloes", "SAMPLEREXTERNALOES");
 
-			this.AddTermsReportGroup(
-				"types"
-				,VOID_STM
+			TypesTerms = new HashSet<KeyTerm> (
+				new []{
+				VOID_STM
 				,FLOAT_TKN
 				,DOUBLE_TKN
 				,INT_TKN
@@ -306,7 +306,7 @@ namespace GLSLSyntaxAST
 				,IIMAGE2DMSARRAY
 				,UIMAGE2DMSARRAY
 				,SAMPLEREXTERNALOES
-				);
+				});
 
 			var TYPE_NAME = TerminalFactory.CreateCSharpString ("TYPE_NAME");
 			string LEFT_BRACKET = "[";
@@ -323,16 +323,19 @@ namespace GLSLSyntaxAST
 			var DOT = ToTerm (".", "DOT");
 			var FIELD_SELECTION = TerminalFactory.CreateCSharpIdentifier("FIELD_SELECTION");
 			var INTCONSTANT = new NumberLiteral ("INTCONSTANT", NumberOptions.AllowSign | NumberOptions.IntOnly);
+			INTCONSTANT.Priority = 3;
 			var UINTCONSTANT = new NumberLiteral ("UINTCONSTANT", NumberOptions.IntOnly);
+			UINTCONSTANT.Priority = 2;
 			var FLOATCONSTANT = new NumberLiteral ("FLOATCONSTANT", NumberOptions.AllowSign);
+			FLOATCONSTANT.Priority = 1;
 			var DOUBLECONSTANT = new NumberLiteral ("DOUBLECONSTANT", NumberOptions.AllowSign);
 			var FALSE_STM = ToTerm ("false", "FALSE_STM");
 			var TRUE_STM = ToTerm ("true", "TRUE_STM");
 			var ATTRIBUTE = ToTerm ("attribute", "ATTRIBUTE");
 			var VARYING = ToTerm ("varying", "VARYING");
 			var INOUT = ToTerm ("inout", "INOUT");
-			var IN = ToTerm ("in", "IN");
-			var OUT = ToTerm ("out", "OUT");
+			InTerm = ToTerm ("in", "IN");
+			OutTerm = ToTerm ("out", "OUT");
 			var CONST_STM = ToTerm ("CONST", "CONST");
 			var UNIFORM = ToTerm ("uniform", "UNIFORM");
 			var CENTROID = ToTerm ("centroid", "CENTROID");
@@ -396,16 +399,16 @@ namespace GLSLSyntaxAST
 			var for_init_statement = new NonTerminal ("for_init_statement"); // CHECKED
 			var for_rest_statement = new NonTerminal ("for_rest_statement"); // CHECKED
 			var conditionopt = new NonTerminal ("conditionopt"); // CHECKED
-			var fully_specified_type = new NonTerminal ("fully_specified_type"); // CHECKED
+			FullySpecifiedType = new NonTerminal ("fully_specified_type"); // CHECKED
 			var initializer = new NonTerminal ("initializer"); // CHECKED 
 			var initializer_list = new NonTerminal ("initializer_list"); // CHECKED
 			var type_specifier = new NonTerminal ("type_specifier"); // CHECKED
 			var single_type_qualifier = new NonTerminal ("single_type_qualifier"); // CHECKED
 			var type_specifier_nonarray = new NonTerminal ("type_specifier_nonarray"); // CHECKED
-			var type_qualifier = new NonTerminal ("type_qualifier"); // CHECKED
+			TypeQualifier = new NonTerminal ("type_qualifier"); // CHECKED
 			var array_specifier = new NonTerminal ("array_specifier"); // CHECKED
-			var constant_expression = new NonTerminal ("constant_expression"); // CHECKED
-			var struct_specifier = new NonTerminal ("struct_specifier"); // CHECKED 
+			ConstantExpression = new NonTerminal ("constant_expression"); // CHECKED
+			StructSpecifier = new NonTerminal ("struct_specifier"); // CHECKED 
 			var struct_declaration_list = new NonTerminal ("struct_declaration_list"); // CHECKED 
 			var struct_declaration = new NonTerminal ("struct_declaration"); // CHECKED 
 			var struct_declarator_list = new NonTerminal ("struct_declarator_list"); // CHECKED 
@@ -414,7 +417,7 @@ namespace GLSLSyntaxAST
 			var init_declarator_list = new NonTerminal ("init_declarator_list"); // CHECKED 
 			var precision_qualifier = new NonTerminal ("precision_qualifier"); // CHECKED 
 			var block_structure = new NonTerminal ("block_structure"); // CHECKED 
-			var single_declaration = new NonTerminal ("single_declaration"); // CHECKED 
+			SingleDeclaration = new NonTerminal ("single_declaration"); // CHECKED 
 			var identifier_list = new NonTerminal ("identifier_list"); // CHECKED 
 			var function_header = new NonTerminal ("function_header"); // CHECKED
 			var function_header_with_parameters = new NonTerminal ("function_header_with_parameters"); // CHECKED 
@@ -434,9 +437,9 @@ namespace GLSLSyntaxAST
 			var boolconstant = new NonTerminal ("boolconstant"); // CHECKED
 			var storage_qualifier = new NonTerminal ("storage_qualifier"); // CHECKED
 			var type_name_list = new NonTerminal ("type_name_list"); // CHECKED 
-			var layout_qualifier = new NonTerminal ("layout_qualifier"); // CHECKED
-			var layout_qualifier_id_list = new NonTerminal ("layout_qualifier_id_list"); // CHECKED
-			var layout_qualifier_id = new NonTerminal ("layout_qualifier_id"); // CHECKED
+			LayoutQualifier = new NonTerminal ("layout_qualifier"); // CHECKED
+			LayoutQualifierIdList = new NonTerminal ("layout_qualifier_id_list"); // CHECKED
+			LayoutQualifierId = new NonTerminal ("layout_qualifier_id"); // CHECKED
 			var interpolation_qualifier = new NonTerminal ("interpolation_qualifier"); // CHECKED 
 			var invariant_qualifier = new NonTerminal ("invariant_qualifier"); // CHECKED
 			var precise_qualifier = new NonTerminal ("precise_qualifier"); // CHECKED
@@ -458,9 +461,9 @@ namespace GLSLSyntaxAST
 				| block_structure + SEMICOLON
 				| block_structure + IDENTIFIER + SEMICOLON
 				| block_structure + IDENTIFIER + array_specifier + SEMICOLON
-				| type_qualifier + SEMICOLON 
-				| type_qualifier + IDENTIFIER + SEMICOLON
-				| type_qualifier + IDENTIFIER + identifier_list + SEMICOLON;
+				| TypeQualifier + SEMICOLON 
+				| TypeQualifier + IDENTIFIER + SEMICOLON
+				| TypeQualifier + IDENTIFIER + identifier_list + SEMICOLON;
 
 			identifier_list.Rule = COMMA + IDENTIFIER
 				| identifier_list + COMMA + IDENTIFIER;
@@ -471,19 +474,19 @@ namespace GLSLSyntaxAST
 							| MEDIUM_PRECISION 
 							| LOW_PRECISION;
 
-			block_structure.Rule = type_qualifier + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
+			block_structure.Rule = TypeQualifier + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
 
-			init_declarator_list.Rule = single_declaration
+			init_declarator_list.Rule = SingleDeclaration
 				| init_declarator_list + COMMA + IDENTIFIER
 				| init_declarator_list + COMMA + IDENTIFIER + array_specifier
 				| init_declarator_list + COMMA + IDENTIFIER + array_specifier + EQUAL + initializer
 				| init_declarator_list + COMMA + IDENTIFIER + EQUAL + initializer;
 
-			single_declaration.Rule = fully_specified_type
-				| fully_specified_type + IDENTIFIER
-				| fully_specified_type + IDENTIFIER + array_specifier
-				| fully_specified_type + IDENTIFIER + array_specifier + EQUAL + initializer
-				| fully_specified_type + IDENTIFIER + EQUAL + initializer;
+			SingleDeclaration.Rule = FullySpecifiedType
+				| FullySpecifiedType + IDENTIFIER
+				| FullySpecifiedType + IDENTIFIER + array_specifier
+				| FullySpecifiedType + IDENTIFIER + array_specifier + EQUAL + initializer
+				| FullySpecifiedType + IDENTIFIER + EQUAL + initializer;
 
 			function_definition.Rule = function_prototype + compound_statement_no_new_scope;
 
@@ -492,16 +495,16 @@ namespace GLSLSyntaxAST
 			function_declarator.Rule = function_header 	
 				| function_header_with_parameters;
 
-			function_header.Rule = fully_specified_type + IDENTIFIER + LEFT_PAREN;
+			function_header.Rule = FullySpecifiedType + IDENTIFIER + LEFT_PAREN;
 
 			function_header_with_parameters.Rule = function_header + parameter_declaration
 				| function_header_with_parameters + COMMA + parameter_declaration;
 
 //			function_header_with_parameters.Rule = MakePlusRule (function_header_with_parameters, COMMA, parameter_declaration);
 
-			parameter_declaration.Rule = type_qualifier + parameter_declarator 	
+			parameter_declaration.Rule = TypeQualifier + parameter_declarator 	
 				| parameter_declarator
-				| type_qualifier + parameter_type_specifier
+				| TypeQualifier + parameter_type_specifier
 				| parameter_type_specifier;
 
 			parameter_declarator.Rule = type_specifier + IDENTIFIER
@@ -659,7 +662,7 @@ namespace GLSLSyntaxAST
 				| FOR_STM +  LEFT_PAREN + for_init_statement + for_rest_statement + RIGHT_PAREN + statement_no_new_scope;
 
 			condition.Rule = expression 
-					| fully_specified_type + IDENTIFIER + EQUAL + initializer;
+					| FullySpecifiedType + IDENTIFIER + EQUAL + initializer;
 
 			statement_no_new_scope.Rule = compound_statement_no_new_scope
 						| simple_statement;
@@ -680,8 +683,8 @@ namespace GLSLSyntaxAST
 			initializer_list.Rule =  initializer 
 				| initializer_list + COMMA + initializer;
 
-			fully_specified_type.Rule = type_specifier 
-				| type_qualifier + type_specifier;
+			FullySpecifiedType.Rule = type_specifier 
+				| TypeQualifier + type_specifier;
 
 			type_specifier.Rule = type_specifier_nonarray
 				| type_specifier_nonarray + array_specifier;
@@ -697,39 +700,39 @@ namespace GLSLSyntaxAST
 
 			// two additional rules
 			array_empty_bracket.Rule = LEFT_BRACKET + RIGHT_BRACKET;
-			constant_inside_bracket.Rule = LEFT_BRACKET + constant_expression + RIGHT_BRACKET;
+			constant_inside_bracket.Rule = LEFT_BRACKET + ConstantExpression + RIGHT_BRACKET;
 
-			constant_expression.Rule = conditional_expression;
+			ConstantExpression.Rule = conditional_expression;
 
 //			type_qualifier.Rule = single_type_qualifier
 //				| type_qualifier + single_type_qualifier;
 
-			type_qualifier.Rule = MakePlusRule(type_qualifier, single_type_qualifier);
+			TypeQualifier.Rule = MakePlusRule(TypeQualifier, single_type_qualifier);
 
 			single_type_qualifier.Rule = storage_qualifier
-					| layout_qualifier
+					| LayoutQualifier
 					| precision_qualifier
 					| interpolation_qualifier
 					| invariant_qualifier
 					| precise_qualifier;
 
-			layout_qualifier.Rule = LAYOUT + LEFT_PAREN + layout_qualifier_id_list + RIGHT_PAREN;
+			LayoutQualifier.Rule = LAYOUT + LEFT_PAREN + LayoutQualifierIdList + RIGHT_PAREN;
 
 //			layout_qualifier_id_list.Rule =  layout_qualifier_id
 //				| layout_qualifier_id_list + COMMA + layout_qualifier_id;
 
-			layout_qualifier_id_list.Rule = MakePlusRule (layout_qualifier_id_list, COMMA, layout_qualifier_id);
+			LayoutQualifierIdList.Rule = MakePlusRule (LayoutQualifierIdList, COMMA, LayoutQualifierId);
 
-			layout_qualifier_id.Rule = IDENTIFIER 
-					| IDENTIFIER + EQUAL  + constant_expression
+			LayoutQualifierId.Rule = IDENTIFIER 
+					| IDENTIFIER + EQUAL  + ConstantExpression
 					| SHARED;
 
 			storage_qualifier.Rule = CONST_STM 
 				| ATTRIBUTE 
 				| VARYING 
 				| INOUT 
-				| IN
-				| OUT
+				| InTerm
+				| OutTerm
 				| CENTROID
 				| PATCH
 				| SAMPLE
@@ -756,9 +759,9 @@ namespace GLSLSyntaxAST
 					| type_name_list + COMMA + TYPE_NAME;
 
 			type_specifier_nonarray.Rule = VOID_STM 
-				| ImplyPrecedenceHere(2) + FLOAT_TKN 
-				| ImplyPrecedenceHere(3) + DOUBLE_TKN 
-				| ImplyPrecedenceHere(1) + INT_TKN 
+				| FLOAT_TKN 
+				| DOUBLE_TKN 
+				| INT_TKN 
 				| UINT_TKN 
 				| BOOL_TKN 
 				| VEC2 
@@ -875,10 +878,10 @@ namespace GLSLSyntaxAST
 				| IIMAGE2DMSARRAY
 				| UIMAGE2DMSARRAY
 				| SAMPLEREXTERNALOES
-				| struct_specifier
+				| StructSpecifier
 				| TYPE_NAME;
 
-			struct_specifier.Rule = STRUCT_STM + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE
+			StructSpecifier.Rule = STRUCT_STM + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE
 				| STRUCT_STM + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
 
 //			struct_declaration_list.Rule = struct_declaration
@@ -887,7 +890,7 @@ namespace GLSLSyntaxAST
 			struct_declaration_list.Rule = MakePlusRule (struct_declaration_list, struct_declaration);
 
 			struct_declaration.Rule = type_specifier + struct_declarator_list + SEMICOLON 
-				| type_qualifier + type_specifier + struct_declarator_list  + SEMICOLON;
+				| TypeQualifier + type_specifier + struct_declarator_list  + SEMICOLON;
 
 //			struct_declarator_list.Rule = struct_declarator
 //				| struct_declarator_list + COMMA + struct_declarator;
@@ -986,13 +989,26 @@ namespace GLSLSyntaxAST
 //				boolconstant,
 //				type_name_list,
 				storage_qualifier,
-				layout_qualifier_id,
+//				layout_qualifier_id,
 //				invariant_qualifier
 //				array_empty_bracket
 				constant_inside_bracket
 			);
 
 		}
+
+		public KeyTerm InTerm {	get; private set; }
+		public KeyTerm OutTerm { get; private set; }
+		public NonTerminal SingleDeclaration { get; private set; }
+		public HashSet<KeyTerm> TypesTerms {get; private set; }
+		public NonTerminal ConstantExpression { get; private set; }
+		public NonTerminal LayoutQualifier { get; private set; }
+		public NonTerminal LayoutQualifierIdList {	get; private set; }
+		public NonTerminal LayoutQualifierId { get; private set; }
+		public NonTerminal FullySpecifiedType {	get; private set; }
+		public NonTerminal StructSpecifier { get; private set; }
+		public NonTerminal TypeQualifier { get; private set;}
+		public IdentifierTerminal IDENTIFIER { get; private set; }
 	}
 }
 
