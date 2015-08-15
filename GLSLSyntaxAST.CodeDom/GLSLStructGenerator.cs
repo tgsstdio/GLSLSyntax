@@ -140,6 +140,8 @@ namespace GLSLSyntaxAST.CodeDom
 			using (var writer = new StreamWriter(fs))
 			{
 				var contentUnit = InitialiseCompileUnit (assembly);
+
+
 				provider.GenerateCodeFromCompileUnit (contentUnit, writer, options);
 			}
 		}

@@ -221,8 +221,8 @@
 						}
 						if (ch == '.' || ch == 'e' || ch == 'f' || ch == 'E' || ch == 'F' || ch == 'l' || ch == 'L')
 						{
-							ppToken.name = new string(pp.buffer.name, 0, len);	
-							return pp.lFloatConst (len, ch, ppToken);
+							//ppToken.name = new string(pp.buffer.name, 0, len);	
+							return pp.lFloatConst (pp.buffer, len, ch, ppToken);
 						}
 
 						// wasn't a float, so must be octal...
@@ -420,7 +420,7 @@
 					if (ch >= '0' && ch <= '9')
 					{
 						pp.ungetChar();
-						return pp.lFloatConst(0, '.', ppToken);
+						return pp.lFloatConst(pp.buffer, 0, '.', ppToken);
 					}
 					else
 					{
@@ -511,8 +511,7 @@
 			} while (ch >= '0' && ch <= '9');
 			if (ch == '.' || ch == 'e' || ch == 'f' || ch == 'E' || ch == 'F' || ch == 'l' || ch == 'L')
 			{
-				ppToken.name = new string (buffer.name, 0, len);				
-				return pp.lFloatConst(len, ch, ppToken);
+				return pp.lFloatConst(pp.buffer, len, ch, ppToken);
 			} 
 			else
 			{

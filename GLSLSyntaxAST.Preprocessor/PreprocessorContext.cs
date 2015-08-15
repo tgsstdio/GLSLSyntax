@@ -67,18 +67,6 @@ namespace GLSLSyntaxAST.Preprocessor
 		//private int nextAtom;
 		private void InitAtomTable()
 		{
-
-			// Add single character tokens to the atom table:
-			string[] s = {"~","!","%","^","&","*","(",")","-","+","=","|",",",".","<",">","/","?",";",":","[","]","{","}","#"};
-
-			int key = 0;
-			foreach (var letter in s)
-			{
-				// TODO : make sure index doesn't clash
-				Symbols.Atoms.AddFixedAtom(letter,  char.ConvertToUtf32(letter, 0));
-				++key;
-			}			
-
 			binop = new List<BinaryEvalOperation> ();
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.OR_OP, precedence = EvalPrecedence.LOGOR, op = op_logor });
 			binop.Add (new BinaryEvalOperation{ token = (int)CppEnums.AND_OP, precedence = EvalPrecedence.LOGAND, op = op_logand });
@@ -99,37 +87,6 @@ namespace GLSLSyntaxAST.Preprocessor
 			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("*"), precedence = EvalPrecedence.MUL, op = op_mul });
 			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("/"), precedence = EvalPrecedence.MUL, op = op_div });
 			binop.Add (new BinaryEvalOperation{ token = Symbols.Atoms.GetAtomKey("%"), precedence = EvalPrecedence.MUL, op = op_mod });
-
-			var tokens = new []
-			{
-				new { atom = CppEnums.AND_OP, str = "&&" },
-				new { atom = CppEnums.AND_ASSIGN, str = "&=" },
-				new { atom = CppEnums.SUB_ASSIGN, str = "-=" },
-				new { atom = CppEnums.MOD_ASSIGN, str = "%=" },
-				new { atom = CppEnums.ADD_ASSIGN, str = "+=" },
-				new { atom = CppEnums.DIV_ASSIGN, str = "/=" },
-				new { atom = CppEnums.MUL_ASSIGN, str = "*=" },
-				new { atom = CppEnums.EQ_OP, str = "==" },
-				new { atom = CppEnums.XOR_OP, str = "^^" },
-				new { atom = CppEnums.XOR_ASSIGN, str = "^=" },
-				new { atom = CppEnums.GE_OP, str = ">=" },
-				new { atom = CppEnums.RIGHT_OP, str = ">>" },
-				new { atom = CppEnums.RIGHT_ASSIGN, str = ">>="},
-				new { atom = CppEnums.LE_OP, str = "<=" },
-				new { atom = CppEnums.LEFT_OP, str = "<<" },
-				new { atom = CppEnums.LEFT_ASSIGN, str = "<<="},
-				new { atom = CppEnums.DEC_OP, str = "--" },
-				new { atom = CppEnums.NE_OP, str = "!=" },
-				new { atom = CppEnums.OR_OP, str = "||" },
-				new { atom = CppEnums.OR_ASSIGN, str = "|=" },
-				new { atom = CppEnums.INC_OP, str = "++" },
-			};
-
-			// Add multiple character scanner tokens :
-			foreach (var token in tokens)
-			{
-				Symbols.Atoms.AddFixedAtom (token.str, (int) token.atom);
-			}
 		}
 
 		internal int InitScanner()
@@ -1336,7 +1293,7 @@ namespace GLSLSyntaxAST.Preprocessor
 		/// <param name="len">Length.</param>
 		/// <param name="ch">Ch.</param>
 		/// <param name="ppToken">Pp token.</param>
-		internal int lFloatConst(int len, int ch, PreprocessorToken ppToken)
+		internal int lFloatConst(StringInputBuffer buffer, int len, int ch, PreprocessorToken ppToken)
 		{
 			bool HasDecimalOrExponent = false;
 			int declen, exp, ExpSign;
@@ -1349,7 +1306,7 @@ namespace GLSLSyntaxAST.Preprocessor
 			const int MAX_TOKEN_LENGTH = 1024;
 
 			str_len=len;
-			char[] str =  ppToken.name.ToCharArray();
+			char[] str =  buffer.name;
 			if (ch == '.') {
 				HasDecimalOrExponent = true;
 				str[len++] = (char)ch;

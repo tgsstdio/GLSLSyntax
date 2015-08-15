@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Irony.Parsing;
+using System;
+using System.Linq;
 
 namespace GLSLSyntaxAST
 {
@@ -320,14 +322,19 @@ namespace GLSLSyntaxAST
 			var HIGH_PRECISION = ToTerm ("highp", "HIGH_PRECISION");
 			var MEDIUM_PRECISION = ToTerm ("mediump", "MEDIUM_PRECISION");
 			var LOW_PRECISION = ToTerm ("lowp", "LOW_PRECISION");
-			var DOT = ToTerm (".", "DOT");
-			var FIELD_SELECTION = TerminalFactory.CreateCSharpIdentifier("FIELD_SELECTION");
-			var INTCONSTANT = new NumberLiteral ("INTCONSTANT", NumberOptions.AllowSign | NumberOptions.IntOnly);
-			INTCONSTANT.Priority = 3;
+			FIELD_SELECTION = TerminalFactory.CreateCSharpIdentifier ("FIELD_SELECTION");
+			INTCONSTANT = new NumberLiteral ("INTCONSTANT", NumberOptions.AllowSign | NumberOptions.IntOnly);
+			INTCONSTANT.Priority = 4;
+			var DOT = new NonTerminal("DOT");
+			DOT.Rule = ".";
+			DOT.Precedence = 1;
 			var UINTCONSTANT = new NumberLiteral ("UINTCONSTANT", NumberOptions.IntOnly);
-			UINTCONSTANT.Priority = 2;
-			var FLOATCONSTANT = new NumberLiteral ("FLOATCONSTANT", NumberOptions.AllowSign);
-			FLOATCONSTANT.Priority = 1;
+			UINTCONSTANT.Priority = 3;
+			FLOATCONSTANT = new NumberLiteral ("FLOATCONSTANT", NumberOptions.AllowSign | NumberOptions.AllowLetterAfter);
+			FLOATCONSTANT.Priority = 2;
+			FLOATCONSTANT.AddSuffix("f", TypeCode.Single);
+			REMAINDER = new NumberLiteral ("REMAINDER", NumberOptions.NoDotAfterInt | NumberOptions.IntOnly | NumberOptions.AllowLetterAfter);
+			REMAINDER.AddSuffix("f", TypeCode.Single);
 			var DOUBLECONSTANT = new NumberLiteral ("DOUBLECONSTANT", NumberOptions.AllowSign);
 			var FALSE_STM = ToTerm ("false", "FALSE_STM");
 			var TRUE_STM = ToTerm ("true", "TRUE_STM");
@@ -424,7 +431,7 @@ namespace GLSLSyntaxAST
 			var parameter_declaration = new NonTerminal ("parameter_declaration"); // CHECKED 
 			var parameter_declarator = new NonTerminal ("parameter_declarator"); // CHECKED 
 			var parameter_type_specifier = new NonTerminal ("parameter_type_specifier"); // CHECKED 
-			var primary_expression = new NonTerminal ("primary_expression"); // CHECKED 
+			PrimaryExpression = new NonTerminal ("primary_expression"); // CHECKED 
 			var integer_expression = new NonTerminal ("integer_expression"); // CHECKED 
 			var function_call = new NonTerminal ("function_call"); // CHECKED 
 			var function_call_or_method = new NonTerminal ("function_call_or_method"); // CHECKED 
@@ -446,6 +453,7 @@ namespace GLSLSyntaxAST
 
 			var array_empty_bracket = new NonTerminal ("array_empty_bracket");
 			var constant_inside_bracket = new NonTerminal ("constant_inside_bracket");
+			var floating_number_value = new NonTerminal ("floating_number_value");
 
 			// Place Rules Here
 			this.Root = translation_unit;
@@ -514,7 +522,8 @@ namespace GLSLSyntaxAST
 
 			compound_statement_no_new_scope.Rule = LEFT_BRACE + RIGHT_BRACE | LEFT_BRACE + statement_list + RIGHT_BRACE;
 
-			statement_list.Rule = statement | statement_list + statement;
+			statement_list.Rule = MakeStarRule (statement_list, statement);
+//				statement | statement_list + statement;
 //			statement_list.Rule = MakePlusRule(statement_list, statement);
 
 			statement.Rule = compound_statement | simple_statement;
@@ -580,15 +589,20 @@ namespace GLSLSyntaxAST
 				| multiplicative_expression + SLASH + unary_expression
 				| multiplicative_expression + PERCENT + unary_expression;
 
-			unary_expression.Rule = postfix_expression
+			unary_expression.Rule = 
+				 floating_number_value
+				| postfix_expression				
 				| INC_OP + unary_expression
 				| DEC_OP + unary_expression
 				| unary_operator + unary_expression;
 
-			postfix_expression.Rule = primary_expression
+			floating_number_value.Rule = INTCONSTANT + DOT + REMAINDER;
+
+			postfix_expression.Rule = ImplyPrecedenceHere(1) + PrimaryExpression
 				| postfix_expression + LEFT_BRACKET + integer_expression + RIGHT_BRACKET
-				| function_call
-				| postfix_expression + DOT + FIELD_SELECTION
+				| ImplyPrecedenceHere(4) + FLOATCONSTANT
+				| ImplyPrecedenceHere(3) + postfix_expression + DOT + INTCONSTANT // for floating values
+				| ImplyPrecedenceHere(2) +  postfix_expression + DOT + FIELD_SELECTION
 				| postfix_expression + INC_OP
 				| postfix_expression + DEC_OP;
 
@@ -614,7 +628,7 @@ namespace GLSLSyntaxAST
 			function_call_header_no_parameters.Rule = function_call_header + VOID_STM
 				| function_call_header;
 
-			primary_expression.Rule = variable_identifier
+			PrimaryExpression.Rule = variable_identifier
 				| INTCONSTANT
 				| UINTCONSTANT
 				| FLOATCONSTANT
@@ -937,7 +951,7 @@ namespace GLSLSyntaxAST
 				additive_expression,
 				multiplicative_expression,
 				unary_expression,
-				postfix_expression,
+//				postfix_expression,
 				unary_operator,
 //				assignment_operator,
 //				selection_statement,
@@ -977,7 +991,7 @@ namespace GLSLSyntaxAST
 //				parameter_declaration,
 //				parameter_declarator,
 //				parameter_type_specifier,
-				primary_expression,
+				PrimaryExpression,
 //				integer_expression,
 ////				function_call,
 ////				function_call_generic,
@@ -992,9 +1006,36 @@ namespace GLSLSyntaxAST
 //				layout_qualifier_id,
 //				invariant_qualifier
 //				array_empty_bracket
-				constant_inside_bracket
+				constant_inside_bracket,
+				//floating_number_value,
+				DOT
 			);
 
+		}
+
+		NonTerminal PrimaryExpression {
+			get;
+			set;
+		}
+
+		NumberLiteral FLOATCONSTANT {
+			get;
+			set;
+		}
+
+		public NumberLiteral INTCONSTANT {
+			get;
+			private set;
+		}
+
+		public NumberLiteral REMAINDER {
+			get;
+			private set;
+		}
+
+		IdentifierTerminal FIELD_SELECTION {
+			get;
+			set;
 		}
 
 		public KeyTerm InTerm {	get; private set; }

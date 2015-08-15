@@ -6,15 +6,26 @@ using System.Reflection;
 using System.IO;
 using Microsoft.CSharp;
 using System.CodeDom.Compiler;
+using GLSLSyntaxAST.Preprocessor;
 
 namespace GLSLSyntaxAST.CommandLine
 {
 	class MainClass
 	{
+		static Standalone InitialisePreprocessor (InfoSink infoSink)
+		{
+
+			var intermediate = new GLSLIntermediate ();
+			var symbols = new SymbolLookup ();
+			symbols.SetPreambleManually (Profile.CoreProfile);
+			symbols.DefineAs ("GL_ARB_shader_storage_buffer_object", 1);
+			return new Standalone (infoSink, intermediate, symbols);
+		}
+
 		public static int Main (string[] args)
 		{
-			try
-			{
+//			try
+//			{
 				if (args.Length < 2)
 				{
 					Console.WriteLine("Invalid arguments");
@@ -35,12 +46,22 @@ namespace GLSLSyntaxAST.CommandLine
 				var extractor = new GLSLUniformExtractor (lookup);
 				extractor.Initialize ();
 
+				var debug = new InfoSinkBase (SinkType.StdOut);
+				var info = new InfoSinkBase (SinkType.StdOut);
+				var infoSink = new InfoSink (info, debug);
+				var preprocessor = InitialisePreprocessor (infoSink);
+
 				for (int i = 1; i < args.Length; ++i)
 				{
-					using (var fs = File.Open(args[i], FileMode.Open))
+					var fileName = args[i];
+					using (var fs = File.Open(fileName, FileMode.Open))
 					{
-						int actual = extractor.Extract (fs);
-						Console.WriteLine("{0} - no of blocks extracted : {1}", args[i], actual);
+						var stage = Standalone.FindLanguage(fileName);
+						string result;
+						preprocessor.Run(fs, stage, out result);
+
+						int actual = extractor.Extract (result);
+						Console.WriteLine("{0} - no of blocks extracted : {1}", fileName, actual);
 					}
 				}
 
@@ -61,19 +82,19 @@ namespace GLSLSyntaxAST.CommandLine
 				}
 
 				return 0;
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine (ex.Message);
-				return 1;
-			}
+//			}
+//			catch (Exception ex)
+//			{
+//				Debug.WriteLine (ex.Message);
+//				return 1;
+//			}
 		//	Test();
 		}
 
-		public static void Compare()
+		public static void Compare(Type entityType)
 		{
 			// Create an array of types.
-			Type[] types = { typeof(EmptyStruct), typeof(ArgIterator)};
+			Type[] types = { entityType, typeof(ArgIterator)};
 
 			foreach (var t in types) {
 				Console.WriteLine("Attributes for type {0}:", t.Name);
@@ -155,18 +176,6 @@ namespace GLSLSyntaxAST.CommandLine
 					Console.WriteLine("   ...is sealed");
 				}
 				Console.WriteLine();
-			}
-		}
-
-		public static void CheckNodes(ParseTreeNode node, int level)
-		{
-			for(int i = 0; i < level; i++)
-				Debug.Write("  ");
-			Debug.WriteLine (node);
-
-			foreach (ParseTreeNode child in node.ChildNodes)
-			{
-				CheckNodes (child, level + 1);
 			}
 		}
 	}

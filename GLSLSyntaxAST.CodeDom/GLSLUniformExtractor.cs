@@ -346,6 +346,13 @@ namespace GLSLSyntaxAST.CodeDom
 		public void DebugCode (string code)
 		{
 			var tree = mCompiler.Parse (code);
+			if (tree.ParserMessages.Count > 0)
+			{
+				foreach (var m in tree.ParserMessages)
+				{
+					Debug.WriteLine ("PARSER : {0} [{1}] {2}", m.Level, m.Location, m.Message);
+				}
+			}
 			DebugNode (tree.Root, 0);
 		}
 

@@ -11,6 +11,50 @@ namespace GLSLSyntaxAST.Preprocessor
 		{
 			Atoms = new AtomLookup ();
 			mSymbols = new Dictionary<int, Symbol> ();
+			InitAtomTable ();
+		}
+
+		private void InitAtomTable()
+		{
+			// Add single character tokens to the atom table:
+			string[] s = {"~","!","%","^","&","*","(",")","-","+","=","|",",",".","<",">","/","?",";",":","[","]","{","}","#"};
+
+			foreach (var letter in s)
+			{
+				// TODO : make sure index doesn't clash
+				Atoms.AddFixedAtom(letter,  char.ConvertToUtf32(letter, 0));
+			}		
+
+			var tokens = new []
+			{
+				new { atom = CppEnums.AND_OP, str = "&&" },
+				new { atom = CppEnums.AND_ASSIGN, str = "&=" },
+				new { atom = CppEnums.SUB_ASSIGN, str = "-=" },
+				new { atom = CppEnums.MOD_ASSIGN, str = "%=" },
+				new { atom = CppEnums.ADD_ASSIGN, str = "+=" },
+				new { atom = CppEnums.DIV_ASSIGN, str = "/=" },
+				new { atom = CppEnums.MUL_ASSIGN, str = "*=" },
+				new { atom = CppEnums.EQ_OP, str = "==" },
+				new { atom = CppEnums.XOR_OP, str = "^^" },
+				new { atom = CppEnums.XOR_ASSIGN, str = "^=" },
+				new { atom = CppEnums.GE_OP, str = ">=" },
+				new { atom = CppEnums.RIGHT_OP, str = ">>" },
+				new { atom = CppEnums.RIGHT_ASSIGN, str = ">>="},
+				new { atom = CppEnums.LE_OP, str = "<=" },
+				new { atom = CppEnums.LEFT_OP, str = "<<" },
+				new { atom = CppEnums.LEFT_ASSIGN, str = "<<="},
+				new { atom = CppEnums.DEC_OP, str = "--" },
+				new { atom = CppEnums.NE_OP, str = "!=" },
+				new { atom = CppEnums.OR_OP, str = "||" },
+				new { atom = CppEnums.OR_ASSIGN, str = "|=" },
+				new { atom = CppEnums.INC_OP, str = "++" },
+			};
+
+			// Add multiple character scanner tokens :
+			foreach (var token in tokens)
+			{
+				Atoms.AddFixedAtom (token.str, (int) token.atom);
+			}
 		}
 
 		internal Symbol Add(int atom)
