@@ -71,6 +71,8 @@
     <Compile Include="GLSLStructGenerator\CodeDomStructs.cs" />
     <Compile Include="GLSLStructGenerator\CodeDomUniforms.cs" />
     <Compile Include="GLSLStructGenerator\CodeDomVersionString.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomUniformBlockArray.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomCaseInsensitive.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

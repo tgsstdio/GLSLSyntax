@@ -64,6 +64,7 @@
     <Compile Include="InputAttribute.cs" />
     <Compile Include="LayoutInformation.cs" />
     <Compile Include="GLSLStructGenerator.cs" />
+    <Compile Include="ArraySpecification.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

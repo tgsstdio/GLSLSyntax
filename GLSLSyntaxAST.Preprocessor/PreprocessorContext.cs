@@ -1439,7 +1439,7 @@ namespace GLSLSyntaxAST.Preprocessor
 
 				//str[len]='\0';
 
-				ppToken.dval = Double.Parse(new string(str));
+				ppToken.dval = Double.Parse(new string(str, 0, len));
 			}
 
 			if (isDouble)

@@ -84,12 +84,6 @@
     <Folder Include="Shaders\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Shaders\phong_linked_list.frag.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Shaders\phong_linked_list.vert.glsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Shaders\ToScreen.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -102,10 +96,16 @@
     <Content Include="Shaders\PassThru.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Shaders\fullscreen_blend.frag.glsl">
+    <Content Include="Shaders\phong_linked_list.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Shaders\fullscreen_blend.vert.glsl">
+    <Content Include="Shaders\phong_linked_list.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\fullscreen_blend.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\fullscreen_blend.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

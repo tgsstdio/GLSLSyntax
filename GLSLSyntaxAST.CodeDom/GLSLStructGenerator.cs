@@ -4,6 +4,7 @@ using System.CodeDom.Compiler;
 using System.CodeDom;
 using System.Reflection;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace GLSLSyntaxAST.CodeDom
 {
@@ -22,14 +23,11 @@ namespace GLSLSyntaxAST.CodeDom
 
 		}
 
-		private static CodeTypeDeclaration CreateClass(CodeNamespace contentNs, string folderName)
+		private static CodeTypeDeclaration CreateClassType(CodeNamespace contentNs, string folderName)
 		{
 			var textures = new CodeTypeDeclaration (folderName);
 			textures.IsClass = true;
 			textures.TypeAttributes = TypeAttributes.Public;
-			//textures.Members.
-
-			contentNs.Types.Add (textures);
 
 			return textures;
 		}
@@ -41,21 +39,14 @@ namespace GLSLSyntaxAST.CodeDom
 			contentUnit.AssemblyCustomAttributes.Add (versionNumber);
 		}
 
-		private static void AddStruct (CodeNamespace dest, CodeTypeDeclaration folder, StructInfo info)
+		private static void AddStruct (CodeNamespace dest, StructInfo info)
 		{
 			var structType = new CodeTypeDeclaration (info.Name);
 			//structType.IsClass = false;
 			structType.IsStruct = true;
 			structType.TypeAttributes = TypeAttributes.Public | TypeAttributes.SequentialLayout | TypeAttributes.Sealed;
-
-//			structType.CustomAttributes.Add(
-//				new CodeAttributeDeclaration(typeof(StructLayoutAttribute),
-//				new CodeAttributeArgument(
-//					new CodeFieldReferenceExpression(
-//							new CodeTypeReferenceExpression(typeof(LayoutKind)), "Sequential")				
-//					)
-//				)
-//			);
+			var argument = new CodeAttributeArgument (new CodeFieldReferenceExpression (new CodeTypeReferenceExpression (typeof(LayoutKind)), "Sequential"));
+			structType.CustomAttributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(StructLayoutAttribute)),argument));
 
 			dest.Types.Add (structType);
 
@@ -136,13 +127,19 @@ namespace GLSLSyntaxAST.CodeDom
 			string outputFile = System.IO.Path.GetFileNameWithoutExtension (assembly.OutputAssembly) + ".cs";
 			string absolutePath = System.IO.Path.Combine(assembly.Path,outputFile);
 
-			using (var fs = File.OpenWrite (absolutePath))
-			using (var writer = new StreamWriter(fs))
+			using (var writer = new StreamWriter(absolutePath, false))
 			{
 				var contentUnit = InitialiseCompileUnit (assembly);
 
-
 				provider.GenerateCodeFromCompileUnit (contentUnit, writer, options);
+			}
+		}
+
+		void DeclareStructs (CodeNamespace contentNs)
+		{
+			foreach (var block in mExtractor.Blocks)
+			{
+				AddStruct (contentNs, block);
 			}
 		}
 
@@ -157,18 +154,91 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 			var contentNs = new CodeNamespace (nameSpace);
 			contentUnit.Namespaces.Add (contentNs);
-			var uniforms = CreateClass (contentNs, "Uniforms");
-			var defaultConstructor = new CodeTypeConstructor ();
-			defaultConstructor.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-			uniforms.Members.Add (defaultConstructor);
-			defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (typeof(int), "testInt", new CodePrimitiveExpression (0)));
-			foreach (var block in mExtractor.Blocks)
+
+			DeclareStructs (contentNs);
+
+			var uniforms = CreateClassType (contentNs, "Uniforms");
+			var inputBindings = CreateClassType (contentNs, "InputBindings");
+			var outputBindings = CreateClassType (contentNs, "OutputBindings");
+
+			var defaultConstructor = new CodeConstructor ();
+			defaultConstructor.Attributes = MemberAttributes.Public;
+
+			AddUniforms (uniforms, defaultConstructor);
+
+			AddAttributes (inputBindings, outputBindings);
+
+			if (uniforms.Members.Count > 0)
 			{
-				AddStruct (contentNs, uniforms, block);
+				uniforms.Members.Add (defaultConstructor);
+				contentNs.Types.Add (uniforms);
 			}
+
+			if (inputBindings.Members.Count > 0)
+				contentNs.Types.Add (inputBindings);
+
+			if (outputBindings.Members.Count > 0)
+				contentNs.Types.Add (outputBindings);
+
+			//defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (typeof(int), "testInt", new CodePrimitiveExpression (0)));
+
 			return contentUnit;
 		}
 		#endregion
+
+		void AddUniforms (CodeTypeDeclaration uniforms, CodeConstructor defaultConstructor)
+		{
+			foreach (var member in mExtractor.Uniforms)
+			{
+				if (member.ClosestType != null)
+				{
+					var field1 = new CodeMemberField (member.ClosestType, member.Name);
+					field1.Attributes = MemberAttributes.Public;
+					uniforms.Members.Add (field1);
+				}
+				else
+					if (member.ArrayDetails != null)
+					{
+						var arrayType = new CodeTypeReference (member.ArrayDetails.StructType.Name + "[]");
+						var field1 = new CodeMemberField (arrayType, member.Name);
+						field1.Attributes = MemberAttributes.Public;
+						uniforms.Members.Add (field1);
+						defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (arrayType, member.Name, new CodeArrayCreateExpression (arrayType, member.ArrayDetails.ArraySize)));
+					}
+			}
+		}
+
+		void AddAttributes (CodeTypeDeclaration inputBindings, CodeTypeDeclaration outputBindings)
+		{
+			foreach (var member in mExtractor.Attributes)
+			{
+				if (member.ClosestType != null)
+				{
+					if (member.Layout != null)
+					{
+						if (member.Direction == "in" || member.Direction == "inout")
+						{
+							AddBindingIndex (member, inputBindings);
+						}
+						if (member.Direction == "out" || member.Direction == "inout")
+						{
+							AddBindingIndex (member, outputBindings);
+						}
+					}
+				}
+			}
+		}
+
+		static void AddBindingIndex (InputAttribute member, CodeTypeDeclaration dest)
+		{
+			var field1 = new CodeMemberField (typeof(int), member.Name);
+			field1.Attributes = MemberAttributes.Public;
+			if (member.Layout.Location.HasValue)
+			{
+				field1.InitExpression = new CodePrimitiveExpression (member.Layout.Location.Value);
+			}
+			dest.Members.Add (field1);
+		}
 	}
 }
 

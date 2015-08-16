@@ -17,6 +17,9 @@ namespace GLSLSyntaxAST.UnitTests
 			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
 			int actual = test.Extract (FUNC_3_PARAMS_FLOAT);
+			Assert.AreEqual (0, test.Blocks.Count);
+			Assert.AreEqual (0, test.Uniforms.Count);
+			Assert.AreEqual (0, test.Attributes.Count);
 		}
 
 		[Test ()]

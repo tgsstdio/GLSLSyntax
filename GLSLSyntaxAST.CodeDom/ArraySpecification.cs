@@ -2,12 +2,12 @@
 
 namespace GLSLSyntaxAST.CodeDom
 {
-	public class StructMember
+	public class ArraySpecification
 	{
+		public StructInfo StructType;
+		public int ArraySize;
 		public string TypeString;
 		public Type ClosestType;
-		public string Name;
-		public ArraySpecification ArrayDetails;
 	}
 }
 

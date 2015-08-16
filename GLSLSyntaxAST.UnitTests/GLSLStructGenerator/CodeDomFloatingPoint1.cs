@@ -17,6 +17,10 @@ namespace GLSLSyntaxAST.UnitTests
 			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
 			int actual = test.Extract (FLOAT_POINT_1);
+			Assert.AreEqual (0, actual);
+			Assert.AreEqual (0, test.Blocks.Count);
+			Assert.AreEqual (0, test.Uniforms.Count);
+			Assert.AreEqual (0, test.Attributes.Count);
 		}
 
 		[Test ()]

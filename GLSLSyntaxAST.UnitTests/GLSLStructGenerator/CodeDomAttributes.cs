@@ -19,6 +19,8 @@ namespace GLSLSyntaxAST.UnitTests
 			test.Initialize ();
 			int actual = test.Extract (ATTRIBUTES_TEST_CASE);
 			Assert.AreEqual (expected, actual);
+			Assert.AreEqual (0, test.Blocks.Count);
+			Assert.AreEqual (0, test.Uniforms.Count);
 			Assert.AreEqual (1, test.Attributes.Count);
 		}
 

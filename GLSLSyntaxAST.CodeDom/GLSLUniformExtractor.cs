@@ -55,7 +55,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		private bool CheckForUniformTag (StructInfo info, ParseTreeNode parent)
+		private bool IsUniform (StructInfo info, ParseTreeNode parent)
 		{
 			ParseTreeNode typeQualifier = parent.ChildNodes.Find (p => p.Term == mLanguage.TypeQualifier);
 			if (typeQualifier == null )
@@ -77,12 +77,6 @@ namespace GLSLSyntaxAST.CodeDom
 
 			info.Layout = new LayoutInformation ();
 			ExtractLayout (info.Layout, typeQualifier);					
-			return true;
-		}
-
-		private bool ExtractName (StructInfo info, ParseTreeNode child)
-		{
-			info.Name = child.Token.ValueString;
 			return true;
 		}
 
@@ -118,59 +112,100 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-
-		private int FindBlocks(ParseTreeNode parent, int level)
+		bool ExtractUniformArrayDetails (StructInfo info, ParseTreeNode node)
 		{
-			if (parent == null)
+			var arraySpecifier = node.ChildNodes.Find (p => p.Term == mLanguage.ArraySpecifier);
+			if (arraySpecifier == null)
+				return false;
+			
+			var uniformName = node.ChildNodes.Find (p => p.Term == mLanguage.IDENTIFIER);
+			if (uniformName == null)
+			{
+				return false;
+			}
+
+			var constNode = arraySpecifier.ChildNodes.Find (p => p.Term == mLanguage.ConstantExpression);
+			if (constNode == null)
+			{
+				return false;
+			}
+
+			var uniform = new StructMember ();
+			uniform.Name = uniformName.Token.ValueString;
+			uniform.ArrayDetails = new ArraySpecification ();
+			uniform.ArrayDetails.StructType = info;
+			uniform.ArrayDetails.ArraySize = (int) constNode.ChildNodes[0].Token.Value;
+
+			var key = uniform.Name;
+			if (!mUniforms.ContainsKey (key))
+			{
+				mUniforms.Add (key, uniform);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private int FindBlocks(ParseTreeNode node, int level)
+		{
+			if (node == null)
 			{
 				return 0;
 			}
 
-
-			if (parent.Term == mLanguage.BlockStructure)
+			if (node.Term == mLanguage.Declaration)
 			{
-				var info = new StructInfo ();
-
-				// first child is uniform keyword
-				bool isValid = CheckForUniformTag(info, parent);
-
-				var uniform = parent.ChildNodes.Find (p => p.Term == mLanguage.InTerm);
-
-				if (isValid)
-				{
-					// second child is struct type name
-					if (!ExtractName (info, parent.ChildNodes [1]))
-					{
-						return 0;
-					}
-
-					// third child is list of member inside
-					if (ExtractMembers (info, parent.ChildNodes [2]))
-					{
-						// TODO : case sensitive ????
-						var key = info.Name.ToLowerInvariant();
-						if (!mBlocks.ContainsKey (key))
-						{
-							mBlocks.Add (key, info);
-						}
-
-						return 1;
-					}
-					else
-					{
-						return 0;
-					}
-				}
-				else
+				var parent = node.ChildNodes.Find (p => p.Term == mLanguage.BlockStructure);
+				if (parent == null)
 				{
 					return 0;
 				}
 
+				var info = new StructInfo ();
+
+				// first child is uniform keyword
+				if (!IsUniform (info, parent))
+				{
+					return 0;
+				}
+
+				var typeName = parent.ChildNodes.Find (p => p.Term == mLanguage.IDENTIFIER);
+				if (typeName == null)
+				{
+					return 0;
+				}
+
+				// second child is struct type name
+				info.ExtractName (typeName);
+
+				// third child is list of member inside
+				if (!ExtractMembers (info, parent.ChildNodes [2]))
+				{
+					return 0;
+				}
+
+				int changes = 0;
+
+				var key = info.Name;
+				if (!mBlocks.ContainsKey (key))
+				{
+					mBlocks.Add (key, info);
+					++changes;
+				}
+
+				if (ExtractUniformArrayDetails(info, node))
+				{
+					++changes;
+				}
+
+				return changes;
 			} 
 			else
 			{
 				int total = 0;
-				foreach (ParseTreeNode child in parent.ChildNodes)
+				foreach (ParseTreeNode child in node.ChildNodes)
 				{
 					total += FindBlocks (child, level + 1);
 				}
@@ -202,6 +237,8 @@ namespace GLSLSyntaxAST.CodeDom
 				}
 			}
 		}
+
+
 
 		public void ExtractLayoutInfo (LayoutInformation info, ParseTreeNode parent )
 		{
@@ -242,10 +279,8 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 
 			// second child is struct type name
-			if (!ExtractName (temp, specifier.ChildNodes [1]))
-			{
-				return 0;
-			}
+			temp.ExtractName (specifier.ChildNodes [1]);
+
 			// third child is list of member inside
 			if (ExtractMembers (temp, specifier.ChildNodes [2]))
 			{
@@ -334,7 +369,6 @@ namespace GLSLSyntaxAST.CodeDom
 					{
 						return 0;
 					}
-
 				} 
 				else
 				{

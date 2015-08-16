@@ -18,7 +18,12 @@ namespace GLSLSyntaxAST.DebugTree
 			var test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
 			test.DebugCode (
-				"void main() { float in_position = 1.0; }"	
+				@"
+layout(binding = 1, std430) buffer LinkedList
+{
+	int nodes[];
+};
+"
 			);
 		}
 	}

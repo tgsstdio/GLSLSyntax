@@ -20,6 +20,8 @@ namespace GLSLSyntaxAST.UnitTests
 			int actual = test.Extract (STRUCT_TEST_CASE);
 			Assert.AreEqual (expected, actual);
 			Assert.AreEqual (1, test.Blocks.Count);
+			Assert.AreEqual (0, test.Uniforms.Count);
+			Assert.AreEqual (0, test.Attributes.Count);
 		}
 
 		[Test ()]
