@@ -11,7 +11,8 @@ namespace GLSLSyntaxAST.CodeDom
 		ICollection<InputAttribute> Attributes { get; }
 		void Initialize();
 		int Extract(string code);
-		int Extract(Stream stream);		
+		int Extract(Stream stream);	
+		string ExpressTree (string code);
 	}
 
 }

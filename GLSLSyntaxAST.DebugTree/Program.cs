@@ -17,7 +17,9 @@ namespace GLSLSyntaxAST.DebugTree
 			lookup.Initialize ();			
 			var test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
-			test.DebugCode ("void main() { float in_position = 1.0; }");
+			test.DebugCode (
+				"void main() { float in_position = 1.0; }"	
+			);
 		}
 	}
 }

@@ -1,0 +1,60 @@
+﻿using System;
+using NUnit.Framework;
+using GLSLSyntaxAST.CodeDom;
+
+namespace GLSLSyntaxAST.UnitTests
+{
+	[TestFixture ()]
+	public class CodeDomFuncSingleParam
+	{
+		const string FUNC_SINGLE_PARAM = "void main() { float value = sin(in_position); }";
+
+		[Test ()]
+		public void ExtractFuncSingleParam ()
+		{
+			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
+			lookup.Initialize ();
+			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
+			test.Initialize ();
+			int actual = test.Extract (FUNC_SINGLE_PARAM);
+		}
+
+		[Test ()]
+		public void ExpressFuncSingleParam ()
+		{
+			const string expected 	= "translation_unit\n"
+								  	+ " external_declaration\n"
+								  	+ "  function_definition\n"
+									+ "   function_prototype\n"
+									+ "    function_declarator\n"
+									+ "     function_header\n"
+									+ "      fully_specified_type\n"
+									+ "       void (Keyword)\n"
+									+ "      main (IDENTIFIER)\n"
+									+ "   compound_statement_no_new_scope\n"
+									+ "    statement_list\n"
+									+ "     statement\n"
+									+ "      simple_statement\n"
+									+ "       declaration_statement\n"
+									+ "        declaration\n"
+									+ "         single_declaration\n"
+									+ "          fully_specified_type\n"
+									+ "           float (Keyword)\n"
+									+ "          value (IDENTIFIER)\n"
+									+ "          = (Key symbol)\n"
+									+ "          initializer\n"
+									+ "           assignment_expression\n"
+									+ "            function_call\n"
+									+ "             function_call_header_with_parameters\n"
+									+ "              assignment_expression\n"
+									+ "               variable_identifier\n"
+									+ "                in_position (IDENTIFIER)\n";
+			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
+			lookup.Initialize ();
+			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
+			test.Initialize ();
+			var actual = test.ExpressTree (FUNC_SINGLE_PARAM);
+			Assert.AreEqual (expected, actual);
+		}
+	}
+}

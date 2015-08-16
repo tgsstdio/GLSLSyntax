@@ -59,6 +59,18 @@
     <Compile Include="Test.cs" />
     <Compile Include="CodeDomTest.cs" />
     <Compile Include="ProprocessorTests.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomAttributes.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomEmptyString.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFloatingPoint1.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFloatingPoint2.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFuncSingleParam.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFunc2Parameters.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFunc3ParamsWithFloat.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFunc3ParamsWithNegetiveInt.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFuncVoidParam.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomStructs.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomUniforms.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomVersionString.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -86,5 +98,8 @@
     <Content Include="Sample.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GLSLStructGenerator\" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ using Irony.Parsing;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Collections.Specialized;
+using System.Text;
 
 namespace GLSLSyntaxAST.CodeDom
 {
@@ -54,27 +55,28 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 		}
 
-		private bool CheckForUniformTag (StructInfo info, ParseTreeNode child)
+		private bool CheckForUniformTag (StructInfo info, ParseTreeNode parent)
 		{
-			if (child.Term != mLanguage.TypeQualifier )
+			ParseTreeNode typeQualifier = parent.ChildNodes.Find (p => p.Term == mLanguage.TypeQualifier);
+			if (typeQualifier == null )
 			{
 				return false;
 			}
 
-			var qualifierlist = child.ChildNodes.Find ((p) => p.Term == mLanguage.LayoutQualifierIdList);
-			if (qualifierlist == null)
+			ParseTreeNode storageQualifier = typeQualifier.ChildNodes.Find (p => p.Term == mLanguage.StorageQualifier);
+			if (storageQualifier == null)
+			{
+				return false;
+			}
+
+			ParseTreeNode uniformTag = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.UNIFORM);
+			if (uniformTag == null)
 			{
 				return false;
 			}
 
 			info.Layout = new LayoutInformation ();
-			ExtractLayout (info.Layout, qualifierlist);					
-
-			var uniformTag = child.ChildNodes [1].Token;
-			if (uniformTag.ValueString != "uniform")
-			{
-				return false;
-			}
+			ExtractLayout (info.Layout, typeQualifier);					
 			return true;
 		}
 
@@ -117,36 +119,39 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 
 
-		private int FindBlocks(ParseTreeNode node, int level)
+		private int FindBlocks(ParseTreeNode parent, int level)
 		{
-			if (node == null)
+			if (parent == null)
 			{
 				return 0;
 			}
 
 
-			if (node.Term.Name == "block_structure")
+			if (parent.Term == mLanguage.BlockStructure)
 			{
-				var temp = new StructInfo ();
+				var info = new StructInfo ();
 
 				// first child is uniform keyword
-				bool isValid = CheckForUniformTag(temp, node.ChildNodes[0]);
+				bool isValid = CheckForUniformTag(info, parent);
+
+				var uniform = parent.ChildNodes.Find (p => p.Term == mLanguage.InTerm);
+
 				if (isValid)
 				{
 					// second child is struct type name
-					if (!ExtractName (temp, node.ChildNodes [1]))
+					if (!ExtractName (info, parent.ChildNodes [1]))
 					{
 						return 0;
 					}
 
 					// third child is list of member inside
-					if (ExtractMembers (temp, node.ChildNodes [2]))
+					if (ExtractMembers (info, parent.ChildNodes [2]))
 					{
 						// TODO : case sensitive ????
-						var key = temp.Name.ToLowerInvariant();
+						var key = info.Name.ToLowerInvariant();
 						if (!mBlocks.ContainsKey (key))
 						{
-							mBlocks.Add (key, temp);
+							mBlocks.Add (key, info);
 						}
 
 						return 1;
@@ -165,7 +170,7 @@ namespace GLSLSyntaxAST.CodeDom
 			else
 			{
 				int total = 0;
-				foreach (ParseTreeNode child in node.ChildNodes)
+				foreach (ParseTreeNode child in parent.ChildNodes)
 				{
 					total += FindBlocks (child, level + 1);
 				}
@@ -272,6 +277,12 @@ namespace GLSLSyntaxAST.CodeDom
 				{
 					var specifier = node.ChildNodes.Find (p => p.Term == mLanguage.StructSpecifier);
 					var typeQualifier = node.ChildNodes.Find (p => p.Term == mLanguage.TypeQualifier);
+
+					if (typeQualifier == null)
+					{
+						return 0;
+					}
+
 					if (specifier != null)
 					{
 						var temp = new StructInfo ();
@@ -280,11 +291,19 @@ namespace GLSLSyntaxAST.CodeDom
 						return ExtractStructMembers (temp, specifier);
 					}
 
-					var inDirection = typeQualifier.ChildNodes.Find (p => p.Term == mLanguage.InTerm);
+					ParseTreeNode storageQualifier = typeQualifier.ChildNodes.Find (p => p.Term == mLanguage.StorageQualifier);
+					if (storageQualifier == null)
+					{
+						return 0;
+					}
 
-					var outDirection = typeQualifier.ChildNodes.Find (p => p.Term == mLanguage.OutTerm);
+					var inDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.InTerm);
 
-					if (inDirection == null && outDirection == null)
+					var outDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.OutTerm);
+
+					var inoutDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.InOutTerm);
+
+					if (inDirection == null && outDirection == null && inoutDirection == null)
 					{
 						return 0;
 					}
@@ -354,6 +373,30 @@ namespace GLSLSyntaxAST.CodeDom
 				}
 			}
 			DebugNode (tree.Root, 0);
+		}
+
+		public string ExpressTree (string code)
+		{
+			var builder = new StringBuilder ();
+			var tree = mCompiler.Parse (code);
+			ExpressTreeNode (builder, tree.Root, 0);
+			return builder.ToString ();
+		}
+
+		private void ExpressTreeNode(StringBuilder builder, ParseTreeNode node, int level)
+		{
+			if (node == null)
+			{
+				return;
+			}
+
+			builder.Append (new string (' ', level));
+			builder.Append (node.ToString ());
+			builder.Append ("\n");
+			foreach (ParseTreeNode child in node.ChildNodes)
+			{
+				ExpressTreeNode(builder, child, level + 1);
+			}
 		}
 
 		private void DebugNode(ParseTreeNode node, int level)

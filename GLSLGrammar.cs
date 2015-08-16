@@ -11,6 +11,12 @@ namespace GLSLSyntaxAST
 		public GLSLGrammar ()
 		{
 			var multiLine = new CommentTerminal ("MULTI-LINE", "/*", "*/");
+			var SingleLineComment = new CommentTerminal("SingleLineComment", "//", "\r", "\n", "\u2085", "\u2028", "\u2029");
+			NonGrammarTerminals.Add(SingleLineComment);
+			//Temporarily, treat preprocessor instructions like comments
+			var ppInstruction = new CommentTerminal("ppInstruction", "#","\r", "\n");
+			NonGrammarTerminals.Add(ppInstruction);
+
 			this.NonGrammarTerminals.Add (multiLine);
 
 			string RIGHT_PAREN = ")";
@@ -340,11 +346,11 @@ namespace GLSLSyntaxAST
 			var TRUE_STM = ToTerm ("true", "TRUE_STM");
 			var ATTRIBUTE = ToTerm ("attribute", "ATTRIBUTE");
 			var VARYING = ToTerm ("varying", "VARYING");
-			var INOUT = ToTerm ("inout", "INOUT");
+			InOutTerm = ToTerm ("inout", "INOUT");
 			InTerm = ToTerm ("in", "IN");
 			OutTerm = ToTerm ("out", "OUT");
 			var CONST_STM = ToTerm ("CONST", "CONST");
-			var UNIFORM = ToTerm ("uniform", "UNIFORM");
+			UNIFORM = ToTerm ("uniform", "UNIFORM");
 			var CENTROID = ToTerm ("centroid", "CENTROID");
 			var SAMPLE = ToTerm ("sample", "SAMPLE");
 			var READONLY = ToTerm ("readonly", "READONLY");
@@ -423,7 +429,7 @@ namespace GLSLSyntaxAST
 			var jump_statement = new NonTerminal ("jump_statement"); // CHECKED 
 			var init_declarator_list = new NonTerminal ("init_declarator_list"); // CHECKED 
 			var precision_qualifier = new NonTerminal ("precision_qualifier"); // CHECKED 
-			var block_structure = new NonTerminal ("block_structure"); // CHECKED 
+			BlockStructure = new NonTerminal ("block_structure"); // CHECKED 
 			SingleDeclaration = new NonTerminal ("single_declaration"); // CHECKED 
 			var identifier_list = new NonTerminal ("identifier_list"); // CHECKED 
 			var function_header = new NonTerminal ("function_header"); // CHECKED
@@ -442,7 +448,7 @@ namespace GLSLSyntaxAST
 			var function_identifier = new NonTerminal ("function_identifier"); // CHECKED 
 			var variable_identifier = new NonTerminal ("variable_identifier"); // CHECKED 
 			var boolconstant = new NonTerminal ("boolconstant"); // CHECKED
-			var storage_qualifier = new NonTerminal ("storage_qualifier"); // CHECKED
+			StorageQualifier = new NonTerminal ("storage_qualifier"); // CHECKED
 			var type_name_list = new NonTerminal ("type_name_list"); // CHECKED 
 			LayoutQualifier = new NonTerminal ("layout_qualifier"); // CHECKED
 			LayoutQualifierIdList = new NonTerminal ("layout_qualifier_id_list"); // CHECKED
@@ -459,16 +465,16 @@ namespace GLSLSyntaxAST
 			this.Root = translation_unit;
 
 			//translation_unit.Rule = external_declaration | translation_unit + external_declaration;
-			translation_unit.Rule = MakePlusRule(translation_unit, external_declaration);
+			translation_unit.Rule = MakeStarRule(translation_unit, external_declaration);
 
 			external_declaration.Rule =  function_definition | declaration;
 
 			declaration.Rule = function_prototype + SEMICOLON 
 				| init_declarator_list + SEMICOLON 
 				| PRECISION + precision_qualifier + type_specifier + SEMICOLON
-				| block_structure + SEMICOLON
-				| block_structure + IDENTIFIER + SEMICOLON
-				| block_structure + IDENTIFIER + array_specifier + SEMICOLON
+				| BlockStructure + SEMICOLON
+				| BlockStructure + IDENTIFIER + SEMICOLON
+				| BlockStructure + IDENTIFIER + array_specifier + SEMICOLON
 				| TypeQualifier + SEMICOLON 
 				| TypeQualifier + IDENTIFIER + SEMICOLON
 				| TypeQualifier + IDENTIFIER + identifier_list + SEMICOLON;
@@ -482,7 +488,7 @@ namespace GLSLSyntaxAST
 							| MEDIUM_PRECISION 
 							| LOW_PRECISION;
 
-			block_structure.Rule = TypeQualifier + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
+			BlockStructure.Rule = TypeQualifier + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
 
 			init_declarator_list.Rule = SingleDeclaration
 				| init_declarator_list + COMMA + IDENTIFIER
@@ -598,11 +604,12 @@ namespace GLSLSyntaxAST
 
 			floating_number_value.Rule = INTCONSTANT + DOT + REMAINDER;
 
-			postfix_expression.Rule = ImplyPrecedenceHere(1) + PrimaryExpression
+			postfix_expression.Rule = PrimaryExpression
 				| postfix_expression + LEFT_BRACKET + integer_expression + RIGHT_BRACKET
-				| ImplyPrecedenceHere(4) + FLOATCONSTANT
-				| ImplyPrecedenceHere(3) + postfix_expression + DOT + INTCONSTANT // for floating values
-				| ImplyPrecedenceHere(2) +  postfix_expression + DOT + FIELD_SELECTION
+				| FLOATCONSTANT
+				| postfix_expression + DOT + INTCONSTANT // for floating values
+				| function_call
+				| postfix_expression + DOT + FIELD_SELECTION
 				| postfix_expression + INC_OP
 				| postfix_expression + DEC_OP;
 
@@ -610,23 +617,22 @@ namespace GLSLSyntaxAST
 
 			function_call.Rule = function_call_or_method;
 
-			function_call_or_method.Rule = function_call_generic;
+			function_call_or_method.Rule = function_identifier + LEFT_PAREN + function_call_generic + RIGHT_PAREN;
 
-			function_call_generic.Rule = function_call_header_with_parameters + RIGHT_PAREN
-				| function_call_header_no_parameters + RIGHT_PAREN;
+			function_call_generic.Rule = VOID_STM
+				| function_call_header_with_parameters;
 
 //			function_call_header_with_parameters.Rule = function_call_header + assignment_expression
 //				| function_call_header_with_parameters + COMMA + assignment_expression;
-			function_call_header_with_parameters.Rule = function_call_header + assignment_expression
-				| MakePlusRule(function_call_header_with_parameters, COMMA, assignment_expression);
+			function_call_header_with_parameters.Rule = MakeStarRule(function_call_header_with_parameters, COMMA, assignment_expression);
 
 			function_call_header.Rule = function_identifier + LEFT_PAREN;
 
 			function_identifier.Rule = type_specifier
 				| postfix_expression;
 
-			function_call_header_no_parameters.Rule = function_call_header + VOID_STM
-				| function_call_header;
+//			function_call_header_no_parameters.Rule = function_call_header + VOID_STM
+//				| function_call_header;
 
 			PrimaryExpression.Rule = variable_identifier
 				| INTCONSTANT
@@ -723,7 +729,7 @@ namespace GLSLSyntaxAST
 
 			TypeQualifier.Rule = MakePlusRule(TypeQualifier, single_type_qualifier);
 
-			single_type_qualifier.Rule = storage_qualifier
+			single_type_qualifier.Rule = StorageQualifier
 					| LayoutQualifier
 					| precision_qualifier
 					| interpolation_qualifier
@@ -741,10 +747,10 @@ namespace GLSLSyntaxAST
 					| IDENTIFIER + EQUAL  + ConstantExpression
 					| SHARED;
 
-			storage_qualifier.Rule = CONST_STM 
+			StorageQualifier.Rule = CONST_STM 
 				| ATTRIBUTE 
 				| VARYING 
-				| INOUT 
+				| InOutTerm 
 				| InTerm
 				| OutTerm
 				| CENTROID
@@ -951,7 +957,7 @@ namespace GLSLSyntaxAST
 				additive_expression,
 				multiplicative_expression,
 				unary_expression,
-//				postfix_expression,
+				postfix_expression,
 				unary_operator,
 //				assignment_operator,
 //				selection_statement,
@@ -973,7 +979,7 @@ namespace GLSLSyntaxAST
 				single_type_qualifier,
 				type_specifier_nonarray,
 //				//type_qualifier,
-//				//array_specifier,
+				//array_specifier,
 //				constant_expression,
 //				struct_specifier,
 //				struct_declaration_list, 
@@ -981,7 +987,7 @@ namespace GLSLSyntaxAST
 				struct_declarator_list,
 //				struct_declarator, 
 //				jump_statement, 
-//				init_declarator_list, 
+				init_declarator_list, 
 //				precision_qualifier, 
 //				block_structure, 
 //				single_declaration, 
@@ -994,7 +1000,7 @@ namespace GLSLSyntaxAST
 				PrimaryExpression,
 //				integer_expression,
 ////				function_call,
-////				function_call_generic,
+				function_call_generic,
 //				function_call_header_with_parameters,
 //				function_call_header_no_parameters
 ////				function_call_header,
@@ -1002,15 +1008,21 @@ namespace GLSLSyntaxAST
 //				//variable_identifier,
 //				boolconstant,
 //				type_name_list,
-				storage_qualifier,
+//				storage_qualifier,
 //				layout_qualifier_id,
 //				invariant_qualifier
 //				array_empty_bracket
-				constant_inside_bracket,
+//				constant_inside_bracket,
 				//floating_number_value,
+				function_call_or_method,
 				DOT
 			);
 
+		}
+
+		public NonTerminal StorageQualifier {
+			get;
+			set;
 		}
 
 		NonTerminal PrimaryExpression {
@@ -1028,6 +1040,11 @@ namespace GLSLSyntaxAST
 			private set;
 		}
 
+		public KeyTerm UNIFORM {
+			get;
+			private set;
+		}
+
 		public NumberLiteral REMAINDER {
 			get;
 			private set;
@@ -1038,6 +1055,9 @@ namespace GLSLSyntaxAST
 			set;
 		}
 
+		public NonTerminal BlockStructure { get; private set; }
+
+		public KeyTerm InOutTerm { get; private set;}
 		public KeyTerm InTerm {	get; private set; }
 		public KeyTerm OutTerm { get; private set; }
 		public NonTerminal SingleDeclaration { get; private set; }
