@@ -22,64 +22,89 @@ namespace GLSLSyntaxAST.CommandLine
 			return new Standalone (infoSink, intermediate, symbols);
 		}
 
+		static void PrintHelp ()
+		{
+			Console.WriteLine ("Invalid arguments");
+			Console.WriteLine ("[optional arguments] -F {1} {n}... ");
+			Console.WriteLine (" -F = any argument after this switch will be processed as a shader file");
+			Console.WriteLine (" {1} => glsl shader file 1");
+			Console.WriteLine (" {n} => glsl shader file n");
+			Console.WriteLine ("==================================");
+			Console.WriteLine (" [optional arguments]");
+			Console.WriteLine (" Must appear before -F switch");
+			Console.WriteLine (" -c {file} => will generate C# source code");
+			Console.WriteLine (" i.e. -c Sample.c => Sample.c contain generated classes");
+			Console.WriteLine (" -a {file} => will generate C# assembly ");
+			Console.WriteLine (" i.e. -a Program.dll => Program.dll contain generated classes");
+			Console.WriteLine (" -ns {file} => namespace for the classes ");
+		}
+
 		public static int Main (string[] args)
 		{
+			int returnCode = 0;
+
+			try
+			{
+				var parser = new ArgumentParser ();
+				parser.Parse(args);
+			}
+			catch(Exception ex)
+			{
+				Console.WriteLine (ex.Message);
+				PrintHelp ();
+				returnCode = 1;
+			}
+
+			return returnCode;
+
 //			try
 //			{
-				if (args.Length < 2)
+
+
+			foreach(var arg in args)
+			{
+				Console.WriteLine(arg);
+			}
+
+			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
+			lookup.Initialize ();
+			var extractor = new GLSLUniformExtractor (lookup);
+			extractor.Initialize ();
+
+			var debug = new InfoSinkBase (SinkType.StdOut);
+			var info = new InfoSinkBase (SinkType.StdOut);
+			var infoSink = new InfoSink (info, debug);
+			var preprocessor = InitialisePreprocessor (infoSink);
+
+			for (int i = 1; i < args.Length; ++i)
+			{
+				var fileName = args[i];
+				using (var fs = File.Open(fileName, FileMode.Open))
 				{
-					Console.WriteLine("Invalid arguments");
-					Console.WriteLine("{0} {1} {n}... ");
-					Console.WriteLine("{0} = output file");
-					Console.WriteLine("{1} = glsl shader file 1");
-					Console.WriteLine("{n} = glsl shader file n");
-					return 1;
+					var stage = Standalone.FindLanguage(fileName);
+					string result;
+					preprocessor.Run(fs, stage, out result);
+
+					int actual = extractor.Extract (result);
+					Console.WriteLine("{0} - no of blocks extracted : {1}", fileName, actual);
 				}
+			}
 
-				foreach(var arg in args)
-				{
-					Console.WriteLine(arg);
-				}
+			GLSLAssembly output = new GLSLAssembly ();
+			output.OutputAssembly = System.IO.Path.GetFileName(args[0]);
+			output.Version = "1.0.0.1";
+			output.Namespace = "";
+			output.Path = System.IO.Path.GetPathRoot(args[0]);
+			output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
 
-				IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
-				lookup.Initialize ();
-				var extractor = new GLSLUniformExtractor (lookup);
-				extractor.Initialize ();
-
-				var debug = new InfoSinkBase (SinkType.StdOut);
-				var info = new InfoSinkBase (SinkType.StdOut);
-				var infoSink = new InfoSink (info, debug);
-				var preprocessor = InitialisePreprocessor (infoSink);
-
-				for (int i = 1; i < args.Length; ++i)
-				{
-					var fileName = args[i];
-					using (var fs = File.Open(fileName, FileMode.Open))
-					{
-						var stage = Standalone.FindLanguage(fileName);
-						string result;
-						preprocessor.Run(fs, stage, out result);
-
-						int actual = extractor.Extract (result);
-						Console.WriteLine("{0} - no of blocks extracted : {1}", fileName, actual);
-					}
-				}
-
-				GLSLAssembly output = new GLSLAssembly ();
-				output.OutputAssembly = System.IO.Path.GetFileName(args[0]);
-				output.Version = "1.0.0.1";
-				output.Namespace = "";
-				output.Path = System.IO.Path.GetPathRoot(args[0]);
-				output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
-
-				IGLSLStructGenerator generator = new GLSLStructGenerator(extractor);
-				using (var provider = new CSharpCodeProvider ())
-				{
-					//generator.SaveAsAssembly (provider, output);
-					var options = new CodeGeneratorOptions();
-					options.BlankLinesBetweenMembers = true;
-					generator.SaveAsCode(provider, output, extractor, options);
-				}
+			IGLSLStructGenerator generator = new GLSLStructGenerator(extractor);
+			using (var provider = new CSharpCodeProvider ())
+			{
+				//generator.SaveAsAssembly (provider, output);
+				var options = new CodeGeneratorOptions();
+				options.BlankLinesBetweenMembers = true;
+				generator.SaveAsCode(provider, output, extractor, options);
+			}
 
 				return 0;
 //			}

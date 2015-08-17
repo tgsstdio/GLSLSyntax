@@ -73,6 +73,10 @@
     <Compile Include="GLSLStructGenerator\CodeDomVersionString.cs" />
     <Compile Include="GLSLStructGenerator\CodeDomUniformBlockArray.cs" />
     <Compile Include="GLSLStructGenerator\CodeDomCaseInsensitive.cs" />
+    <Compile Include="ArgumentParser\ArgParserFileSwitchNotSuppliedTests.cs" />
+    <Compile Include="ArgumentParser\ArgParserMissingValueTests.cs" />
+    <Compile Include="ArgumentParser\ArgParserDefaultValueTests.cs" />
+    <Compile Include="ArgumentParser\ArgParserValidArguments.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -103,5 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GLSLStructGenerator\" />
+    <Folder Include="ArgumentParser\" />
   </ItemGroup>
 </Project>

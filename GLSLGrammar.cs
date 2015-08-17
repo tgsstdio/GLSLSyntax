@@ -467,7 +467,7 @@ namespace GLSLSyntaxAST
 			this.Root = translation_unit;
 
 			//translation_unit.Rule = external_declaration | translation_unit + external_declaration;
-			translation_unit.Rule = MakeStarRule(translation_unit, external_declaration);
+			translation_unit.Rule = Eof | MakeStarRule(translation_unit, external_declaration);
 
 			external_declaration.Rule =  function_definition | Declaration;
 
@@ -550,7 +550,7 @@ namespace GLSLSyntaxAST
 
 			expression_statement.Rule = SEMICOLON | expression + SEMICOLON;
 
-			expression.Rule = assignment_expression | expression  + COMMA + assignment_expression;
+			expression.Rule = assignment_expression |  expression  + COMMA + assignment_expression;
 			//expression.Rule = MakePlusRule(expression, COMMA, assignment_expression);
 
 			assignment_expression.Rule = conditional_expression	| unary_expression  + assignment_operator + assignment_expression;

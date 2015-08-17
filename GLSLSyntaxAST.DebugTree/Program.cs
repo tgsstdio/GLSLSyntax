@@ -9,9 +9,9 @@ namespace GLSLSyntaxAST.DebugTree
 	{
 		public static void Main (string[] args)
 		{
-			//var compiler = new Parser (new GLSLGrammar());
-
-			//Debug.WriteLine(ParserDataPrinter.PrintStateList(compiler.Language));
+//			var compiler = new Parser (new GLSLGrammar());
+//
+//			Debug.WriteLine(ParserDataPrinter.PrintStateList(compiler.Language));
 
 			var lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();			
@@ -21,7 +21,7 @@ namespace GLSLSyntaxAST.DebugTree
 				@"
 layout(binding = 1, std430) buffer LinkedList
 {
-	int nodes[];
+	Node nodes[];
 };
 "
 			);
