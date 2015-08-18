@@ -4,25 +4,25 @@ using GLSLSyntaxAST.CodeDom;
 
 namespace GLSLSyntaxAST.UnitTests
 {
-	[TestFixture ()]
-	public class CodeDomFuncVoidParam
+	[TestFixture]
+	public class CodeDomFuncNoParams
 	{
-		const string FUNC_VOID_PARAM = "void main() { float value = sin(void); }";
+		const string FUNC_NO_PARAM = "void main() { float value = sin(); }";
 
-		[Test ()]
-		public void ExtractFuncVoidParam ()
+		[TestCase]
+		public void ExtractFuncNoParams ()
 		{
-			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
+			var lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();
-			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
+			var test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
-			int actual = test.Extract (FUNC_VOID_PARAM);
+			int actual = test.Extract (FUNC_NO_PARAM);			
 		}
 
-		[Test ()]
-		public void ExpressFuncVoidParam ()
+		[TestCase]
+		public void  ExpressFuncNoParams ()
 		{
-			const string expected 	= "translation_unit\n"
+			const string expected = "translation_unit\n" 
 				+ " external_declaration\n"
 				+ "  function_definition\n"
 				+ "   function_prototype\n"
@@ -45,13 +45,15 @@ namespace GLSLSyntaxAST.UnitTests
 				+ "          initializer\n"
 				+ "           assignment_expression\n"
 				+ "            function_call\n"
-				+ "             VOID\n";
-			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
+				+ "             function_call_header_with_parameters\n";
+
+			var lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();
-			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
+			var test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
-			var actual = test.ExpressTree (FUNC_VOID_PARAM);
-			Assert.AreEqual (expected, actual);
+			var actual = test.ExpressTree (FUNC_NO_PARAM);
+			Assert.AreEqual (expected, actual);			
 		}
 	}
 }
+

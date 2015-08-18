@@ -47,8 +47,8 @@ namespace GLSLSyntaxAST.UnitTests
 				+ "    function_declarator\n"
 				+ "     function_header\n"
 				+ "      fully_specified_type\n"
-				+ "       void (Keyword)\n"
-				+ "      MAIN (IDENTIFIER)\n"
+				+ "       VOID\n"
+				+ "      IDENTIFIER\n"
 				+ "   compound_statement_no_new_scope\n"
 				+ "    statement_list\n"
 				+ "     statement\n"
@@ -57,15 +57,15 @@ namespace GLSLSyntaxAST.UnitTests
 				+ "        declaration\n"
 				+ "         single_declaration\n"
 				+ "          fully_specified_type\n"
-				+ "           FLOAT (Keyword)\n"
-				+ "          IN_POSITION (IDENTIFIER)\n"
-				+ "          = (Key symbol)\n"
+				+ "           FLOAT\n"
+				+ "          IDENTIFIER\n"
+				+ "          EQUAL\n"
 				+ "          initializer\n"
 				+ "           assignment_expression\n"
 				+ "            floating_number_value\n"
-				+ "             1 (INTCONSTANT)\n"
-				+ "             . (Key symbol)\n"
-				+ "             0 (REMAINDER)\n";
+				+ "             INTCONSTANT\n"
+				+ "             .\n"
+				+ "             REMAINDER\n";
 
 			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();
@@ -85,8 +85,8 @@ namespace GLSLSyntaxAST.UnitTests
 				+ "    function_declarator\n"
 				+ "     function_header\n"
 				+ "      fully_specified_type\n"
-				+ "       void (Keyword)\n"
-				+ "      main (IDENTIFIER)\n"
+				+ "       VOID\n"
+				+ "      IDENTIFIER\n"
 				+ "   compound_statement_no_new_scope\n"
 				+ "    statement_list\n"
 				+ "     statement\n"
@@ -95,15 +95,15 @@ namespace GLSLSyntaxAST.UnitTests
 				+ "        declaration\n"
 				+ "         single_declaration\n"
 				+ "          fully_specified_type\n"
-				+ "           float (Keyword)\n"
-				+ "          in_position (IDENTIFIER)\n"
-				+ "          = (Key symbol)\n"
+				+ "           FLOAT\n"
+				+ "          IDENTIFIER\n"
+				+ "          EQUAL\n"
 				+ "          initializer\n"
 				+ "           assignment_expression\n"
 				+ "            floating_number_value\n"
-				+ "             1 (INTCONSTANT)\n"
-				+ "             . (Key symbol)\n"
-				+ "             0 (REMAINDER)\n";
+				+ "             INTCONSTANT\n"
+				+ "             .\n"
+				+ "             REMAINDER\n";
 
 			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();

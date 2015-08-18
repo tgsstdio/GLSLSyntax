@@ -195,129 +195,129 @@ namespace GLSLSyntaxAST
 
 			TypesTerms = new HashSet<KeyTerm> (
 				new []{
-				VOID_STM
-				,FLOAT_TKN
-				,DOUBLE_TKN
-				,INT_TKN
-				,UINT_TKN
-				,BOOL_TKN
-				,VEC2
-				,VEC3
-				,VEC4
-				,DVEC2
-				,DVEC3
-				,DVEC4
-				,BVEC2
-				,BVEC3
-				,BVEC4
-				,IVEC2
-				,IVEC3
-				,IVEC4
-				,UVEC2
-				,UVEC3
-				,UVEC4
-				,MAT2
-				,MAT3
-				,MAT4
-				,MAT2X2
-				,MAT2X3
-				,MAT2X4
-				,MAT3X2
-				,MAT3X3
-				,MAT3X4
-				,MAT4X2
-				,MAT4X3
-				,MAT4X4
-				,DMAT2
-				,DMAT3
-				,DMAT4
-				,DMAT2X2
-				,DMAT2X3
-				,DMAT2X4
-				,DMAT3X2
-				,DMAT3X3
-				,DMAT3X4
-				,DMAT4X2
-				,DMAT4X3
-				,DMAT4X4
-				,ATOMIC_UINT
-				,SAMPLER1D
-				,SAMPLER2D
-				,SAMPLER3D
-				,SAMPLERCUBE
-				,SAMPLER1DSHADOW
-				,SAMPLER2DSHADOW
-				,SAMPLERCUBESHADOW
-				,SAMPLER1DARRAY
-				,SAMPLER2DARRAY
-				,SAMPLER1DARRAYSHADOW
-				,SAMPLER2DARRAYSHADOW
-				,SAMPLERCUBEARRAY
-				,SAMPLERCUBEARRAYSHADOW
-				,ISAMPLER1D
-				,ISAMPLER2D
-				,ISAMPLER3D
-				,ISAMPLERCUBE
-				,ISAMPLER1DARRAY
-				,ISAMPLER2DARRAY
-				,ISAMPLERCUBEARRAY
-				,USAMPLER1D
-				,USAMPLER2D
-				,USAMPLER3D
-				,USAMPLERCUBE
-				,USAMPLER1DARRAY
-				,USAMPLER2DARRAY
-				,USAMPLERCUBEARRAY
-				,SAMPLER2DRECT
-				,SAMPLER2DRECTSHADOW
-				,ISAMPLER2DRECT
-				,USAMPLER2DRECT
-				,SAMPLERBUFFER
-				,ISAMPLERBUFFER
-				,USAMPLERBUFFER
-				,SAMPLER2DMS
-				,ISAMPLER2DMS
-				,USAMPLER2DMS
-				,SAMPLER2DMSARRAY
-				,ISAMPLER2DMSARRAY
-				,USAMPLER2DMSARRAY
-				,IMAGE1D
-				,IIMAGE1D
-				,UIMAGE1D
-				,IMAGE2D
-				,IIMAGE2D
-				,UIMAGE2D
-				,IMAGE3D
-				,IIMAGE3D
-				,UIMAGE3D
-				,IMAGE2DRECT
-				,IIMAGE2DRECT
-				,UIMAGE2DRECT
-				,IMAGECUBE
-				,IIMAGECUBE
-				,UIMAGECUBE
-				,IMAGEBUFFER
-				,IIMAGEBUFFER
-				,UIMAGEBUFFER
-				,IMAGE1DARRAY
-				,IIMAGE1DARRAY
-				,UIMAGE1DARRAY
-				,IMAGE2DARRAY
-				,IIMAGE2DARRAY
-				,UIMAGE2DARRAY
-				,IMAGECUBEARRAY
-				,IIMAGECUBEARRAY
-				,UIMAGECUBEARRAY
-				,IMAGE2DMS
-				,IIMAGE2DMS
-				,UIMAGE2DMS
-				,IMAGE2DMSARRAY
-				,IIMAGE2DMSARRAY
-				,UIMAGE2DMSARRAY
-				,SAMPLEREXTERNALOES
+					VOID_STM
+					,FLOAT_TKN
+					,DOUBLE_TKN
+					,INT_TKN
+					,UINT_TKN
+					,BOOL_TKN
+					,VEC2
+					,VEC3
+					,VEC4
+					,DVEC2
+					,DVEC3
+					,DVEC4
+					,BVEC2
+					,BVEC3
+					,BVEC4
+					,IVEC2
+					,IVEC3
+					,IVEC4
+					,UVEC2
+					,UVEC3
+					,UVEC4
+					,MAT2
+					,MAT3
+					,MAT4
+					,MAT2X2
+					,MAT2X3
+					,MAT2X4
+					,MAT3X2
+					,MAT3X3
+					,MAT3X4
+					,MAT4X2
+					,MAT4X3
+					,MAT4X4
+					,DMAT2
+					,DMAT3
+					,DMAT4
+					,DMAT2X2
+					,DMAT2X3
+					,DMAT2X4
+					,DMAT3X2
+					,DMAT3X3
+					,DMAT3X4
+					,DMAT4X2
+					,DMAT4X3
+					,DMAT4X4
+					,ATOMIC_UINT
+					,SAMPLER1D
+					,SAMPLER2D
+					,SAMPLER3D
+					,SAMPLERCUBE
+					,SAMPLER1DSHADOW
+					,SAMPLER2DSHADOW
+					,SAMPLERCUBESHADOW
+					,SAMPLER1DARRAY
+					,SAMPLER2DARRAY
+					,SAMPLER1DARRAYSHADOW
+					,SAMPLER2DARRAYSHADOW
+					,SAMPLERCUBEARRAY
+					,SAMPLERCUBEARRAYSHADOW
+					,ISAMPLER1D
+					,ISAMPLER2D
+					,ISAMPLER3D
+					,ISAMPLERCUBE
+					,ISAMPLER1DARRAY
+					,ISAMPLER2DARRAY
+					,ISAMPLERCUBEARRAY
+					,USAMPLER1D
+					,USAMPLER2D
+					,USAMPLER3D
+					,USAMPLERCUBE
+					,USAMPLER1DARRAY
+					,USAMPLER2DARRAY
+					,USAMPLERCUBEARRAY
+					,SAMPLER2DRECT
+					,SAMPLER2DRECTSHADOW
+					,ISAMPLER2DRECT
+					,USAMPLER2DRECT
+					,SAMPLERBUFFER
+					,ISAMPLERBUFFER
+					,USAMPLERBUFFER
+					,SAMPLER2DMS
+					,ISAMPLER2DMS
+					,USAMPLER2DMS
+					,SAMPLER2DMSARRAY
+					,ISAMPLER2DMSARRAY
+					,USAMPLER2DMSARRAY
+					,IMAGE1D
+					,IIMAGE1D
+					,UIMAGE1D
+					,IMAGE2D
+					,IIMAGE2D
+					,UIMAGE2D
+					,IMAGE3D
+					,IIMAGE3D
+					,UIMAGE3D
+					,IMAGE2DRECT
+					,IIMAGE2DRECT
+					,UIMAGE2DRECT
+					,IMAGECUBE
+					,IIMAGECUBE
+					,UIMAGECUBE
+					,IMAGEBUFFER
+					,IIMAGEBUFFER
+					,UIMAGEBUFFER
+					,IMAGE1DARRAY
+					,IIMAGE1DARRAY
+					,UIMAGE1DARRAY
+					,IMAGE2DARRAY
+					,IIMAGE2DARRAY
+					,UIMAGE2DARRAY
+					,IMAGECUBEARRAY
+					,IIMAGECUBEARRAY
+					,UIMAGECUBEARRAY
+					,IMAGE2DMS
+					,IIMAGE2DMS
+					,UIMAGE2DMS
+					,IMAGE2DMSARRAY
+					,IIMAGE2DMSARRAY
+					,UIMAGE2DMSARRAY
+					,SAMPLEREXTERNALOES
 				});
 
-			var TYPE_NAME = TerminalFactory.CreateCSharpNumber ("TYPE_NAME");
+			var TYPE_NAME = TerminalFactory.CreateCSharpIdentifier ("TYPE_NAME");
 			TYPE_NAME.Precedence = 1;
 			string LEFT_BRACKET = "[";
 			string RIGHT_BRACKET = "]";
@@ -444,9 +444,7 @@ namespace GLSLSyntaxAST
 			var function_call = new NonTerminal ("function_call"); // CHECKED 
 			var function_call_or_method = new NonTerminal ("function_call_or_method"); // CHECKED 
 			var function_call_generic = new NonTerminal ("function_call_generic"); // CHECKED 
-			var function_call_header_no_parameters = new NonTerminal ("function_call_header_no_parameters"); // CHECKED
 			var function_call_header_with_parameters = new NonTerminal ("function_call_header_with_parameters"); // CHECKED 
-			var function_call_header = new NonTerminal ("function_call_header"); // CHECKED 
 			var function_identifier = new NonTerminal ("function_identifier"); // CHECKED 
 			var variable_identifier = new NonTerminal ("variable_identifier"); // CHECKED 
 			var boolconstant = new NonTerminal ("boolconstant"); // CHECKED
@@ -462,6 +460,9 @@ namespace GLSLSyntaxAST
 			var array_empty_bracket = new NonTerminal ("array_empty_bracket");
 			var constant_inside_bracket = new NonTerminal ("constant_inside_bracket");
 			var floating_number_value = new NonTerminal ("floating_number_value");
+			var buffer_or_struct = new NonTerminal ("buffer_or_struct");
+
+			var function_call_parameter = new NonTerminal ("function_call_parameter");
 
 			// Place Rules Here
 			this.Root = translation_unit;
@@ -484,11 +485,11 @@ namespace GLSLSyntaxAST
 			identifier_list.Rule = COMMA + IDENTIFIER
 				| identifier_list + COMMA + IDENTIFIER;
 
-//			identifier_list.Rule = MakePlusRule (identifier_list, COMMA, IDENTIFIER);
+			//			identifier_list.Rule = MakePlusRule (identifier_list, COMMA, IDENTIFIER);
 
 			precision_qualifier.Rule = HIGH_PRECISION 
-							| MEDIUM_PRECISION 
-							| LOW_PRECISION;
+				| MEDIUM_PRECISION 
+				| LOW_PRECISION;
 
 			BlockStructure.Rule = TypeQualifier + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
 
@@ -516,7 +517,7 @@ namespace GLSLSyntaxAST
 			function_header_with_parameters.Rule = function_header + parameter_declaration
 				| function_header_with_parameters + COMMA + parameter_declaration;
 
-//			function_header_with_parameters.Rule = MakePlusRule (function_header_with_parameters, COMMA, parameter_declaration);
+			//		function_header_with_parameters.Rule = MakePlusRule (function_header_with_parameters, COMMA, parameter_declaration);
 
 			parameter_declaration.Rule = TypeQualifier + parameter_declarator 	
 				| parameter_declarator
@@ -531,20 +532,20 @@ namespace GLSLSyntaxAST
 			compound_statement_no_new_scope.Rule = LEFT_BRACE + RIGHT_BRACE | LEFT_BRACE + statement_list + RIGHT_BRACE;
 
 			statement_list.Rule = MakeStarRule (statement_list, statement);
-//				statement | statement_list + statement;
-//			statement_list.Rule = MakePlusRule(statement_list, statement);
+			//				statement | statement_list + statement;
+			//			statement_list.Rule = MakePlusRule(statement_list, statement);
 
 			statement.Rule = compound_statement | simple_statement;
 
 			compound_statement.Rule = LEFT_BRACE + RIGHT_BRACE | LEFT_BRACE + statement_list + RIGHT_BRACE;
 
 			simple_statement.Rule = declaration_statement
-										| expression_statement
-										| selection_statement
-										| switch_statement
-										| case_label
-										| iteration_statement
-										| jump_statement;
+				| expression_statement
+				| selection_statement
+				| switch_statement
+				| case_label
+				| iteration_statement
+				| jump_statement;
 
 			declaration_statement.Rule = Declaration;
 
@@ -571,8 +572,8 @@ namespace GLSLSyntaxAST
 			//and_expression = MakePlusRule(and_expression, AMPERSAND, equality_expression);
 
 			equality_expression.Rule = relational_expression
-						| equality_expression + EQ_OP + relational_expression
-						| equality_expression + NE_OP + relational_expression;
+				| equality_expression + EQ_OP + relational_expression
+				| equality_expression + NE_OP + relational_expression;
 
 			relational_expression.Rule = shift_expression 
 				| relational_expression + LEFT_ANGLE + shift_expression 
@@ -581,16 +582,16 @@ namespace GLSLSyntaxAST
 				| relational_expression + GE_OP + shift_expression;
 
 			shift_expression.Rule =  additive_expression 
-					| shift_expression + LEFT_OP + additive_expression 
-						| shift_expression + RIGHT_OP + additive_expression;
+				| shift_expression + LEFT_OP + additive_expression 
+				| shift_expression + RIGHT_OP + additive_expression;
 
-		//	shift_expression.Rule = additive_expression
-		//		| MakePlusRule (shift_expression, LEFT_OP, additive_expression)
-	//			| MakePlusRule (shift_expression, RIGHT_OP, additive_expression);
+			//	shift_expression.Rule = additive_expression
+			//		| MakePlusRule (shift_expression, LEFT_OP, additive_expression)
+			//			| MakePlusRule (shift_expression, RIGHT_OP, additive_expression);
 
 			additive_expression.Rule = multiplicative_expression 
-						| additive_expression + PLUS + multiplicative_expression 
-						| additive_expression + DASH  + multiplicative_expression;
+				| additive_expression + PLUS + multiplicative_expression 
+				| additive_expression + DASH  + multiplicative_expression;
 
 			multiplicative_expression.Rule = unary_expression
 				| multiplicative_expression + STAR + unary_expression
@@ -598,7 +599,7 @@ namespace GLSLSyntaxAST
 				| multiplicative_expression + PERCENT + unary_expression;
 
 			unary_expression.Rule = 
-				 floating_number_value
+				floating_number_value
 				| postfix_expression				
 				| INC_OP + unary_expression
 				| DEC_OP + unary_expression
@@ -624,17 +625,19 @@ namespace GLSLSyntaxAST
 			function_call_generic.Rule = VOID_STM
 				| function_call_header_with_parameters;
 
-//			function_call_header_with_parameters.Rule = function_call_header + assignment_expression
-//				| function_call_header_with_parameters + COMMA + assignment_expression;
-			function_call_header_with_parameters.Rule = MakeStarRule(function_call_header_with_parameters, COMMA, assignment_expression);
+			//			function_call_header_with_parameters.Rule = function_call_header + assignment_expression
+			//				| function_call_header_with_parameters + COMMA + assignment_expression;
+			function_call_header_with_parameters.Rule = MakeStarRule(function_call_header_with_parameters, COMMA, function_call_parameter);
 
-			function_call_header.Rule = function_identifier + LEFT_PAREN;
+			function_call_parameter.Rule = IDENTIFIER | assignment_expression;
+
+			//function_call_header.Rule = function_identifier + LEFT_PAREN;
 
 			function_identifier.Rule = type_specifier
 				| postfix_expression;
 
-//			function_call_header_no_parameters.Rule = function_call_header + VOID_STM
-//				| function_call_header;
+			//			function_call_header_no_parameters.Rule = function_call_header + VOID_STM
+			//				| function_call_header;
 
 			PrimaryExpression.Rule = variable_identifier
 				| INTCONSTANT
@@ -649,26 +652,26 @@ namespace GLSLSyntaxAST
 			variable_identifier.Rule = IDENTIFIER;
 
 			unary_operator.Rule = PLUS
-					| DASH
-					| BANG
-					| TILDE;
+				| DASH
+				| BANG
+				| TILDE;
 
 			assignment_operator.Rule = EQUAL
-					| MUL_ASSIGN 
-					| DIV_ASSIGN
-					| MOD_ASSIGN 
-					| ADD_ASSIGN 
-					| SUB_ASSIGN 
-					| LEFT_ASSIGN 
-					| RIGHT_ASSIGN 
-					| AND_ASSIGN 
-					| XOR_ASSIGN 
-					| OR_ASSIGN;
+				| MUL_ASSIGN 
+				| DIV_ASSIGN
+				| MOD_ASSIGN 
+				| ADD_ASSIGN 
+				| SUB_ASSIGN 
+				| LEFT_ASSIGN 
+				| RIGHT_ASSIGN 
+				| AND_ASSIGN 
+				| XOR_ASSIGN 
+				| OR_ASSIGN;
 
 			selection_statement.Rule = IF_STM + LEFT_PAREN + expression + RIGHT_PAREN  + selection_rest_statement;
 
 			selection_rest_statement.Rule = statement_scoped + ELSE + statement_scoped	
-						| statement_scoped;
+				| statement_scoped;
 
 			statement_scoped.Rule =  compound_statement	| simple_statement;
 
@@ -684,19 +687,19 @@ namespace GLSLSyntaxAST
 				| FOR_STM +  LEFT_PAREN + for_init_statement + for_rest_statement + RIGHT_PAREN + statement_no_new_scope;
 
 			condition.Rule = expression 
-					| FullySpecifiedType + IDENTIFIER + EQUAL + initializer;
+				| FullySpecifiedType + IDENTIFIER + EQUAL + initializer;
 
 			statement_no_new_scope.Rule = compound_statement_no_new_scope
-						| simple_statement;
+				| simple_statement;
 
 			for_init_statement.Rule = expression_statement
 				| declaration_statement;
 
 			for_rest_statement.Rule = conditionopt  + SEMICOLON
-					| conditionopt + SEMICOLON + expression;
+				| conditionopt + SEMICOLON + expression;
 
 			conditionopt.Rule = condition 
-					| Empty;
+				| Empty;
 
 			initializer.Rule = assignment_expression 
 				| LEFT_BRACE + initializer_list + RIGHT_BRACE
@@ -711,13 +714,13 @@ namespace GLSLSyntaxAST
 			type_specifier.Rule = type_specifier_nonarray
 				| type_specifier_nonarray + ArraySpecifier;
 
-//			array_specifier.Rule = LEFT_BRACKET + RIGHT_BRACKET
-//				| LEFT_BRACKET + constant_expression + RIGHT_BRACKET
-//				| array_specifier + LEFT_BRACKET + RIGHT_BRACKET
-//				| array_specifier + LEFT_BRACKET + constant_expression + RIGHT_BRACKET;
+			//			array_specifier.Rule = LEFT_BRACKET + RIGHT_BRACKET
+			//				| LEFT_BRACKET + constant_expression + RIGHT_BRACKET
+			//				| array_specifier + LEFT_BRACKET + RIGHT_BRACKET
+			//				| array_specifier + LEFT_BRACKET + constant_expression + RIGHT_BRACKET;
 
 			ArraySpecifier.Rule = 
-				  MakePlusRule (ArraySpecifier, array_empty_bracket)
+				MakePlusRule (ArraySpecifier, array_empty_bracket)
 				| MakePlusRule (ArraySpecifier, constant_inside_bracket);
 
 			// two additional rules
@@ -726,28 +729,28 @@ namespace GLSLSyntaxAST
 
 			ConstantExpression.Rule = conditional_expression;
 
-//			type_qualifier.Rule = single_type_qualifier
-//				| type_qualifier + single_type_qualifier;
+			//			type_qualifier.Rule = single_type_qualifier
+			//				| type_qualifier + single_type_qualifier;
 
 			TypeQualifier.Rule = MakePlusRule(TypeQualifier, single_type_qualifier);
 
 			single_type_qualifier.Rule = StorageQualifier
-					| LayoutQualifier
-					| precision_qualifier
-					| interpolation_qualifier
-					| invariant_qualifier
-					| precise_qualifier;
+				| LayoutQualifier
+				| precision_qualifier
+				| interpolation_qualifier
+				| invariant_qualifier
+				| precise_qualifier;
 
 			LayoutQualifier.Rule = LAYOUT + LEFT_PAREN + LayoutQualifierIdList + RIGHT_PAREN;
 
-//			layout_qualifier_id_list.Rule =  layout_qualifier_id
-//				| layout_qualifier_id_list + COMMA + layout_qualifier_id;
+			//			layout_qualifier_id_list.Rule =  layout_qualifier_id
+			//				| layout_qualifier_id_list + COMMA + layout_qualifier_id;
 
 			LayoutQualifierIdList.Rule = MakePlusRule (LayoutQualifierIdList, COMMA, LayoutQualifierId);
 
 			LayoutQualifierId.Rule = IDENTIFIER 
-					| IDENTIFIER + EQUAL  + ConstantExpression
-					| SHARED;
+				| IDENTIFIER + EQUAL  + ConstantExpression
+				| SHARED;
 
 			StorageQualifier.Rule = CONST_STM 
 				| ATTRIBUTE 
@@ -759,7 +762,6 @@ namespace GLSLSyntaxAST
 				| PATCH
 				| SAMPLE
 				| UNIFORM
-				| BUFFER
 				| SHARED
 				| COHERENT
 				| VOLATILE
@@ -779,142 +781,144 @@ namespace GLSLSyntaxAST
 
 			type_name_list.Rule = MakePlusRule (type_name_list, COMMA, TYPE_NAME);
 
-			type_specifier_nonarray.Rule = VOID_STM 
-				| FLOAT_TKN 
-				| DOUBLE_TKN 
-				| INT_TKN 
-				| UINT_TKN 
-				| BOOL_TKN 
-				| VEC2 
-				| VEC3 
-				| VEC4 
-				| DVEC2 
-				| DVEC3 
-				| DVEC4 
-				| BVEC2 
-				| BVEC3 
-				| BVEC4
-				| IVEC2
-				| IVEC3
-				| IVEC4
-				| UVEC2
-				| UVEC3
-				| UVEC4
-				| MAT2
-				| MAT3
-				| MAT4
-				| MAT2X2
-				| MAT2X3
-				| MAT2X4
-				| MAT3X2
-				| MAT3X3
-				| MAT3X4
-				| MAT4X2
-				| MAT4X3
-				| MAT4X4
-				| DMAT2
-				| DMAT3
-				| DMAT4
-				| DMAT2X2
-				| DMAT2X3
-				| DMAT2X4
-				| DMAT3X2
-				| DMAT3X3
-				| DMAT3X4
-				| DMAT4X2
-				| DMAT4X3
-				| DMAT4X4
-				| ATOMIC_UINT
-				| SAMPLER1D
-				| SAMPLER2D
-				| SAMPLER3D
-				| SAMPLERCUBE
-				| SAMPLER1DSHADOW
-				| SAMPLER2DSHADOW
-				| SAMPLERCUBESHADOW
-				| SAMPLER1DARRAY
-				| SAMPLER2DARRAY
-				| SAMPLER1DARRAYSHADOW
-				| SAMPLER2DARRAYSHADOW
-				| SAMPLERCUBEARRAY
-				| SAMPLERCUBEARRAYSHADOW
-				| ISAMPLER1D
-				| ISAMPLER2D
-				| ISAMPLER3D
-				| ISAMPLERCUBE
-				| ISAMPLER1DARRAY
-				| ISAMPLER2DARRAY
-				| ISAMPLERCUBEARRAY
-				| USAMPLER1D
-				| USAMPLER2D
-				| USAMPLER3D
-				| USAMPLERCUBE
-				| USAMPLER1DARRAY
-				| USAMPLER2DARRAY
-				| USAMPLERCUBEARRAY
-				| SAMPLER2DRECT
-				| SAMPLER2DRECTSHADOW
-				| ISAMPLER2DRECT
-				| USAMPLER2DRECT
-				| SAMPLERBUFFER
-				| ISAMPLERBUFFER
-				| USAMPLERBUFFER
-				| SAMPLER2DMS
-				| ISAMPLER2DMS
-				| USAMPLER2DMS
-				| SAMPLER2DMSARRAY
-				| ISAMPLER2DMSARRAY
-				| USAMPLER2DMSARRAY
-				| IMAGE1D
-				| IIMAGE1D
-				| UIMAGE1D
-				| IMAGE2D
-				| IIMAGE2D
-				| UIMAGE2D
-				| IMAGE3D
-				| IIMAGE3D
-				| UIMAGE3D
-				| IMAGE2DRECT
-				| IIMAGE2DRECT
-				| UIMAGE2DRECT
-				| IMAGECUBE
-				| IIMAGECUBE
-				| UIMAGECUBE
-				| IMAGEBUFFER
-				| IIMAGEBUFFER
-				| UIMAGEBUFFER
-				| IMAGE1DARRAY
-				| IIMAGE1DARRAY
-				| UIMAGE1DARRAY
-				| IMAGE2DARRAY
-				| IIMAGE2DARRAY
-				| UIMAGE2DARRAY
-				| IMAGECUBEARRAY
-				| IIMAGECUBEARRAY
-				| UIMAGECUBEARRAY
-				| IMAGE2DMS
-				| IIMAGE2DMS
-				| UIMAGE2DMS
-				| IMAGE2DMSARRAY
-				| IIMAGE2DMSARRAY
-				| UIMAGE2DMSARRAY
-				| SAMPLEREXTERNALOES
-				| StructSpecifier
-				| TYPE_NAME;
+			type_specifier_nonarray.Rule = VOID_STM
+			| FLOAT_TKN
+			| DOUBLE_TKN
+			| INT_TKN
+			| UINT_TKN
+			| BOOL_TKN
+			| VEC2
+			| VEC3
+			| VEC4
+			| DVEC2
+			| DVEC3
+			| DVEC4
+			| BVEC2
+			| BVEC3
+			| BVEC4
+			| IVEC2
+			| IVEC3
+			| IVEC4
+			| UVEC2
+			| UVEC3
+			| UVEC4
+			| MAT2
+			| MAT3
+			| MAT4
+			| MAT2X2
+			| MAT2X3
+			| MAT2X4
+			| MAT3X2
+			| MAT3X3
+			| MAT3X4
+			| MAT4X2
+			| MAT4X3
+			| MAT4X4
+			| DMAT2
+			| DMAT3
+			| DMAT4
+			| DMAT2X2
+			| DMAT2X3
+			| DMAT2X4
+			| DMAT3X2
+			| DMAT3X3
+			| DMAT3X4
+			| DMAT4X2
+			| DMAT4X3
+			| DMAT4X4
+			| ATOMIC_UINT
+			| SAMPLER1D
+			| SAMPLER2D
+			| SAMPLER3D
+			| SAMPLERCUBE
+			| SAMPLER1DSHADOW
+			| SAMPLER2DSHADOW
+			| SAMPLERCUBESHADOW
+			| SAMPLER1DARRAY
+			| SAMPLER2DARRAY
+			| SAMPLER1DARRAYSHADOW
+			| SAMPLER2DARRAYSHADOW
+			| SAMPLERCUBEARRAY
+			| SAMPLERCUBEARRAYSHADOW
+			| ISAMPLER1D
+			| ISAMPLER2D
+			| ISAMPLER3D
+			| ISAMPLERCUBE
+			| ISAMPLER1DARRAY
+			| ISAMPLER2DARRAY
+			| ISAMPLERCUBEARRAY
+			| USAMPLER1D
+			| USAMPLER2D
+			| USAMPLER3D
+			| USAMPLERCUBE
+			| USAMPLER1DARRAY
+			| USAMPLER2DARRAY
+			| USAMPLERCUBEARRAY
+			| SAMPLER2DRECT
+			| SAMPLER2DRECTSHADOW
+			| ISAMPLER2DRECT
+			| USAMPLER2DRECT
+			| SAMPLERBUFFER
+			| ISAMPLERBUFFER
+			| USAMPLERBUFFER
+			| SAMPLER2DMS
+			| ISAMPLER2DMS
+			| USAMPLER2DMS
+			| SAMPLER2DMSARRAY
+			| ISAMPLER2DMSARRAY
+			| USAMPLER2DMSARRAY
+			| IMAGE1D
+			| IIMAGE1D
+			| UIMAGE1D
+			| IMAGE2D
+			| IIMAGE2D
+			| UIMAGE2D
+			| IMAGE3D
+			| IIMAGE3D
+			| UIMAGE3D
+			| IMAGE2DRECT
+			| IIMAGE2DRECT
+			| UIMAGE2DRECT
+			| IMAGECUBE
+			| IIMAGECUBE
+			| UIMAGECUBE
+			| IMAGEBUFFER
+			| IIMAGEBUFFER
+			| UIMAGEBUFFER
+			| IMAGE1DARRAY
+			| IIMAGE1DARRAY
+			| UIMAGE1DARRAY
+			| IMAGE2DARRAY
+			| IIMAGE2DARRAY
+			| UIMAGE2DARRAY
+			| IMAGECUBEARRAY
+			| IIMAGECUBEARRAY
+			| UIMAGECUBEARRAY
+			| IMAGE2DMS
+			| IIMAGE2DMS
+			| UIMAGE2DMS
+			| IMAGE2DMSARRAY
+			| IIMAGE2DMSARRAY
+			| UIMAGE2DMSARRAY
+			| SAMPLEREXTERNALOES
+			| StructSpecifier
+			| IDENTIFIER;
 
-			StructSpecifier.Rule = STRUCT_STM + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE
-				| STRUCT_STM + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
+			StructSpecifier.Rule = buffer_or_struct + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE
+				| buffer_or_struct + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
 
-//			struct_declaration_list.Rule = struct_declaration
-//				| struct_declaration_list + struct_declaration;
+			buffer_or_struct.Rule = STRUCT_STM | BUFFER;
+
+			//			struct_declaration_list.Rule = struct_declaration
+			//				| struct_declaration_list + struct_declaration;
 
 			struct_declaration_list.Rule = MakePlusRule (struct_declaration_list, struct_declaration);
 
 			struct_declaration.Rule = type_specifier + struct_declarator_list + SEMICOLON 
 				| TypeQualifier + type_specifier + struct_declarator_list  + SEMICOLON;
 
-//			struct_declarator_list.Rule = struct_declarator
-//				| struct_declarator_list + COMMA + struct_declarator;
+			//			struct_declarator_list.Rule = struct_declarator
+			//				| struct_declarator_list + COMMA + struct_declarator;
 
 			struct_declarator_list.Rule = MakePlusRule (struct_declarator_list, COMMA, struct_declarator);
 
@@ -931,21 +935,21 @@ namespace GLSLSyntaxAST
 
 			// This removes certain nodes from appearing in the AST tree later
 			this.MarkTransient(
-//				translation_unit,
-//				external_declaration,
-//				//function_definition,
-//				//declaration,
-//				//function_prototype,
-//				compound_statement_no_new_scope,
-//				function_declarator,
-//				statement_list,
-//				statement,
-//				compound_statement,
-//				simple_statement,
-//				//declaration_statement,
-//				expression_statement,
-//				expression,
-//				assignment_expression,
+				//				translation_unit,
+				//				external_declaration,
+				//				//function_definition,
+				//				//declaration,
+				//				//function_prototype,
+				//				compound_statement_no_new_scope,
+				//				function_declarator,
+				//				statement_list,
+				//				statement,
+				//				compound_statement,
+				//				simple_statement,
+				//				//declaration_statement,
+				//				expression_statement,
+				//				expression,
+				//				assignment_expression,
 				conditional_expression,
 				logical_or_expression,
 				logical_xor_expression,
@@ -961,63 +965,65 @@ namespace GLSLSyntaxAST
 				unary_expression,
 				postfix_expression,
 				unary_operator,
-//				assignment_operator,
-//				selection_statement,
-//				selection_rest_statement,
-//				statement_scoped,
-//				switch_statement,
-//				switch_statement_list,
-//				case_label,
-//				iteration_statement,
-//				//condition,
-//				statement_no_new_scope,
-//				for_init_statement,
-//				for_rest_statement,
-//				conditionopt,
-//				fully_specified_type,
-//				initializer,
-//				initializer_list,
+				//				assignment_operator,
+				//				selection_statement,
+				//				selection_rest_statement,
+				//				statement_scoped,
+				//				switch_statement,
+				//				switch_statement_list,
+				//				case_label,
+				//				iteration_statement,
+				//				//condition,
+				//				statement_no_new_scope,
+				//				for_init_statement,
+				//				for_rest_statement,
+				//				conditionopt,
+				//				fully_specified_type,
+				//				initializer,
+				//				initializer_list,
 				type_specifier,
 				single_type_qualifier,
 				type_specifier_nonarray,
-//				//type_qualifier,
+				//				//type_qualifier,
 				//array_specifier,
-//				constant_expression,
-//				struct_specifier,
-//				struct_declaration_list, 
-//				//struct_declaration, 
+				//				constant_expression,
+				//				struct_specifier,
+				//				struct_declaration_list, 
+				//				//struct_declaration, 
 				struct_declarator_list,
-//				struct_declarator, 
-//				jump_statement, 
+				//				struct_declarator, 
+				//				jump_statement, 
 				init_declarator_list, 
-//				precision_qualifier, 
-//				block_structure, 
-//				single_declaration, 
-//				identifier_list,
-//				//function_header,
-//				function_header_with_parameters,
-//				parameter_declaration,
-//				parameter_declarator,
-//				parameter_type_specifier,
+				//				precision_qualifier, 
+				//				block_structure, 
+				//				single_declaration, 
+				//				identifier_list,
+				//				//function_header,
+				//				function_header_with_parameters,
+				//				parameter_declaration,
+				//				parameter_declarator,
+				//				parameter_type_specifier,
 				PrimaryExpression,
-//				integer_expression,
-////				function_call,
+				//				integer_expression,
+				////				function_call,
 				function_call_generic,
-//				function_call_header_with_parameters,
-//				function_call_header_no_parameters
-////				function_call_header,
-////				function_identifier,
-//				//variable_identifier,
-//				boolconstant,
-//				type_name_list,
-//				storage_qualifier,
-//				layout_qualifier_id,
-//				invariant_qualifier
-//				array_empty_bracket
+				//				function_call_header_with_parameters,
+				//				function_call_header_no_parameters
+				////				function_call_header,
+				////				function_identifier,
+				//				//variable_identifier,
+				//				boolconstant,
+				//				type_name_list,
+				//				storage_qualifier,
+				//				layout_qualifier_id,
+				//				invariant_qualifier
+				//				array_empty_bracket,
 				constant_inside_bracket,
 				//floating_number_value,
 				function_call_or_method,
-				DOT
+				DOT,
+				buffer_or_struct,
+				function_call_parameter
 			);
 
 		}

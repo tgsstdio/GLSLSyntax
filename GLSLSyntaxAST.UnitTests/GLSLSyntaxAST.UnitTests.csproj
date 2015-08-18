@@ -77,6 +77,8 @@
     <Compile Include="ArgumentParser\ArgParserMissingValueTests.cs" />
     <Compile Include="ArgumentParser\ArgParserDefaultValueTests.cs" />
     <Compile Include="ArgumentParser\ArgParserValidArguments.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomBufferDeclaration.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomFuncNoParams.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

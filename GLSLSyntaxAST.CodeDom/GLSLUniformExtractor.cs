@@ -425,7 +425,7 @@ namespace GLSLSyntaxAST.CodeDom
 			}
 
 			builder.Append (new string (' ', level));
-			builder.Append (node.ToString ());
+			builder.Append (node.Term);
 			builder.Append ("\n");
 			foreach (ParseTreeNode child in node.ChildNodes)
 			{
@@ -440,7 +440,10 @@ namespace GLSLSyntaxAST.CodeDom
 				return;
 			}
 
-			Debug.WriteLine(new string(' ', level) + node.ToString ());
+			Debug.Write (new string (' ', level));
+			Debug.Write (node.Term);
+			Debug.Write ("\n");
+
 			foreach (ParseTreeNode child in node.ChildNodes)
 			{
 				DebugNode(child, level + 1);

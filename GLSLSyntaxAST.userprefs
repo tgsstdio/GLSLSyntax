@@ -1,50 +1,6 @@
 ﻿<Properties StartupItem="GLSLSyntaxAST.DebugTree\GLSLSyntaxAST.DebugTree.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLGrammar.cs">
-    <Files>
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="415" Column="1" />
-      <File FileName="GLSLSyntaxAST.DebugTree\Program.cs" Line="21" Column="7" />
-      <File FileName="GLSLSyntaxAST.UnitTests\CodeDomTest.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\PassThru.vert" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\packages.config" Line="1" Column="1" />
-      <File FileName="glslang.y" Line="1232" Column="16" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Program.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLUniformExtractor.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLTypeLookup.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomAttributes.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomEmptyString.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFloatingPoint1.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFloatingPoint2.cs" Line="36" Column="24" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFuncSingleParam.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFunc2Parameters.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFunc3ParamsWithFloat.cs" Line="45" Column="29" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFunc3ParamsWithNegetiveInt.cs" Line="46" Column="24" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFuncVoidParam.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomStructs.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomVersionString.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomUniforms.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\IGLSLStructGenerator.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StructMember.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\ArraySpecification.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\PassThru.frag" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\fullscreen_blend.vert" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\fullscreen_blend.frag" Line="1" Column="1" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.Preprocessor\PreprocessorContext.cs" Line="1" Column="1" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.Preprocessor\StringInput.cs" Line="1" Column="1" />
-      <File FileName="Irony\Parsing\Terminals\CompoundTerminalBase.cs" Line="1" Column="1" />
-      <File FileName="Irony\Parsing\Grammar\Grammar.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomCaseInsensitive.cs" Line="50" Column="19" />
-      <File FileName="GLSLSyntaxAST.CodeDom\ArgumentParser.cs" Line="153" Column="29" />
-      <File FileName="GLSLSyntaxAST.UnitTests\ArgumentParser\ArgParserMissingValueTests.cs" Line="93" Column="4" />
-      <File FileName="GLSLSyntaxAST.UnitTests\ArgumentParser\ArgParserDefaultValueTests.cs" Line="18" Column="53" />
-      <File FileName="GLSLSyntaxAST.UnitTests\ArgumentParser\ArgParserValidArguments.cs" Line="78" Column="22" />
-      <File FileName="CorrectGLSLGrammar.cs" Line="109" Column="69" />
-      <File FileName="JsonGrammar.cs" Line="1" Column="1" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\Irony\Parsing\Parser\Parser.cs" Line="60" Column="1" />
-      <File FileName="GLSLGrammar.cs" Line="6" Column="24" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="MonoDevelop.NUnit.TestPad">
         <State name="__root__">
@@ -55,6 +11,7 @@
                   <Node name="ArgParserMissingValueTests" expanded="True" />
                   <Node name="ArgParserValidArguments" expanded="True" />
                   <Node name="CodeDomAttributes" expanded="True" />
+                  <Node name="CodeDomBufferDeclaration" expanded="True" />
                   <Node name="CodeDomCaseInsensitive" expanded="True" />
                   <Node name="CodeDomEmptyString" expanded="True" />
                   <Node name="CodeDomFloatingPoint1" expanded="True" />
@@ -62,6 +19,7 @@
                   <Node name="CodeDomFunc2Parameters" expanded="True" />
                   <Node name="CodeDomFunc3ParamsWithFloat" expanded="True" />
                   <Node name="CodeDomFunc3ParamsWithNegetiveInt" expanded="True" />
+                  <Node name="CodeDomFuncNoParams" expanded="True" />
                   <Node name="CodeDomFuncSingleParam" expanded="True" />
                   <Node name="CodeDomFuncVoidParam" expanded="True" />
                   <Node name="CodeDomStruct" expanded="True" />
@@ -78,7 +36,7 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFloatingPoint2.cs" line="65" column="33" />
+      <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFloatingPoint2.cs" line="64" column="33" />
       <Breakpoint file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFunc3ParamsWithFloat.cs" line="69" column="33" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -34,17 +34,17 @@ namespace GLSLSyntaxAST.UnitTests
 				+ "    fully_specified_type\n"
 				+ "     type_qualifier\n"
 				+ "      layout_qualifier\n"
-				+ "       layout (Keyword)\n"
+				+ "       LAYOUT\n"
 				+ "       layout_qualifier_id_list\n"
 				+ "        layout_qualifier_id\n"
-				+ "         location (IDENTIFIER)\n"
-				+ "         = (Key symbol)\n"
+				+ "         IDENTIFIER\n"
+				+ "         EQUAL\n"
 				+ "         constant_expression\n"
-				+ "          1 (INTCONSTANT)\n"
+				+ "          INTCONSTANT\n"
 				+ "      storage_qualifier\n"
-				+ "       in (Keyword)\n"
-				+ "     vec3 (Keyword)\n"
-				+ "    v_normal (IDENTIFIER)\n";
+				+ "       IN\n"
+				+ "     VEC3\n"
+				+ "    IDENTIFIER\n";
 			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();
 			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);

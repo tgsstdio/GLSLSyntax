@@ -26,15 +26,15 @@ namespace GLSLSyntaxAST.UnitTests
 		[Test ()]
 		public void ExpressFunc3ParamsWithNegetiveInt ()
 		{
-			const string expected 	= "translation_unit\n"
+			const string expected = "translation_unit\n"
 				+ " external_declaration\n"
 				+ "  function_definition\n"
 				+ "   function_prototype\n"
 				+ "    function_declarator\n"
 				+ "     function_header\n"
 				+ "      fully_specified_type\n"
-				+ "       void (Keyword)\n"
-				+ "      main (IDENTIFIER)\n"
+				+ "       VOID\n"
+				+ "      IDENTIFIER\n"
 				+ "   compound_statement_no_new_scope\n"
 				+ "    statement_list\n"
 				+ "     statement\n"
@@ -43,23 +43,22 @@ namespace GLSLSyntaxAST.UnitTests
 				+ "        declaration\n"
 				+ "         single_declaration\n"
 				+ "          fully_specified_type\n"
-				+ "           float (Keyword)\n"
-				+ "          value (IDENTIFIER)\n"
-				+ "          = (Key symbol)\n"
+				+ "           FLOAT\n"
+				+ "          IDENTIFIER\n"
+				+ "          EQUAL\n"
 				+ "          initializer\n"
 				+ "           assignment_expression\n"
 				+ "            function_call\n"
 				+ "             function_call_header_with_parameters\n"
-				+ "              assignment_expression\n"
-				+ "               variable_identifier\n"
-				+ "                in_position (IDENTIFIER)\n"
+				+ "              function_call_parameter\n"
+				+ "               IDENTIFIER\n"
 				+ "              assignment_expression\n"
 				+ "               floating_number_value\n"
-				+ "                1 (INTCONSTANT)\n"
-				+ "                . (Key symbol)\n"
-				+ "                0 (REMAINDER)\n"
+				+ "                INTCONSTANT\n"
+				+ "                .\n"
+				+ "                REMAINDER\n"
 				+ "              assignment_expression\n"
-				+ "               -1234 (INTCONSTANT)\n";
+				+ "               INTCONSTANT\n";
 
 			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
 			lookup.Initialize ();

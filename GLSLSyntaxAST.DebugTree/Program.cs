@@ -1,7 +1,4 @@
-﻿using System;
-using GLSLSyntaxAST.CodeDom;
-using Irony.Parsing;
-using System.Diagnostics;
+﻿using GLSLSyntaxAST.CodeDom;
 
 namespace GLSLSyntaxAST.DebugTree
 {
@@ -18,12 +15,11 @@ namespace GLSLSyntaxAST.DebugTree
 			var test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
 			test.DebugCode (
-				@"
-layout(binding = 1, std430) buffer LinkedList
+				@"layout(binding = 1, std430) buffer LinkedList
 {
-	Node nodes[];
-};
-"
+	NodeType nodes[];
+	// Padding[]
+};"
 			);
 		}
 	}
