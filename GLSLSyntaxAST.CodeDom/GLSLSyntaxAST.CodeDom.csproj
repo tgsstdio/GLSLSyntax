@@ -66,6 +66,7 @@
     <Compile Include="GLSLStructGenerator.cs" />
     <Compile Include="ArraySpecification.cs" />
     <Compile Include="ArgumentParser.cs" />
+    <Compile Include="GLSLStructType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

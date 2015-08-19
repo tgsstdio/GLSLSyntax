@@ -1,17 +1,45 @@
 ﻿using System;
 using NUnit.Framework;
 using GLSLSyntaxAST.CodeDom;
+using System.Collections.Generic;
 
 namespace GLSLSyntaxAST.UnitTests
 {
 	[TestFixture]
 	public class CodeDomBufferDeclaration
 	{
-		const string BUFFER_STRING = @"layout(binding = 1, std430) buffer LinkedList
+		const string BUFFER_STRING = @"layout(binding = 4, std430) buffer LinkedList
 {
 	NodeType nodes[];
 	// Padding[]
 };";
+		[Test ()]
+		public void ExtractBufferDeclaration ()
+		{
+			int expected = 1;
+			IGLSLTypeLookup lookup = new OpenTKTypeLookup ();
+			lookup.Initialize ();
+			IGLSLUniformExtractor test = new GLSLUniformExtractor (lookup);
+			test.Initialize ();
+			int actual = test.Extract (BUFFER_STRING);
+			Assert.AreEqual (expected, actual);
+
+			Assert.AreEqual (1, test.Blocks.Count);
+			Assert.AreEqual (0, test.Uniforms.Count);
+			Assert.AreEqual (0, test.Attributes.Count);
+			var blocks = new List<StructInfo> ();
+			foreach (var block in test.Blocks)
+			{
+				blocks.Add (block);
+			}
+			var first = blocks [0];
+			Assert.AreEqual (GLSLStructType.Buffer, first.StructType);
+			Assert.IsNotNull (first.Layout);
+			Assert.IsTrue (first.Layout.Binding.HasValue);
+			Assert.AreEqual (4, first.Layout.Binding.Value);
+			Assert.AreEqual ("std430", first.Layout.Format);
+		}
+
 
 		[Test ()]
 		public void ExpressBufferDeclaration ()

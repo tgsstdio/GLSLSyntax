@@ -15,11 +15,12 @@ namespace GLSLSyntaxAST.DebugTree
 			var test = new GLSLUniformExtractor (lookup);
 			test.Initialize ();
 			test.DebugCode (
-				@"layout(binding = 1, std430) buffer LinkedList
-{
-	NodeType nodes[];
-	// Padding[]
-};"
+
+				@"struct BindlessTextureHandle
+				{
+					texture2D TextureId;
+				};"
+
 			);
 		}
 	}

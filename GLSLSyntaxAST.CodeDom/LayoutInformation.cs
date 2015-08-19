@@ -6,6 +6,7 @@ namespace GLSLSyntaxAST.CodeDom
 	{
 		public string Format {get;set;}
 		public int? Location { get; set; }
+		public int? Binding {get;set;}
 	}
 }
 

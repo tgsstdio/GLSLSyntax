@@ -321,7 +321,7 @@ namespace GLSLSyntaxAST
 			TYPE_NAME.Precedence = 1;
 			string LEFT_BRACKET = "[";
 			string RIGHT_BRACKET = "]";
-			var STRUCT_STM = ToTerm ("struct", "STRUCT");
+			StructTerm = ToTerm ("struct", "STRUCT");
 			var CONTINUE = ToTerm ("continue", "CONTINUE");
 			var BREAK_STM = ToTerm ("break", "BREAK");
 			var RETURN_STM = ToTerm ("return", "RETURN");
@@ -360,7 +360,7 @@ namespace GLSLSyntaxAST
 			var RESTRICT = ToTerm ("restrict", "RESTRICT");
 			var VOLATILE = ToTerm ("volatile", "VOLATILE");
 			var COHERENT = ToTerm ("coherent", "COHERENT");
-			var BUFFER = ToTerm ("buffer", "BUFFER");
+			BufferTerm = ToTerm ("buffer", "BUFFER");
 			var SHARED = ToTerm ("shared", "SHARED");
 			var PATCH = ToTerm ("patch", "PATCH");
 			var SUBROUTINE = ToTerm ("subroutine", "SUBROUTINE");
@@ -424,8 +424,8 @@ namespace GLSLSyntaxAST
 			ArraySpecifier = new NonTerminal ("array_specifier"); // CHECKED
 			ConstantExpression = new NonTerminal ("constant_expression"); // CHECKED
 			StructSpecifier = new NonTerminal ("struct_specifier"); // CHECKED 
-			var struct_declaration_list = new NonTerminal ("struct_declaration_list"); // CHECKED 
-			var struct_declaration = new NonTerminal ("struct_declaration"); // CHECKED 
+			StructDeclarationList = new NonTerminal ("struct_declaration_list"); // CHECKED 
+			StructDeclaration = new NonTerminal ("struct_declaration"); // CHECKED 
 			var struct_declarator_list = new NonTerminal ("struct_declarator_list"); // CHECKED 
 			var struct_declarator = new NonTerminal ("struct_declarator"); // CHECKED 
 			var jump_statement = new NonTerminal ("jump_statement"); // CHECKED 
@@ -460,7 +460,7 @@ namespace GLSLSyntaxAST
 			var array_empty_bracket = new NonTerminal ("array_empty_bracket");
 			var constant_inside_bracket = new NonTerminal ("constant_inside_bracket");
 			var floating_number_value = new NonTerminal ("floating_number_value");
-			var buffer_or_struct = new NonTerminal ("buffer_or_struct");
+			BufferOrStruct = new NonTerminal ("buffer_or_struct");
 
 			var function_call_parameter = new NonTerminal ("function_call_parameter");
 
@@ -491,7 +491,7 @@ namespace GLSLSyntaxAST
 				| MEDIUM_PRECISION 
 				| LOW_PRECISION;
 
-			BlockStructure.Rule = TypeQualifier + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
+			BlockStructure.Rule = TypeQualifier + IDENTIFIER + LEFT_BRACE + StructDeclarationList + RIGHT_BRACE;
 
 			init_declarator_list.Rule = SingleDeclaration
 				| init_declarator_list + COMMA + IDENTIFIER
@@ -549,7 +549,7 @@ namespace GLSLSyntaxAST
 
 			declaration_statement.Rule = Declaration;
 
-			expression_statement.Rule = SEMICOLON | expression + SEMICOLON;
+			expression_statement.Rule = SEMICOLON | expression + SEMICOLON | IDENTIFIER + SEMICOLON;
 
 			expression.Rule = assignment_expression |  expression  + COMMA + assignment_expression;
 			//expression.Rule = MakePlusRule(expression, COMMA, assignment_expression);
@@ -904,17 +904,17 @@ namespace GLSLSyntaxAST
 			| StructSpecifier
 			| IDENTIFIER;
 
-			StructSpecifier.Rule = buffer_or_struct + IDENTIFIER + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE
-				| buffer_or_struct + LEFT_BRACE + struct_declaration_list + RIGHT_BRACE;
+			StructSpecifier.Rule = BufferOrStruct + IDENTIFIER + LEFT_BRACE + StructDeclarationList + RIGHT_BRACE
+				| BufferOrStruct + LEFT_BRACE + StructDeclarationList + RIGHT_BRACE;
 
-			buffer_or_struct.Rule = STRUCT_STM | BUFFER;
+			BufferOrStruct.Rule = StructTerm | BufferTerm;
 
 			//			struct_declaration_list.Rule = struct_declaration
 			//				| struct_declaration_list + struct_declaration;
 
-			struct_declaration_list.Rule = MakePlusRule (struct_declaration_list, struct_declaration);
+			StructDeclarationList.Rule = MakePlusRule (StructDeclarationList, StructDeclaration);
 
-			struct_declaration.Rule = type_specifier + struct_declarator_list + SEMICOLON 
+			StructDeclaration.Rule = type_specifier + struct_declarator_list + SEMICOLON 
 				| TypeQualifier + type_specifier + struct_declarator_list  + SEMICOLON;
 
 			//			struct_declarator_list.Rule = struct_declarator
@@ -1022,10 +1022,35 @@ namespace GLSLSyntaxAST
 				//floating_number_value,
 				function_call_or_method,
 				DOT,
-				buffer_or_struct,
+				BufferOrStruct,
 				function_call_parameter
 			);
 
+		}
+
+		public NonTerminal StructDeclaration {
+			get;
+			private set;
+		}
+
+		public NonTerminal StructDeclarationList {
+			get;
+			private set;
+		}
+
+		public KeyTerm BufferTerm {
+			get;
+			private set;
+		}
+
+		public KeyTerm StructTerm {
+			get;
+			private set;
+		}
+
+		public NonTerminal BufferOrStruct {
+			get;
+			private set;
 		}
 
 		public NonTerminal Declaration {

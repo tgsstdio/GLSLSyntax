@@ -143,6 +143,11 @@ namespace GLSLSyntaxAST.CodeDom
 			//				| samplerexternaloes
 		}
 
+		public void AddNewTranslation(string glslType, Type tkEquivalent)
+		{
+			mClosestTypes.Add (glslType, tkEquivalent);
+		}
+
 		public Type FindClosestType (string typeName)
 		{
 			Type result = null;

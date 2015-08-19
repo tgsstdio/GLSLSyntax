@@ -8,14 +8,10 @@ namespace GLSLSyntaxAST.CodeDom
 		public StructInfo ()
 		{
 			Members = new List<StructMember> ();
+			StructType = GLSLStructType.Struct;
 		}
 
-		public bool ExtractName (ParseTreeNode child)
-		{
-			Name = child.Token.ValueString;
-			return true;
-		}
-
+		public GLSLStructType StructType { get; set; }
 		public string Name {get;set;}
 		public LayoutInformation Layout {get;set;}
 		public List<StructMember> Members {get; private set;}

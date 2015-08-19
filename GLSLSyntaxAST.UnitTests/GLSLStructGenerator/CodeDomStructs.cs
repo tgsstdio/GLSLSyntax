@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using GLSLSyntaxAST.CodeDom;
+using System.Collections.Generic;
 
 namespace GLSLSyntaxAST.UnitTests
 {
@@ -22,6 +23,16 @@ namespace GLSLSyntaxAST.UnitTests
 			Assert.AreEqual (1, test.Blocks.Count);
 			Assert.AreEqual (0, test.Uniforms.Count);
 			Assert.AreEqual (0, test.Attributes.Count);
+			var blocks = new List<StructInfo> ();
+			foreach (var block in test.Blocks)
+			{
+				blocks.Add (block);
+			}
+			var first = blocks [0];
+			Assert.AreEqual (GLSLStructType.Struct, first.StructType);
+			Assert.IsNotNull (first.Layout);
+			Assert.IsTrue (first.Layout.Location.HasValue);
+			Assert.AreEqual (1, first.Layout.Location.Value);
 		}
 
 		[Test ()]

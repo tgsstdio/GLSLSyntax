@@ -20,6 +20,29 @@ namespace GLSLSyntaxAST.CommandLine
 			return new Standalone (infoSink, intermediate, symbols);
 		}
 
+		static void AddBindlessTextures (OpenTKTypeLookup lookup)
+		{
+			var texTypes = new string[] {
+				"sampler1d",
+				"sampler2d",
+				"sampler3d",
+				"samplercube",
+				"sampler1dshadow",
+				"sampler2dshadow",
+				"samplercubeshadow",
+				"sampler1darray",
+				"sampler2darray",
+				"sampler1darrayshadow",
+				"sampler2darrayshadow",
+				"samplercubearray",
+				"samplercubearrayshadow",
+			};
+			foreach (var tex in texTypes)
+			{
+				lookup.AddNewTranslation (tex, typeof(long));
+			}
+		}
+
 		static void PrintHelp ()
 		{
 			Console.WriteLine ("Invalid arguments");
@@ -48,6 +71,10 @@ namespace GLSLSyntaxAST.CommandLine
 
 				var lookup = new OpenTKTypeLookup ();
 				lookup.Initialize ();
+
+				AddBindlessTextures (lookup);
+
+
 				var extractor = new GLSLUniformExtractor (lookup);
 				extractor.Initialize ();
 
@@ -69,17 +96,17 @@ namespace GLSLSyntaxAST.CommandLine
 					}
 				}
 
+				var output = new GLSLAssembly ();
+				output.Version = "1.0.0.1";
+				output.Namespace = parser.Namespace;
+				output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
+
 				var generator = new GLSLStructGenerator(extractor);
 				if (parser.GenerateAssembly)
 				{
 					var fileName = parser.AssemblyFileName;
-
-					var output = new GLSLAssembly ();
-					output.OutputAssembly = System.IO.Path.GetFileName(fileName);
-					output.Version = "1.0.0.1";
-					output.Namespace = parser.Namespace;
-					output.Path = System.IO.Path.GetPathRoot(fileName);
-					output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
+					output.Path = Path.GetPathRoot(fileName);
+					output.OutputAssembly = Path.GetFileName(fileName);
 
 					using (var provider = new CSharpCodeProvider ())
 					{
@@ -91,12 +118,8 @@ namespace GLSLSyntaxAST.CommandLine
 				{
 					var fileName = parser.SourceFileName;
 
-					var output = new GLSLAssembly ();
-					output.OutputAssembly = System.IO.Path.GetFileName(fileName);
-					output.Version = "1.0.0.1";
-					output.Namespace = parser.Namespace;
-					output.Path = System.IO.Path.GetPathRoot(fileName);
-					output.ReferencedAssemblies = new string[]{"OpenTK.dll"};
+					output.OutputAssembly = Path.GetFileName(fileName);
+					output.Path = Path.GetPathRoot(fileName);
 
 					using (var provider = new CSharpCodeProvider ())
 					{

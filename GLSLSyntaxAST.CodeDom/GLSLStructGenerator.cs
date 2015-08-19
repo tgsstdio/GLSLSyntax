@@ -41,25 +41,36 @@ namespace GLSLSyntaxAST.CodeDom
 
 		private static void AddStruct (CodeNamespace dest, StructInfo info)
 		{
-			var structType = new CodeTypeDeclaration (info.Name);
-			//structType.IsClass = false;
-			structType.IsStruct = true;
-			structType.TypeAttributes = TypeAttributes.Public | TypeAttributes.SequentialLayout | TypeAttributes.Sealed;
-			var argument = new CodeAttributeArgument (new CodeFieldReferenceExpression (new CodeTypeReferenceExpression (typeof(LayoutKind)), "Sequential"));
-			structType.CustomAttributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(StructLayoutAttribute)),argument));
-
-			dest.Types.Add (structType);
-
-			foreach (var member in info.Members)
+			if (info.StructType == GLSLStructType.Struct)
 			{
-				if (member.ClosestType != null)
+				var structType = new CodeTypeDeclaration (info.Name);
+				//structType.IsClass = false;
+				structType.IsStruct = true;
+				structType.TypeAttributes = TypeAttributes.Public | TypeAttributes.SequentialLayout | TypeAttributes.Sealed;
+				var argument = new CodeAttributeArgument (new CodeFieldReferenceExpression (new CodeTypeReferenceExpression (typeof(LayoutKind)), "Sequential"));
+				structType.CustomAttributes.Add (new CodeAttributeDeclaration (new CodeTypeReference (typeof(StructLayoutAttribute)), argument));
+
+				dest.Types.Add (structType);
+
+				foreach (var member in info.Members)
 				{
-					var field1 = new CodeMemberField (member.ClosestType, member.Name);
-					field1.Attributes = MemberAttributes.Public;
-					structType.Members.Add (field1);
+					if (member.ClosestType != null)
+					{
+						var field1 = new CodeMemberField (member.ClosestType, member.Name);
+						field1.Attributes = MemberAttributes.Public;
+						structType.Members.Add (field1);
+					}
+					// single reference
+					else if (member.ArrayDetails == null)
+					{
+						var arrayType = new CodeTypeReference (member.TypeString);
+						var field1 = new CodeMemberField (arrayType, member.Name);
+						field1.Attributes = MemberAttributes.Public;
+						structType.Members.Add (field1);					
+					}
+
 				}
 			}
-
 //			var localVariable = "m" + alias;
 //			var field1 = new CodeMemberField (typeof(string), localVariable);
 //			folder.Members.Add (field1);
@@ -124,8 +135,8 @@ namespace GLSLSyntaxAST.CodeDom
 
 		public void SaveAsCode (CodeDomProvider provider, GLSLAssembly assembly, IGLSLUniformExtractor extractor, CodeGeneratorOptions options)
 		{
-			string outputFile = System.IO.Path.GetFileNameWithoutExtension (assembly.OutputAssembly) + ".cs";
-			string absolutePath = System.IO.Path.Combine(assembly.Path,outputFile);
+			string outputFile = Path.GetFileNameWithoutExtension (assembly.OutputAssembly) + ".cs";
+			string absolutePath = Path.Combine(assembly.Path,outputFile);
 
 			using (var writer = new StreamWriter(absolutePath, false))
 			{
@@ -146,6 +157,12 @@ namespace GLSLSyntaxAST.CodeDom
 		public CodeCompileUnit InitialiseCompileUnit (GLSLAssembly assembly)
 		{
 			var contentUnit = new CodeCompileUnit ();
+			var globalNs = new CodeNamespace ();
+			globalNs.Comments.Add(new CodeCommentStatement("Namespace Comment"));
+			contentUnit.Namespaces.Add (globalNs);
+			contentUnit.ReferencedAssemblies.Add ("System.Runtime.InteropServices.dll");
+			globalNs.Imports.Add(new CodeNamespaceImport("System.Runtime.InteropServices"));
+
 			SetVersionNumber (contentUnit, assembly.Version);
 			string nameSpace = assembly.Namespace;
 			if (string.IsNullOrWhiteSpace (nameSpace))
@@ -153,9 +170,31 @@ namespace GLSLSyntaxAST.CodeDom
 				nameSpace = System.IO.Path.GetFileNameWithoutExtension (assembly.OutputAssembly);
 			}
 			var contentNs = new CodeNamespace (nameSpace);
+
+
 			contentUnit.Namespaces.Add (contentNs);
 
 			DeclareStructs (contentNs);
+
+			var program = CreateClassType (contentNs, "Program");
+			foreach (var member in mExtractor.Uniforms)
+			{
+				var field1 = new CodeMemberField (typeof(int), member.Name);
+				field1.Attributes = MemberAttributes.Public;
+				program.Members.Add (field1);
+			}
+
+			foreach (var member in mExtractor.Blocks)
+			{
+				if (member.StructType == GLSLStructType.Buffer)
+				{
+					var field1 = new CodeMemberField (typeof(int), member.Name);
+					field1.Attributes = MemberAttributes.Public;
+					program.Members.Add (field1);
+				}
+			}
+			contentNs.Types.Add (program);
+
 
 			var uniforms = CreateClassType (contentNs, "Uniforms");
 			var inputBindings = CreateClassType (contentNs, "InputBindings");
@@ -186,25 +225,29 @@ namespace GLSLSyntaxAST.CodeDom
 		}
 		#endregion
 
-		void AddUniforms (CodeTypeDeclaration uniforms, CodeConstructor defaultConstructor)
+		static void AddUniformMember (CodeTypeDeclaration dest, StructMember member, CodeConstructor defaultConstructor)
+		{
+			if (member.ClosestType != null)
+			{
+				var field1 = new CodeMemberField (member.ClosestType, member.Name);
+				field1.Attributes = MemberAttributes.Public;
+				dest.Members.Add (field1);
+			}
+			else if (member.ArrayDetails != null)
+			{
+				var arrayType = new CodeTypeReference (member.ArrayDetails.StructType.Name + "[]");
+				var field1 = new CodeMemberField (arrayType, member.Name);
+				field1.Attributes = MemberAttributes.Public;
+				dest.Members.Add (field1);
+				defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (arrayType, member.Name, new CodeArrayCreateExpression (arrayType, member.ArrayDetails.ArraySize)));
+			}
+		}
+
+		void AddUniforms (CodeTypeDeclaration dest, CodeConstructor defaultConstructor)
 		{
 			foreach (var member in mExtractor.Uniforms)
 			{
-				if (member.ClosestType != null)
-				{
-					var field1 = new CodeMemberField (member.ClosestType, member.Name);
-					field1.Attributes = MemberAttributes.Public;
-					uniforms.Members.Add (field1);
-				}
-				else
-					if (member.ArrayDetails != null)
-					{
-						var arrayType = new CodeTypeReference (member.ArrayDetails.StructType.Name + "[]");
-						var field1 = new CodeMemberField (arrayType, member.Name);
-						field1.Attributes = MemberAttributes.Public;
-						uniforms.Members.Add (field1);
-						defaultConstructor.Statements.Add (new CodeVariableDeclarationStatement (arrayType, member.Name, new CodeArrayCreateExpression (arrayType, member.ArrayDetails.ArraySize)));
-					}
+				AddUniformMember (dest, member, defaultConstructor);
 			}
 		}
 
@@ -218,18 +261,36 @@ namespace GLSLSyntaxAST.CodeDom
 					{
 						if (member.Direction == "in" || member.Direction == "inout")
 						{
-							AddBindingIndex (member, inputBindings);
+							AddLocationIndex (member, inputBindings);
 						}
 						if (member.Direction == "out" || member.Direction == "inout")
 						{
-							AddBindingIndex (member, outputBindings);
+							AddLocationIndex (member, outputBindings);
 						}
 					}
 				}
 			}
+			foreach (var member in mExtractor.Blocks)
+			{
+				if (member.StructType == GLSLStructType.Buffer)
+				{
+					if (member.Layout != null)
+					{
+						var field1 = new CodeMemberField (typeof(int), member.Name);
+						field1.Attributes = MemberAttributes.Public;
+						if (member.Layout.Binding.HasValue)
+						{
+							field1.InitExpression = new CodePrimitiveExpression (member.Layout.Binding.Value);
+						}
+						inputBindings.Members.Add (field1);
+						outputBindings.Members.Add (field1);
+					}
+				}
+			}
+
 		}
 
-		static void AddBindingIndex (InputAttribute member, CodeTypeDeclaration dest)
+		static void AddLocationIndex (InputAttribute member, CodeTypeDeclaration dest)
 		{
 			var field1 = new CodeMemberField (typeof(int), member.Name);
 			field1.Attributes = MemberAttributes.Public;

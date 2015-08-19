@@ -26,8 +26,8 @@ namespace GLSLSyntaxAST.CodeDom
 		private Parser mCompiler;
 		public void Initialize ()
 		{
-			mLayouts.Add ("std140");
-			mLayouts.Add ("std430");
+			mLayouts.Add ("std140".ToLowerInvariant());
+			mLayouts.Add ("std430".ToLowerInvariant());
 		}
 
 		private IGLSLTypeLookup mTypeLookup;
@@ -82,7 +82,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		public void ExtractStructBody (StructInfo info, ParseTreeNode child)
 		{
-			var members = child.ChildNodes.FindAll (p => p.Term.Name == "struct_declaration");
+			var members = child.ChildNodes.FindAll (p => p.Term == mLanguage.StructDeclaration);
 			foreach (var member in members)
 			{
 				var temp = new StructMember ();
@@ -100,7 +100,7 @@ namespace GLSLSyntaxAST.CodeDom
 
 		private bool ExtractMembers (StructInfo info, ParseTreeNode child)
 		{
-			if (child.Term.Name == "struct_declaration_list")
+			if (child.Term == mLanguage.StructDeclarationList)
 			{
 				ExtractStructBody (info, child);
 
@@ -166,7 +166,11 @@ namespace GLSLSyntaxAST.CodeDom
 				var info = new StructInfo ();
 
 				// first child is uniform keyword
-				if (!IsUniform (info, parent))
+				if (IsUniform (info, parent))
+				{
+					info.StructType = GLSLStructType.Uniform;
+				} 
+				else
 				{
 					return 0;
 				}
@@ -178,7 +182,7 @@ namespace GLSLSyntaxAST.CodeDom
 				}
 
 				// second child is struct type name
-				info.ExtractName (typeName);
+				ExtractName (info, typeName);
 
 				// third child is list of member inside
 				if (!ExtractMembers (info, parent.ChildNodes [2]))
@@ -249,7 +253,7 @@ namespace GLSLSyntaxAST.CodeDom
 					var firstNode = node.ChildNodes [0];
 					if (firstNode.Term == mLanguage.IDENTIFIER)
 					{
-						var strValue = firstNode.Token.ValueString;						
+						var strValue = firstNode.Token.ValueString.ToLowerInvariant();						
 						if (node.ChildNodes.Count == 1)
 						{
 							if (mLayouts.Contains (strValue))
@@ -257,32 +261,39 @@ namespace GLSLSyntaxAST.CodeDom
 								info.Format = strValue;
 							}
 						}
-						else if (node.ChildNodes.Count == 3)
+						else if (node.ChildNodes.Count == 3 && node.ChildNodes [1].Token.ValueString == "=")
 						{
 							var thirdNode = node.ChildNodes [2];
-							if (node.ChildNodes [1].Token.ValueString == "=" &&
-								thirdNode.Term == mLanguage.ConstantExpression)
+							if (strValue == "location"
+								&& 	thirdNode.Term == mLanguage.ConstantExpression)
 							{
 								info.Location = (int) thirdNode.ChildNodes[0].Token.Value;
 							}
+							else if (strValue == "binding"
+								&& 	thirdNode.Term == mLanguage.ConstantExpression)
+							{
+								info.Binding = (int) thirdNode.ChildNodes[0].Token.Value;
+							}								
 						}
 					}
 				}
 			}
 		}
 
-		private int ExtractStructMembers (StructInfo temp, ParseTreeNode specifier)
+		private bool ExtractStructMembers (StructInfo temp, ParseTreeNode specifier)
 		{
 			if (specifier == null)
 			{
-				return 0;
+				return false;
 			}
 
 			// second child is struct type name
-			temp.ExtractName (specifier.ChildNodes [1]);
+			ParseTreeNode identifier = specifier.ChildNodes.Find(p => p.Term == mLanguage.IDENTIFIER);
+			ExtractName (temp, identifier);
 
+			ParseTreeNode declarationList = specifier.ChildNodes.Find (p => p.Term == mLanguage.StructDeclarationList);
 			// third child is list of member inside
-			if (ExtractMembers (temp, specifier.ChildNodes [2]))
+			if (ExtractMembers (temp, declarationList))
 			{
 				// TODO : case sensitive ????
 				var key = temp.Name.ToLowerInvariant ();
@@ -290,11 +301,19 @@ namespace GLSLSyntaxAST.CodeDom
 				{
 					mBlocks.Add (key, temp);
 				}
-				return 1;
+				return true;
 			}
 			else
 			{
-				return 0;
+				return false;
+			}
+		}
+
+		public void ExtractName (StructInfo info, ParseTreeNode child)
+		{
+			if (child != null && child.Token != null)
+			{
+				info.Name = child.Token.ValueString;
 			}
 		}
 
@@ -313,62 +332,82 @@ namespace GLSLSyntaxAST.CodeDom
 					var specifier = node.ChildNodes.Find (p => p.Term == mLanguage.StructSpecifier);
 					var typeQualifier = node.ChildNodes.Find (p => p.Term == mLanguage.TypeQualifier);
 
-					if (typeQualifier == null)
+					int changes = 0;
+
+					if (specifier == null && typeQualifier == null)
 					{
-						return 0;
+						return changes;
 					}
 
 					if (specifier != null)
 					{
 						var temp = new StructInfo ();
+
+						//  DETERMINE STRUCT TYPE
+						var structType = specifier.ChildNodes.Find (p => p.Term == mLanguage.StructTerm);
+						if (structType != null)
+						{
+							temp.StructType = GLSLStructType.Struct;
+						}
+						else 
+						{
+							var bufferType = specifier.ChildNodes.Find (p => p.Term == mLanguage.BufferTerm);							
+							if (bufferType != null)
+							{
+								temp.StructType = GLSLStructType.Buffer;
+							}
+							else
+							{
+								return changes;
+							}
+						}
+
 						temp.Layout = new LayoutInformation (); 
 						ExtractLayout (temp.Layout, typeQualifier);					
-						return ExtractStructMembers (temp, specifier);
+						if (ExtractStructMembers (temp, specifier))
+						{
+							++changes;
+						}
 					}
 
-					ParseTreeNode storageQualifier = typeQualifier.ChildNodes.Find (p => p.Term == mLanguage.StorageQualifier);
-					if (storageQualifier == null)
+					if (typeQualifier != null)
 					{
-						return 0;
+						ParseTreeNode storageQualifier = typeQualifier.ChildNodes.Find (p => p.Term == mLanguage.StorageQualifier);
+						if (storageQualifier != null)
+						{
+							var inDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.InTerm);
+							var outDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.OutTerm);
+							var inoutDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.InOutTerm);
+							if (inDirection == null && outDirection == null && inoutDirection == null)
+							{
+								return changes;
+							}
+
+							var attribute = new InputAttribute ();
+							attribute.Direction = (inDirection != null) ? "in" : ((outDirection != null) ? "out" : null);
+							attribute.Layout = new LayoutInformation ();
+							ExtractLayout (attribute.Layout, typeQualifier);	
+							var secondNode = node.ChildNodes [1];
+							if (!mLanguage.TypesTerms.Contains (secondNode.Token.KeyTerm))
+							{
+								return changes;
+							}
+
+							attribute.TypeString = secondNode.Token.ValueString;
+							attribute.ClosestType = mTypeLookup.FindClosestType (attribute.TypeString);
+
+							var nameSibiling = parent.ChildNodes [1];
+							attribute.Name = nameSibiling.Token.ValueString;					
+
+							// IGNORE
+							if (!mAttributes.ContainsKey (attribute.Name))
+							{
+								mAttributes.Add (attribute.Name, attribute);
+								++changes;
+							}
+						}
 					}
-
-					var inDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.InTerm);
-
-					var outDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.OutTerm);
-
-					var inoutDirection = storageQualifier.ChildNodes.Find (p => p.Term == mLanguage.InOutTerm);
-
-					if (inDirection == null && outDirection == null && inoutDirection == null)
-					{
-						return 0;
-					}
-
-					var attribute = new InputAttribute ();
-					attribute.Direction = (inDirection != null) ? "in" : ((outDirection != null) ? "out" : null);
-					attribute.Layout = new LayoutInformation ();
-					ExtractLayout (attribute.Layout, typeQualifier);	
-					var secondNode = node.ChildNodes [1];
-					if (!mLanguage.TypesTerms.Contains (secondNode.Token.KeyTerm))
-					{
-						return 0;
-					}
-
-					attribute.TypeString = secondNode.Token.ValueString;
-					attribute.ClosestType = mTypeLookup.FindClosestType (attribute.TypeString);
-
-					var nameSibiling = parent.ChildNodes [1];
-					attribute.Name = nameSibiling.Token.ValueString;
-
-					// IGNORE
-					if (!mAttributes.ContainsKey (attribute.Name))
-					{
-						mAttributes.Add (attribute.Name, attribute);
-						return 1;
-					}
-					else
-					{
-						return 0;
-					}
+					return changes;
 				} 
 				else
 				{

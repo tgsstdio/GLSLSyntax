@@ -79,6 +79,8 @@
     <Compile Include="ArgumentParser\ArgParserValidArguments.cs" />
     <Compile Include="GLSLStructGenerator\CodeDomBufferDeclaration.cs" />
     <Compile Include="GLSLStructGenerator\CodeDomFuncNoParams.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomSimpleVariableAssignment.cs" />
+    <Compile Include="GLSLStructGenerator\CodeDomBasicStruct.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
