@@ -1,69 +1,39 @@
-﻿<Properties StartupItem="GLSLSyntaxAST.CommandLine\GLSLSyntaxAST.CommandLine.csproj">
+﻿<Properties StartupItem="TextEditor\TextEditor.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs">
     <Files>
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="303" Column="6" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" Line="105" Column="54" />
       <File FileName="GLSLSyntaxAST.CodeDom\StructMember.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\LayoutInformation.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="9" Column="1" />
-      <File FileName="GLSLGrammar.cs" Line="122" Column="38" />
+      <File FileName="GLSLSyntaxAST.CodeDom\StructInfo.cs" Line="1" Column="1" />
+      <File FileName="GLSLGrammar.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\InputAttribute.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="280" Column="51" />
-      <File FileName="GLSLSyntaxAST.CodeDom\GLSLStructType.cs" Line="9" Column="10" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomBufferDeclaration.cs" Line="17" Column="3" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\GLSLStructType.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomBufferDeclaration.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\GLSLAssembly.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomStructs.cs" Line="33" Column="1" />
+      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomStructs.cs" Line="1" Column="1" />
       <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\Irony\Parsing\Parser\Parser.cs" Line="1" Column="1" />
       <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\Irony\Parsing\Parser\ParsingContext.cs" Line="1" Column="1" />
       <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\Irony\Parsing\Scanner\Scanner.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\IGLSLStructGenerator.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CodeDom\IGLSLUniformExtractor.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomUniformBlockArray.cs" Line="1" Column="1" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\BindlessTex.vert" Line="8" Column="23" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\BindlessTex.frag" Line="8" Column="23" />
-      <File FileName="GLSLSyntaxAST.DebugTree\Program.cs" Line="19" Column="1" />
-      <File FileName="glslang.y" Line="651" Column="1" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomSimpleVariableAssignment.cs" Line="59" Column="57" />
-      <File FileName="GLSLSyntaxAST.CommandLine\Program.cs" Line="60" Column="2" />
-      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="146" Column="32" />
-      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomBasicStruct.cs" Line="16" Column="13" />
+      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\BindlessTex.vert" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CommandLine\Shaders\BindlessTex.frag" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.DebugTree\Program.cs" Line="1" Column="1" />
+      <File FileName="glslang.y" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomSimpleVariableAssignment.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CommandLine\Program.cs" Line="1" Column="1" />
+      <File FileName="d:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\OpenTKTypeLookup.cs" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomBasicStruct.cs" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CommandLine\Shaders\fullscreen_blend.vert" Line="1" Column="1" />
       <File FileName="GLSLSyntaxAST.CommandLine\Shaders\fullscreen_blend.frag" Line="1" Column="1" />
+      <File FileName="GLSLSyntaxAST.CodeDom\ArraySpecification.cs" Line="1" Column="1" />
     </Files>
-    <Pads>
-      <Pad Id="MonoDevelop.NUnit.TestPad">
-        <State name="__root__">
-          <Node name="GLSLSyntaxAST" expanded="True">
-            <Node name="GLSLSyntaxAST.UnitTests" expanded="True">
-              <Node name="GLSLSyntaxAST" expanded="True" selected="True">
-                <Node name="UnitTests" expanded="True">
-                  <Node name="CodeDomBufferDeclaration" expanded="True" />
-                  <Node name="CodeDomStruct" expanded="True" />
-                  <Node name="CodeDomUniformBlockArray" expanded="True" />
-                </Node>
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFloatingPoint2.cs" line="64" column="33" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomFunc3ParamsWithFloat.cs" line="69" column="33" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomStructs.cs" line="19" column="35" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.UnitTests\GLSLStructGenerator\CodeDomStructs.cs" line="21" column="22" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CommandLine\Program.cs" line="135" column="19" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="312" column="21" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="294" column="18" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="296" column="29" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLStructGenerator.cs" line="44" column="31" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="431" column="29" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="432" column="31" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="433" column="29" />
-      <Breakpoint enabled="false" file="D:\Projects\TechDemos\GLSLSyntaxAST\GLSLSyntaxAST.CodeDom\GLSLUniformExtractor.cs" line="329" column="26" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.ItemProperties.GLSLSyntaxAST.CommandLine>

@@ -94,6 +94,27 @@ namespace GLSLSyntaxAST.CodeDom
 					// ASSUME type is first child
 					temp.Name = declarator.ChildNodes [0].Token.ValueString;
 				}
+
+				var arraySpecifier = declarator.ChildNodes.Find (p => p.Term == mLanguage.ArraySpecifier);
+				if (arraySpecifier != null)
+				{		
+					temp.ArrayDetails = new ArraySpecification ();
+					if (temp.ClosestType == null)
+					{
+						StructInfo found = null;
+						if (mBlocks.TryGetValue(temp.TypeString.ToLower(), out found))
+						{
+							temp.ArrayDetails.StructType = found;
+						}
+					}
+					var constNode = arraySpecifier.ChildNodes.Find (p => p.Term == mLanguage.ConstantExpression);
+					if (constNode != null)
+					{
+						// okay for buffer member to be null
+						temp.ArrayDetails.ArraySize = (int)constNode.ChildNodes [0].Token.Value;
+					}
+				}
+
 				info.Members.Add (temp);
 			}
 		}
